@@ -1,0 +1,117 @@
+/* styles.css */
+#content-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Distributes space evenly */
+    align-items: center;
+    height: 90vh;  /* Full viewport height */
+}
+
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    background-color: #f3eee8;
+}
+
+header {
+    background-color: #f3eee8;
+    padding: 10px 0;
+
+    display: flex;
+    justify-content: center;
+
+    /*flex-direction: column;*/
+    /*align-items: center;*/
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+}
+
+.social-icons {
+    display: flex;
+    flex-direction: column;
+    /*align-items: flex-start; !* Align icons to the start of the column *!*/
+}
+
+.social-icon {
+    color: #2d2c54; /* Icon color */
+    margin: 5px 0; /* Space between icons */
+    font-size: 24px; /* Icon size */
+}
+
+.social-icon:hover {
+    color: #e7babd; /* Icon hover color */
+}
+
+#library-logo {
+    width: 200px;
+    height: auto;
+}
+
+#book-info {
+    margin: 20px;
+    font-size: 1.2em;
+    color: #2d2c54;
+}
+
+#borrow-button {
+    background-color: #2d2c54;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-top: 100px;
+}
+
+#borrow-button:hover {
+    background-color: #e7babd;
+    color: #2d2c54;
+}
+
+#help-button {
+    background-color: #2d2c54;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-top: 100px;
+}
+
+#help-button:hover {
+    background-color: #e7babd;
+    color: #2d2c54;
+}
+
+#loading-message {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: auto;  /* Take up full viewport height */
+    color: #2d2c54;
+    opacity: 20%;
+}
+
+.loader {
+    border: 5px solid #e7babd; /* Light grey */
+    border-top: 5px solid #2d2c54; /* Blue */
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 2s linear infinite;
+    /*margin-top: auto;*/
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

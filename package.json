@@ -1,0 +1,8 @@
+{
+  "name": "shellf-bot",
+  "version": "1.0.0",
+  "dependencies": {
+    "express": "^4.18.2",
+    "googleapis": "^128.0.0"
+  }
+}

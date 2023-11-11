@@ -1,0 +1,40 @@
+org: ulyana
+app: shellf-bot
+service: shellf-bot
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  memorySize: 256
+  timeout: 15 # in seconds
+  region: eu-central-1
+
+#  iam:
+#    role:
+#      statements:
+#        - Effect: "Allow"
+#          Action:
+#            - dynamodb:Query
+#            - dynamodb:Scan
+#            - dynamodb:GetItem
+#            - dynamodb:PutItem
+#            - dynamodb:UpdateItem
+#            - dynamodb:DeleteItem
+#            - dynamodb:BatchWriteItem
+#          Resource: "arn:aws:dynamodb:eu-central-1:959316667373:table/weinbergbot-db"
+#        - Effect: "Allow"
+#          Action:
+#            - xray:PutTraceSegments
+#            - xray:PutTelemetryRecords
+#          Resource:
+#            - "*"
+
+
+functions:
+  hello:
+    handler: backend/handler.hello
+    events:
+      - http: POST /rentBook
+    environment:
+      TELEGRAM_TOKEN: ${env:TELEGRAM_TOKEN_SHELLF}
