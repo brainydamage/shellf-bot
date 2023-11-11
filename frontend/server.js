@@ -6,14 +6,15 @@ const app = express();
 app.use(express.static('public'));  // Serve static files
 
 const PORT = process.env.PORT || 3000;
+const CLIENT_EMAIL = process.env.CLIENT_EMAIL || '';
+const PRIVATE_KEY = process.env.PRIVATE_KEY || '';
 
 const sheets = google.sheets({version: 'v4'});
-const credentials = require('./googleApiKey.json');
 
-const client = new google.auth.JWT(credentials.client_email, null,
-  credentials.private_key, ['https://www.googleapis.com/auth/spreadsheets']);
+const client = new google.auth.JWT(CLIENT_EMAIL, null,
+  PRIVATE_KEY, ['https://www.googleapis.com/auth/spreadsheets']);
 
-client.authorize(function (err, tokens) {
+client.authorize(function (err) {
   if (err) {
     console.log(err);
   } else {
@@ -62,7 +63,7 @@ async function fetchBookDetails(bookID) {
     const response = await sheets.spreadsheets.values.get(request);
     const rows = response.data.values;
 
-    let rowNumber = 0;
+    let rowNumber;
     if (bookID === "any") {
       rowNumber = Math.floor(Math.random() * 11145);
       console.log(`getting book ${rowNumber}`);
@@ -84,6 +85,6 @@ async function fetchBookDetails(bookID) {
   }
 }
 
-function delay(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
+// function delay(ms) {
+//   return new Promise(resolve => setTimeout(resolve, ms));
+// }
