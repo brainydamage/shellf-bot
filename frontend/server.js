@@ -1,13 +1,27 @@
 // server.js
 const express = require('express');
 const {google} = require('googleapis');
+const awsServerlessExpress = require("aws-serverless-express"); // Your Express
+                                                                // app
+
 const app = express();
+const server = awsServerlessExpress.createServer(app);
 
-app.use(express.static('public'));  // Serve static files
+exports.handler = (event, context) => {
+  awsServerlessExpress.proxy(server, event, context);
+};
 
-const PORT = process.env.PORT || 3000;
-const CLIENT_EMAIL = process.env.CLIENT_EMAIL || '';
-const PRIVATE_KEY = process.env.PRIVATE_KEY || '';
+const cors = require('cors');
+app.use(cors());
+
+// app.use(express.static('public'));  // Serve static files
+
+// const PORT = process.env.PORT || 3000;
+const CLIENT_EMAIL = process.env.SHELLF_CLIENT_EMAIL || '';
+const PRIVATE_KEY = process.env.SHELLF_PRIVATE_KEY.replace(/\\n/g, '\n') || '';
+
+console.log(`CLIENT_EMAIL = ${CLIENT_EMAIL}`);
+console.log(`PRIVATE_KEY = ${PRIVATE_KEY}`);
 
 const sheets = google.sheets({version: 'v4'});
 
@@ -16,21 +30,24 @@ const client = new google.auth.JWT(CLIENT_EMAIL, null,
 
 client.authorize(function (err) {
   if (err) {
+    console.log('error in client.authorize')
     console.log(err);
   } else {
     console.log("Connected to Google Sheets API!");
   }
 });
 
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/public/index.html');
-});
-
-app.get('/book/:bookID', async (req, res) => {
-  res.sendFile(__dirname + '/public/index.html');
-});
+// app.get('/', (req, res) => {
+//   res.sendFile(__dirname + '/public/index.html');
+// });
+//
+// app.get('/book/:bookID', async (req, res) => {
+//   res.sendFile(__dirname + '/public/index.html');
+// });
 
 app.get('/api/book/:bookID', async (req, res) => {
+  console.log(`I'm in /api/book/:bookID!`);
+
   // await delay(1000);
 
   // res.status(404).send('Book not found');
@@ -46,10 +63,6 @@ app.get('/api/book/:bookID', async (req, res) => {
   } catch (error) {
     res.status(500).send('Error fetching book details');
   }
-});
-
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
 });
 
 async function fetchBookDetails(bookID) {
