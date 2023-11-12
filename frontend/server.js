@@ -9,6 +9,8 @@ const PORT = process.env.PORT || 3000;
 const CLIENT_EMAIL = process.env.SHELLF_CLIENT_EMAIL || '';
 const PRIVATE_KEY = process.env.SHELLF_PRIVATE_KEY || '';
 
+console.log(`CLIENT_EMAIL = ${CLIENT_EMAIL}`);
+
 const sheets = google.sheets({version: 'v4'});
 
 const client = new google.auth.JWT(CLIENT_EMAIL, null,
