@@ -32,9 +32,15 @@ provider:
 
 
 functions:
-  hello:
-    handler: handler.hello
+  bot_handler:
+    handler: lambdas/bot.handler
     events:
-      - http: POST /rentBook
+      - httpApi: POST /rentBook
     environment:
       TELEGRAM_TOKEN: ${env:TELEGRAM_TOKEN_SHELLF}
+  backend_handler:
+    handler: lambdas/backend.handler
+    events:
+      - httpApi:
+          method: GET
+          path: /book/{bookID}

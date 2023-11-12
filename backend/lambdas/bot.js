@@ -1,7 +1,8 @@
 'use strict';
 
-module.exports.hello = async (event) => {
+module.exports.handler = async (event) => {
   const body = JSON.parse(event.body);
+  console.log('bot handler triggered');
   console.log(JSON.stringify(body));
 
   return {
