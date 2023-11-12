@@ -9,15 +9,22 @@ const PORT = process.env.PORT || 3000;
 const CLIENT_EMAIL = process.env.SHELLF_CLIENT_EMAIL || '';
 const PRIVATE_KEY = process.env.SHELLF_PRIVATE_KEY || '';
 
+let key = PRIVATE_KEY;
+if (PRIVATE_KEY.startsWith("")) {
+  key = JSON.parse(PRIVATE_KEY);
+}
+
 console.log(`CLIENT_EMAIL = ${CLIENT_EMAIL}`);
+console.log(`key = ${key}`);
 
 const sheets = google.sheets({version: 'v4'});
 
 const client = new google.auth.JWT(CLIENT_EMAIL, null,
-  PRIVATE_KEY, ['https://www.googleapis.com/auth/spreadsheets']);
+  key, ['https://www.googleapis.com/auth/spreadsheets']);
 
 client.authorize(function (err) {
   if (err) {
+    console.log(`cannot authorize google client :(`)
     console.log(err);
   } else {
     console.log("Connected to Google Sheets API!");
