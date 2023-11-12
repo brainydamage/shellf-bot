@@ -33,7 +33,7 @@ provider:
 
 functions:
   hello:
-    handler: backend/handler.hello
+    handler: handler.hello
     events:
       - http: POST /rentBook
     environment:
