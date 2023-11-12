@@ -6,8 +6,8 @@ const app = express();
 app.use(express.static('public'));  // Serve static files
 
 const PORT = process.env.PORT || 3000;
-const CLIENT_EMAIL = process.env.CLIENT_EMAIL || '';
-const PRIVATE_KEY = process.env.PRIVATE_KEY || '';
+const CLIENT_EMAIL = process.env.SHELLF_CLIENT_EMAIL || '';
+const PRIVATE_KEY = process.env.SHELLF_PRIVATE_KEY || '';
 
 const sheets = google.sheets({version: 'v4'});
 
