@@ -17,7 +17,8 @@ module.exports.handler = async (event) => {
   console.log('backend handler triggered');
   // console.log(event);
   const requestedBookID = event.pathParameters.bookID;
-  console.log(`bookID requested = ${requestedBookID}`);
+  console.log(
+    `bookID requested = ${requestedBookID}, ${typeof requestedBookID}`);
 
   const clientEmail = await getParameter('shellf_client_email');
   const privateKey = (await getParameter('shellf_private_key', true)).replace(
@@ -39,30 +40,45 @@ module.exports.handler = async (event) => {
     const rows = response.data.values;
     console.log(`found ${rows.length}`);
 
-    if (rows && rows.length > 0 && requestedBookID !== 0) {
-      const row = rows[requestedBookID];
-      const bookID = row[0];
+    if (requestedBookID === 'any') {
+      const randomIndex = Math.floor(Math.random() * rows.length);
+      const randomRow = rows[randomIndex];
+      bookTitle = randomRow[1];
+      bookAuthor = randomRow[2];
+    } else if (rows && rows.length > 0 && requestedBookID !== 0) {
+      let bookFound = false;
 
-      if (bookID === requestedBookID) {
-        bookTitle = row[1];
-        bookAuthor = row[2];
-      } else {
-        console.log(`!!! book is on the wrong place, searching...`);
+      // Check if requestedBookID is within the range and matches the bookID
+      if (requestedBookID < rows.length) {
+        const row = rows[requestedBookID];
+        if (!isNaN(row[0])) {
+          const bookID = parseInt(row[0], 10);
 
-        console.log(`bookID = ${bookID}`);
-        console.log(`requestedBookID = ${requestedBookID}`);
+          if (bookID === requestedBookID) {
+            bookTitle = row[1];
+            bookAuthor = row[2];
+            bookFound = true;
+          }
+        } else {
+          console.log(
+            `Invalid bookID ${row[0]} in the database on the row ${requestedBookID}`);
+        }
+      }
+
+      // If not found directly, search through all rows
+      if (!bookFound) {
+        console.log(
+          `!!! book ${requestedBookID} is on the wrong place, searching...`);
 
         for (const row of rows) {
           if (row[0] === requestedBookID) {
             bookTitle = row[1];
             bookAuthor = row[2];
+            break;
           }
         }
       }
-
-      console.log(`${bookTitle} by ${bookAuthor}`);
     }
-
   } catch (error) {
     console.log(`failed to access database`);
     console.log(error);
