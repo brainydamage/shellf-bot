@@ -15,10 +15,19 @@ async function getParameter(name, withDecryption = false) {
 
 module.exports.handler = async (event) => {
   console.log('backend handler triggered');
-  // console.log(event);
-  const requestedBookID = event.pathParameters.bookID;
-  console.log(
-    `bookID requested = ${requestedBookID}, ${typeof requestedBookID}`);
+  let requestedBookID = event.pathParameters.bookID;
+
+  // Check if requestedBookID is 'any' or a valid integer
+  if (requestedBookID !== 'any') {
+    requestedBookID = parseInt(requestedBookID, 10);
+    if (isNaN(requestedBookID)) {
+      console.warn(`Invalid bookID format: ${event.pathParameters.bookID}`);
+      return {
+        statusCode: 404,
+        body: JSON.stringify({message: "Not valid book id"}, null, 2),
+      };
+    }
+  }
 
   const clientEmail = await getParameter('shellf_client_email');
   const privateKey = (await getParameter('shellf_private_key', true)).replace(
@@ -38,13 +47,19 @@ module.exports.handler = async (event) => {
     const response = await sheets.spreadsheets.values.get(
       {spreadsheetId, range});
     const rows = response.data.values;
-    console.log(`found ${rows.length}`);
 
     if (requestedBookID === 'any') {
-      const randomIndex = Math.floor(Math.random() * rows.length);
-      const randomRow = rows[randomIndex];
-      bookTitle = randomRow[1];
-      bookAuthor = randomRow[2];
+      if (rows.length > 0) {
+        const randomIndex = Math.floor(Math.random() * rows.length);
+        const randomRow = rows[randomIndex];
+        bookTitle = randomRow[1];
+        bookAuthor = randomRow[2];
+      } else {
+        return {
+          statusCode: 404,
+          body: JSON.stringify({message: "No books available"}, null, 2),
+        };
+      }
     } else if (rows && rows.length > 0 && requestedBookID !== 0) {
       let bookFound = false;
 
@@ -60,8 +75,8 @@ module.exports.handler = async (event) => {
             bookFound = true;
           }
         } else {
-          console.log(
-            `Invalid bookID ${row[0]} in the database on the row ${requestedBookID}`);
+          console.warn(
+            `1 Invalid bookID ${row[0]} in the database on the row ${requestedBookID}`);
         }
       }
 
@@ -70,8 +85,18 @@ module.exports.handler = async (event) => {
         console.log(
           `!!! book ${requestedBookID} is on the wrong place, searching...`);
 
+        let isFirstRow = true;
         for (const row of rows) {
-          if (row[0] === requestedBookID) {
+          if (isFirstRow) {
+            isFirstRow = false;
+            continue;
+          }
+
+          let currentBookID = parseInt(row[0], 10);
+          if (isNaN(currentBookID)) {
+            console.warn(
+              `2 Invalid bookID ${row[0]} in the database on the row ${requestedBookID}`);
+          } else if (currentBookID === requestedBookID) {
             bookTitle = row[1];
             bookAuthor = row[2];
             break;
@@ -79,15 +104,18 @@ module.exports.handler = async (event) => {
         }
       }
     }
-  } catch (error) {
-    console.log(`failed to access database`);
-    console.log(error);
+  } catch
+    (error) {
+    console.error(`failed to access database`);
+    console.error(error);
 
     return {
       statusCode: 500,
       body: JSON.stringify({message: "Error accessing database"}),
     };
   }
+
+  console.log(`${bookTitle} by ${bookAuthor}`);
 
   return (bookTitle !== '' && bookAuthor !== '') ?
     {
@@ -101,4 +129,5 @@ module.exports.handler = async (event) => {
       statusCode: 400,
       body: JSON.stringify({message: "Book not found"}, null, 2),
     };
-};
+}
+;

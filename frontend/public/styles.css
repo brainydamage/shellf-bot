@@ -61,10 +61,10 @@ header {
 .button-style {
     background-color: #2d2c54;
     color: white;
-    padding: 40px 80px;
+    padding: 30px 80px;
     border: none;
     border-radius: 5px;
-    font-size: 2em;
+    font-size: 1.5em;
     cursor: pointer;
     transition: 0.3s;
     margin-top: 100px;
