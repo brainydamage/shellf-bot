@@ -9,27 +9,17 @@ provider:
   memorySize: 256
   timeout: 15 # in seconds
   region: eu-central-1
+  httpApi:
+    cors: true
 
-#  iam:
-#    role:
-#      statements:
-#        - Effect: "Allow"
-#          Action:
-#            - dynamodb:Query
-#            - dynamodb:Scan
-#            - dynamodb:GetItem
-#            - dynamodb:PutItem
-#            - dynamodb:UpdateItem
-#            - dynamodb:DeleteItem
-#            - dynamodb:BatchWriteItem
-#          Resource: "arn:aws:dynamodb:eu-central-1:959316667373:table/weinbergbot-db"
-#        - Effect: "Allow"
-#          Action:
-#            - xray:PutTraceSegments
-#            - xray:PutTelemetryRecords
-#          Resource:
-#            - "*"
-
+  iam:
+    role:
+      statements:
+        - Effect: "Allow"
+          Action:
+            - ssm:GetParameter
+          Resource:
+            - arn:aws:ssm:eu-central-1:959316667373:parameter/*
 
 functions:
   bot_handler:

@@ -2,7 +2,7 @@
   "name": "shellf-bot",
   "version": "1.0.0",
   "dependencies": {
-    "express": "^4.18.2",
+    "@aws-sdk/client-ssm": "^3.449.0",
     "googleapis": "^128.0.0"
   }
 }
