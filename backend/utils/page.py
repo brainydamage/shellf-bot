@@ -91,4 +91,4 @@ def main(original_svg_path, start_number, total_qr_codes):
 
 # Usage
 original_svg_path = 'shellf_stickers.svg'
-main(original_svg_path, 1, 2)  # Start from 1, total 35 QR codes
+main(original_svg_path, 1, 35)  # Start from 1, total 35 QR codes
