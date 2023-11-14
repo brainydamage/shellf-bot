@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "dependencies": {
     "@aws-sdk/client-ssm": "^3.449.0",
-    "googleapis": "^128.0.0"
+    "googleapis": "^128.0.0",
+    "telegraf": "^4.15.0"
   }
 }

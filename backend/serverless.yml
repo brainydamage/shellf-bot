@@ -9,6 +9,8 @@ provider:
   memorySize: 256
   timeout: 15 # in seconds
   region: eu-central-1
+  tracing:
+    lambda: true
   httpApi:
     cors: true
 

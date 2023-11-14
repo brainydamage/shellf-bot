@@ -49,3 +49,9 @@ window.onload = function () {
 document.getElementById('help-button').onclick = function () {
   window.open('https://t.me/shellllllf', '_blank');
 };
+
+document.getElementById('borrow-button').onclick = function () {
+  const pathParts = new URL(window.location.href).pathname.split("/");
+  const bookID = pathParts.length > 2 ? pathParts[2] : 'no_id';
+  window.location = `https://t.me/shellf_bot?start=${bookID}`;
+};
