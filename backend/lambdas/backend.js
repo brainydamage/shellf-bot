@@ -1,8 +1,10 @@
 'use strict';
 const {SSMClient, GetParameterCommand} = require("@aws-sdk/client-ssm");
 const {google} = require('googleapis');
+const config = require('../constants/config');
+const messages = require('../constants/messages');
 
-const ssmClient = new SSMClient({region: "eu-central-1"});
+const ssmClient = new SSMClient({region: config.REGION});
 
 async function getParameter(name, withDecryption = false) {
   const command = new GetParameterCommand({
@@ -14,50 +16,55 @@ async function getParameter(name, withDecryption = false) {
 }
 
 module.exports.handler = async (event) => {
-  console.log('backend handler triggered');
+  console.log(messages.BACKEND_HANDLER_TRIGGER);
   let requestedBookID = event.pathParameters.bookID;
 
   // Check if requestedBookID is 'any' or a valid integer
-  if (requestedBookID !== 'any') {
+  if (requestedBookID !== config.ANY) {
     requestedBookID = parseInt(requestedBookID, 10);
     if (isNaN(requestedBookID)) {
-      console.warn(`Invalid bookID format: ${event.pathParameters.bookID}`);
+      console.warn(`${messages.INVALID_BOOK_ID}${event.pathParameters.bookID}`);
       return {
         statusCode: 404,
-        body: JSON.stringify({message: "Not valid book id"}, null, 2),
+        body: JSON.stringify({message: messages.NOT_VALID_BOOK_ID}, null, 2),
       };
     }
   }
 
-  const clientEmail = await getParameter('shellf_client_email');
-  const privateKey = (await getParameter('shellf_private_key', true)).replace(
+  const clientEmail = await getParameter(config.CLIENT_EMAIL);
+  const privateKey = (await getParameter(config.CLIENT_PRIVATE_KEY,
+    true)).replace(
     /\\n/g, '\n');
 
   const client = new google.auth.JWT(clientEmail, null, privateKey,
-    ['https://www.googleapis.com/auth/spreadsheets']);
+    [config.SCOPE]);
 
   const sheets = google.sheets({version: 'v4', auth: client});
-  const spreadsheetId = '1fbuYSBH3QIZgGX_bPuuLlXOJOBQ4mNKuev6zXDQYzhc';
-  const range = `booksDB`;
+  const spreadsheetId = config.CALENDAR_ID;
+  const range = config.BOOKS_DB;
 
   let bookTitle = "";
   let bookAuthor = "";
+
+  const idColumn = config.ID_COLUMN;
+  const titleColumn = config.TITLE_COLUMN;
+  const authorColumn = config.AUTHOR_COLUMN;
 
   try {
     const response = await sheets.spreadsheets.values.get(
       {spreadsheetId, range});
     const rows = response.data.values;
 
-    if (requestedBookID === 'any') {
+    if (requestedBookID === config.ANY) {
       if (rows.length > 0) {
         const randomIndex = Math.floor(Math.random() * rows.length);
         const randomRow = rows[randomIndex];
-        bookTitle = randomRow[1];
-        bookAuthor = randomRow[2];
+        bookTitle = randomRow[titleColumn];
+        bookAuthor = randomRow[authorColumn];
       } else {
         return {
           statusCode: 404,
-          body: JSON.stringify({message: "No books available"}, null, 2),
+          body: JSON.stringify({message: messages.NO_BOOKS_AVAILABLE}, null, 2),
         };
       }
     } else if (rows && rows.length > 0 && requestedBookID !== 0) {
@@ -66,24 +73,24 @@ module.exports.handler = async (event) => {
       // Check if requestedBookID is within the range and matches the bookID
       if (requestedBookID < rows.length) {
         const row = rows[requestedBookID];
-        if (!isNaN(row[0])) {
-          const bookID = parseInt(row[0], 10);
+        if (!isNaN(row[idColumn])) {
+          const bookID = parseInt(row[idColumn], 10);
 
           if (bookID === requestedBookID) {
-            bookTitle = row[1];
-            bookAuthor = row[2];
+            bookTitle = row[titleColumn];
+            bookAuthor = row[authorColumn];
             bookFound = true;
           }
         } else {
           console.warn(
-            `1 Invalid bookID ${row[0]} in the database on the row ${requestedBookID}`);
+            `1 ${messages.INVALID_BOOK_ID_DATABASE}: value ${row[idColumn]}, raw ${requestedBookID}`);
         }
       }
 
       // If not found directly, search through all rows
       if (!bookFound) {
         console.log(
-          `!!! book ${requestedBookID} is on the wrong place, searching...`);
+          `${requestedBookID}${messages.WRONG_PLACE}`);
 
         let isFirstRow = true;
         for (const row of rows) {
@@ -92,13 +99,13 @@ module.exports.handler = async (event) => {
             continue;
           }
 
-          let currentBookID = parseInt(row[0], 10);
+          let currentBookID = parseInt(row[idColumn], 10);
           if (isNaN(currentBookID)) {
             console.warn(
-              `2 Invalid bookID ${row[0]} in the database on the row ${requestedBookID}`);
+              `2 ${messages.INVALID_BOOK_ID_DATABASE}: value ${row[idColumn]}, raw ${requestedBookID}`);
           } else if (currentBookID === requestedBookID) {
-            bookTitle = row[1];
-            bookAuthor = row[2];
+            bookTitle = row[titleColumn];
+            bookAuthor = row[authorColumn];
             break;
           }
         }
@@ -106,18 +113,18 @@ module.exports.handler = async (event) => {
     }
   } catch
     (error) {
-    console.error(`failed to access database`);
+    console.error(messages.FAILED_ACCESS_DB);
     console.error(error);
 
     return {
       statusCode: 500,
-      body: JSON.stringify({message: "Error accessing database"}),
+      body: JSON.stringify({message: messages.ERROR_ACCESS_DB}),
     };
   }
 
   console.log(`${bookTitle} by ${bookAuthor}`);
 
-  return (bookTitle !== '' && bookAuthor !== '') ?
+  return (bookTitle !== '') ?
     {
       statusCode: 200,
       body: JSON.stringify({
@@ -127,7 +134,7 @@ module.exports.handler = async (event) => {
     } :
     {
       statusCode: 400,
-      body: JSON.stringify({message: "Book not found"}, null, 2),
+      body: JSON.stringify({message: messages.BOOK_NOT_FOUND}, null, 2),
     };
 }
 ;

@@ -2,6 +2,8 @@
 const {SSMClient, GetParameterCommand} = require("@aws-sdk/client-ssm");
 const {google} = require('googleapis');
 const telegramUtils = require('../utils/telegramUtils');
+const config = require('../constants/config');
+const messages = require('../constants/messages');
 
 const ssmClient = new SSMClient({region: "eu-central-1"});
 
@@ -15,16 +17,17 @@ async function getParameter(name, withDecryption = false) {
 }
 
 async function appendToBooksLog(data) {
-  const clientEmail = await getParameter('shellf_client_email');
-  const privateKey = (await getParameter('shellf_private_key', true)).replace(
+  const clientEmail = await getParameter(config.CLIENT_EMAIL);
+  const privateKey = (await getParameter(config.CLIENT_PRIVATE_KEY,
+    true)).replace(
     /\\n/g, '\n');
 
   const client = new google.auth.JWT(clientEmail, null, privateKey,
-    ['https://www.googleapis.com/auth/spreadsheets']);
+    [config.SCOPE]);
 
   const sheets = google.sheets({version: 'v4', auth: client});
-  const spreadsheetId = '1fbuYSBH3QIZgGX_bPuuLlXOJOBQ4mNKuev6zXDQYzhc';
-  const range = `booksLog`;
+  const spreadsheetId = config.CALENDAR_ID;
+  const range = config.BOOKS_LOG;
 
   const valueInputOption = 'USER_ENTERED';
   const resource = {
@@ -62,17 +65,12 @@ async function timestampToHumanReadable(timestamp) {
 }
 
 async function addOneMonthAndFormat(timestamp) {
-  const date = new Date(timestamp * 1000); // Convert Unix timestamp to
-                                           // milliseconds
+  const date = new Date(timestamp * 1000);
 
   date.setMonth(date.getMonth() + 1); // Add one month
 
-  const day = date.getDate().toString().padStart(2, '0'); // Format day
-  const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Format
-                                                                   // month
-                                                                   // (getMonth()
-                                                                   // returns
-                                                                   // 0-11)
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
   const year = date.getFullYear(); // Get year
 
   return `${day}.${month}.${year}`;
