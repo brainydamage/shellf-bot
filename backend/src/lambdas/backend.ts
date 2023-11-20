@@ -1,11 +1,11 @@
-'use strict';
-const config = require('../constants/config');
-const messages = require('../constants/messages');
-const googleSheetsUtils = require('../utils/googleSheetsUtils');
+import config from '../constants/config';
+import messages from '../constants/messages';
+import googleSheetsUtils from '../utils/googleSheetsUtils';
+import {APIGatewayProxyHandler} from 'aws-lambda';
 
-module.exports.handler = async (event) => {
+export const handler: APIGatewayProxyHandler = async (event) => {
   console.log(messages.BACKEND_HANDLER_TRIGGER);
-  let requestedBookID = event.pathParameters.bookID;
+    let requestedBookID = event?.pathParameters?.bookID;
 
   // Check if requestedBookID is 'any' or a valid integer
   if (requestedBookID !== config.ANY) {

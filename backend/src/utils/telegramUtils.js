@@ -1,5 +1,5 @@
 const {Telegraf} = require('telegraf');
-const keyboardUtils = require("../utils/keyboardUtils");
+const keyboardUtils = require("./keyboardUtils");
 
 const TOKEN = process.env.TELEGRAM_TOKEN;
 const bot = new Telegraf(TOKEN);
