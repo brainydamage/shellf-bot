@@ -1,19 +1,7 @@
 'use strict';
-const {SSMClient, GetParameterCommand} = require("@aws-sdk/client-ssm");
-const {google} = require('googleapis');
 const config = require('../constants/config');
 const messages = require('../constants/messages');
-
-const ssmClient = new SSMClient({region: config.REGION});
-
-async function getParameter(name, withDecryption = false) {
-  const command = new GetParameterCommand({
-    Name: name, WithDecryption: withDecryption
-  });
-
-  const response = await ssmClient.send(command);
-  return response.Parameter.Value;
-}
+const googleSheetsUtils = require('../utils/googleSheetsUtils');
 
 module.exports.handler = async (event) => {
   console.log(messages.BACKEND_HANDLER_TRIGGER);
@@ -23,25 +11,14 @@ module.exports.handler = async (event) => {
   if (requestedBookID !== config.ANY) {
     requestedBookID = parseInt(requestedBookID, 10);
     if (isNaN(requestedBookID)) {
-      console.warn(`${messages.INVALID_BOOK_ID}${event.pathParameters.bookID}`);
+      console.warn(
+        `${messages.INVALID_BOOK_ID_FORMAT}${event.pathParameters.bookID}`);
       return {
         statusCode: 404,
         body: JSON.stringify({message: messages.NOT_VALID_BOOK_ID}, null, 2),
       };
     }
   }
-
-  const clientEmail = await getParameter(config.CLIENT_EMAIL);
-  const privateKey = (await getParameter(config.CLIENT_PRIVATE_KEY,
-    true)).replace(
-    /\\n/g, '\n');
-
-  const client = new google.auth.JWT(clientEmail, null, privateKey,
-    [config.SCOPE]);
-
-  const sheets = google.sheets({version: 'v4', auth: client});
-  const spreadsheetId = config.CALENDAR_ID;
-  const range = config.BOOKS_DB;
 
   let bookTitle = "";
   let bookAuthor = "";
@@ -51,9 +28,7 @@ module.exports.handler = async (event) => {
   const authorColumn = config.AUTHOR_COLUMN;
 
   try {
-    const response = await sheets.spreadsheets.values.get(
-      {spreadsheetId, range});
-    const rows = response.data.values;
+    const rows = await googleSheetsUtils.getRows(config.BOOKS_DB);
 
     if (requestedBookID === config.ANY) {
       if (rows.length > 0) {
@@ -111,8 +86,7 @@ module.exports.handler = async (event) => {
         }
       }
     }
-  } catch
-    (error) {
+  } catch (error) {
     console.error(messages.FAILED_ACCESS_DB);
     console.error(error);
 

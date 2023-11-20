@@ -39,3 +39,10 @@ functions:
           path: /book/{bookID}
     environment:
       NODE_ENV: 'production'
+  reminder_handler:
+    handler: lambdas/reminder.handler
+    #    events:
+    #      - schedule: rate(2 minutes)
+    environment:
+      TELEGRAM_TOKEN: ${env:TELEGRAM_TOKEN_SHELLF}
+      NODE_ENV: 'production'

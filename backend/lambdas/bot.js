@@ -1,136 +1,50 @@
 'use strict';
-const {SSMClient, GetParameterCommand} = require("@aws-sdk/client-ssm");
-const {google} = require('googleapis');
-const telegramUtils = require('../utils/telegramUtils');
-const config = require('../constants/config');
 const messages = require('../constants/messages');
-
-const ssmClient = new SSMClient({region: "eu-central-1"});
-
-async function getParameter(name, withDecryption = false) {
-  const command = new GetParameterCommand({
-    Name: name, WithDecryption: withDecryption
-  });
-
-  const response = await ssmClient.send(command);
-  return response.Parameter.Value;
-}
-
-async function appendToBooksLog(data) {
-  const clientEmail = await getParameter(config.CLIENT_EMAIL);
-  const privateKey = (await getParameter(config.CLIENT_PRIVATE_KEY,
-    true)).replace(
-    /\\n/g, '\n');
-
-  const client = new google.auth.JWT(clientEmail, null, privateKey,
-    [config.SCOPE]);
-
-  const sheets = google.sheets({version: 'v4', auth: client});
-  const spreadsheetId = config.CALENDAR_ID;
-  const range = config.BOOKS_LOG;
-
-  const valueInputOption = 'USER_ENTERED';
-  const resource = {
-    values: [data],
-  };
-
-  try {
-    await sheets.spreadsheets.values.append({
-      spreadsheetId,
-      range,
-      valueInputOption,
-      resource,
-    });
-    console.log('Row appended to booksLog');
-  } catch (error) {
-    console.error(error);
-    throw new Error('Error appending to booksLog');
-  }
-}
-
-async function timestampToHumanReadable(timestamp) {
-  const date = new Date(timestamp * 1000); // Convert Unix timestamp to
-                                           // milliseconds
-
-  const options = {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZone: 'Europe/Belgrade'
-  };
-
-  return date.toLocaleString('ru-RU', options);
-}
-
-async function addOneMonthAndFormat(timestamp) {
-  const date = new Date(timestamp * 1000);
-
-  date.setMonth(date.getMonth() + 1); // Add one month
-
-  const day = date.getDate().toString().padStart(2, '0');
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  const year = date.getFullYear(); // Get year
-
-  return `${day}.${month}.${year}`;
-}
+const baseCommandHandler = require('../handlers/baseCommandHandler');
+const callbackCommandHandler = require('../handlers/callbackCommandHandler');
 
 module.exports.handler = async (event) => {
   const body = JSON.parse(event.body);
-  console.log('bot handler triggered');
+  console.log(messages.BOT_HANDLER_TRIGGER);
   console.log(JSON.stringify(body));
 
-  //TODO handle two cases - user is new and user has a chat with bot
-  if (body && body.message) {
-    const msgText = body.message.text;
-    let bookID;
-    const parts = msgText.split(" ");
-    // Check if the second part is a number
-    if (parts.length > 1 && !isNaN(parts[1])) {
-      bookID = parseInt(parts[1], 10);
-      const chatID = body.message.from.id;
-      const username = body.message.from.username || '';
-      const timestamp = body.message.date;
-      const dateTime = await timestampToHumanReadable(timestamp);
-      const deadlineDate = await addOneMonthAndFormat(timestamp);
-      const data = [dateTime, deadlineDate, username, chatID, bookID];
+  let chatID = body.message ?
+    body.message.chat.id :
+    body.callback_query ?
+      body.callback_query.message.chat.id :
+      body.my_chat_member ? body.my_chat_member.chat.id : 0;
 
-      try {
-        //TODO consider saving to GS before sending tg message
-        //pay attention to rollback mechanism
-        await appendToBooksLog(data);
-        await telegramUtils.deleteMessage(body);
-        await telegramUtils.sendMessage(chatID,
-          `успех! пожалуйста, верни книгу до ${deadlineDate}`);
-      } catch (error) {
-        console.error(`Failed to borrow a book`);
-        console.error(error.message);
-        console.error(error);
-        if (error.message === 'Error appending to booksLog') {
-          //send the help contact to user
-        } else if (error.message === 'Failed to delete telegram message') {
-          //pohui
-        } else if (error.message === 'Failed to send telegram message') {
-          //delete row from db and try send the help contact to user
-        }
-      }
+  console.log(`chatID is ${chatID}`);
+  if (chatID === 0) {
+    console.error(`!!! CHAT ID IS NULL !!!`);
+  }
 
+  if (body && body.message && body.message.text) {
+    if (body.message.text.startsWith('/start')) {
+      await baseCommandHandler.borrowBook(chatID, body);
+    } else if (body.message.text.startsWith('/return')) {
+      await baseCommandHandler.returnBook(chatID, body);
     } else {
-      console.error("The message does not contain a valid book id");
+      // Handle other text messages
+      // Your code here
+
+    }
+
+
+  } else if (body && body.callback_query) {
+    const callbackQuery = body.callback_query;
+    const data = callbackQuery.data;
+    if (data.startsWith('_return_')) {
+      // Handle the step when user selects the book to return
+      await callbackCommandHandler.returnBook(chatID, body);
     }
   } else {
     console.warn("the payload is strange");
   }
 
   return {
-    statusCode: 200,
-    body: JSON.stringify(
-      {
-        input: event,
-      },
-      null,
-      2
-    ),
+    statusCode: 200, body: JSON.stringify({
+      input: event,
+    }, null, 2),
   };
 };
