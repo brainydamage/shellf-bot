@@ -3,6 +3,60 @@ const config = require('../constants/config');
 const messages = require('../constants/messages');
 const googleSheetsUtils = require('../utils/googleSheetsUtils');
 
+async function fetchBookData() {
+  try {
+    return await googleSheetsUtils.getRows(config.BOOKS_DB);
+  } catch (error) {
+    console.error(`${messages.FAILED_FETCH_DATA_FROM_DB} ${error.message}`);
+    throw new Error(messages.FAILED_ACCESS_DB);
+  }
+}
+
+async function processBookData(rows, requestedBookID) {
+  let bookTitle = "";
+  let bookAuthor = "";
+
+  // If 'any' is requested, return a random book
+  if (requestedBookID === config.ANY) {
+    if (rows.length > 0) {
+      const randomIndex = Math.floor(Math.random() * rows.length);
+      const randomRow = rows[randomIndex];
+      bookTitle = randomRow[config.TITLE_COLUMN];
+      bookAuthor = randomRow[config.AUTHOR_COLUMN];
+      return {title: bookTitle, author: bookAuthor};
+    }
+    return null;
+  }
+
+  // Search for a specific book by ID
+  for (const row of rows) {
+    const currentBookID = parseInt(row[config.ID_COLUMN], 10);
+    if (!isNaN(currentBookID) && currentBookID === requestedBookID) {
+      bookTitle = row[config.TITLE_COLUMN];
+      bookAuthor = row[config.AUTHOR_COLUMN];
+      return {title: bookTitle, author: bookAuthor};
+    }
+  }
+
+  // Book not found
+  return null;
+}
+
+async function createResponse(book, requestedBookID) {
+  if (!book) {
+    console.error(`${messages.BOOK_NOT_FOUND}: id=${requestedBookID}`);
+    return {
+      statusCode: 404,
+      body: JSON.stringify({message: messages.BOOK_NOT_FOUND}, null, 2),
+    };
+  }
+  return {
+    statusCode: 200, body: JSON.stringify({
+      title: book.title, author: book.author,
+    }, null, 2),
+  };
+}
+
 module.exports.handler = async (event) => {
   console.log(messages.BACKEND_HANDLER_TRIGGER);
   let requestedBookID = event.pathParameters.bookID;
@@ -20,95 +74,16 @@ module.exports.handler = async (event) => {
     }
   }
 
-  let bookTitle = "";
-  let bookAuthor = "";
-
-  const idColumn = config.ID_COLUMN;
-  const titleColumn = config.TITLE_COLUMN;
-  const authorColumn = config.AUTHOR_COLUMN;
-
   try {
-    const rows = await googleSheetsUtils.getRows(config.BOOKS_DB);
+    const rows = await fetchBookData();
+    const book = await processBookData(rows, requestedBookID);
+    return await createResponse(book, requestedBookID);
 
-    if (requestedBookID === config.ANY) {
-      if (rows.length > 0) {
-        const randomIndex = Math.floor(Math.random() * rows.length);
-        const randomRow = rows[randomIndex];
-        bookTitle = randomRow[titleColumn];
-        bookAuthor = randomRow[authorColumn];
-      } else {
-        return {
-          statusCode: 404,
-          body: JSON.stringify({message: messages.NO_BOOKS_AVAILABLE}, null, 2),
-        };
-      }
-    } else if (rows && rows.length > 0 && requestedBookID !== 0) {
-      let bookFound = false;
-
-      // Check if requestedBookID is within the range and matches the bookID
-      if (requestedBookID < rows.length) {
-        const row = rows[requestedBookID];
-        if (!isNaN(row[idColumn])) {
-          const bookID = parseInt(row[idColumn], 10);
-
-          if (bookID === requestedBookID) {
-            bookTitle = row[titleColumn];
-            bookAuthor = row[authorColumn];
-            bookFound = true;
-          }
-        } else {
-          console.warn(
-            `1 ${messages.INVALID_BOOK_ID_DATABASE}: value ${row[idColumn]}, raw ${requestedBookID}`);
-        }
-      }
-
-      // If not found directly, search through all rows
-      if (!bookFound) {
-        console.log(
-          `${requestedBookID}${messages.WRONG_PLACE}`);
-
-        let isFirstRow = true;
-        for (const row of rows) {
-          if (isFirstRow) {
-            isFirstRow = false;
-            continue;
-          }
-
-          let currentBookID = parseInt(row[idColumn], 10);
-          if (isNaN(currentBookID)) {
-            console.warn(
-              `2 ${messages.INVALID_BOOK_ID_DATABASE}: value ${row[idColumn]}, raw ${requestedBookID}`);
-          } else if (currentBookID === requestedBookID) {
-            bookTitle = row[titleColumn];
-            bookAuthor = row[authorColumn];
-            break;
-          }
-        }
-      }
-    }
   } catch (error) {
-    console.error(messages.FAILED_ACCESS_DB);
     console.error(error);
 
     return {
-      statusCode: 500,
-      body: JSON.stringify({message: messages.ERROR_ACCESS_DB}),
+      statusCode: 500, body: JSON.stringify({message: error.message}),
     };
   }
-
-  console.log(`${bookTitle} by ${bookAuthor}`);
-
-  return (bookTitle !== '') ?
-    {
-      statusCode: 200,
-      body: JSON.stringify({
-        title: bookTitle,
-        author: bookAuthor,
-      }, null, 2),
-    } :
-    {
-      statusCode: 400,
-      body: JSON.stringify({message: messages.BOOK_NOT_FOUND}, null, 2),
-    };
-}
-;
+};

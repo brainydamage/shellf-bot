@@ -8,6 +8,7 @@ module.exports = {
   NO_BOOKS_AVAILABLE: 'No books available',
   WRONG_PLACE: ' book is on the wrong place, searching...',
   FAILED_ACCESS_DB: 'failed to access database',
+  FAILED_FETCH_DATA_FROM_DB: 'Error fetching data from Google Sheets:',
   ERROR_ACCESS_DB: 'Error accessing database',
   BOOK_NOT_FOUND: 'Book not found',
 };
