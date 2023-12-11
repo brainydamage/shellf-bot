@@ -102,9 +102,9 @@ module.exports.returnBook = async (chatID, body) => {
         let bookAuthor = row[authorColumn];
 
         if (!bookTitle) {
-          console.log(`.....NO BOOK TITLE.....`);
-          const book = await googleSheetsUtils.getBookData(config.BOOKS_DB,
-            bookID);
+          console.log(messages.EMPTY_TITLE_LOG);
+          const book = await googleSheetsUtils.getBookData(
+            parseInt(bookID, 10));
           bookTitle = book.title;
           bookAuthor = book.author;
         }

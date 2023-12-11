@@ -112,7 +112,6 @@ async function getRow(sheetName, rowNumber) {
   try {
     const spreadsheetId = config.SHEETS_ID;
     const sheets = await getGoogleSheets();
-
     const range = `${sheetName}!A${rowNumber}:D${rowNumber}`;
 
     const response = await sheets.spreadsheets.values.get(

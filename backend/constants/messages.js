@@ -11,7 +11,8 @@ module.exports = {
   NOT_VALID_BOOK_ID: 'Not valid book id',
 
   NO_BOOKS_AVAILABLE: 'No books available',
-  WRONG_PLACE: ' book is on the wrong place, searching...',
+  WRONG_PLACE: 'book is on the wrong place, searching...',
+  EMPTY_TITLE_LOG: 'title is empty, searching in books db...',
   BOOK_NOT_FOUND: 'Book not found',
 
   FAILED_BORROW_BOOK: 'Failed to borrow book',
