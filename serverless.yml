@@ -25,14 +25,14 @@ provider:
 
 functions:
   bot_handler:
-    handler: lambdas/bot.handler
+    handler: backend/lambdas/bot.handler
     events:
       - httpApi: POST /rentBook
     environment:
       TELEGRAM_TOKEN: ${env:TELEGRAM_TOKEN_SHELLF}
       NODE_ENV: 'production'
   backend_handler:
-    handler: lambdas/backend.handler
+    handler: backend/lambdas/backend.handler
     events:
       - httpApi:
           method: GET
@@ -40,7 +40,7 @@ functions:
     environment:
       NODE_ENV: 'production'
   reminder_handler:
-    handler: lambdas/reminder.handler
+    handler: backend/lambdas/reminder.handler
     #    events:
     #      - schedule: rate(2 minutes)
     environment:

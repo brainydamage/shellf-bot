@@ -98,15 +98,17 @@ module.exports.returnBook = async (chatID, body) => {
 
       if (sameChatID && isBookNotReturned) {
         const bookID = row[bookIDColumn];
-        const bookTitle = row[titleColumn];
+        let bookTitle = row[titleColumn];
+        let bookAuthor = row[authorColumn];
 
         if (!bookTitle) {
           console.log(`.....NO BOOK TITLE`);
-          const rows = await googleSheetsUtils.getRows(config.BOOKS_DB);
-
+          const book = await googleSheetsUtils.getBookData(config.BOOKS_DB,
+            bookID);
+          bookTitle = book.title;
+          bookAuthor = book.author;
         }
 
-        const bookAuthor = row[authorColumn];
         const bookInfo = bookAuthor ? `${bookTitle}, ${bookAuthor}` :
           `${bookTitle}`;
 
