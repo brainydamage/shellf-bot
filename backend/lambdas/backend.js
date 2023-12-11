@@ -3,12 +3,21 @@ const config = require('../constants/config');
 const messages = require('../constants/messages');
 const googleSheetsUtils = require('../utils/googleSheetsUtils');
 
-async function fetchBookData() {
+async function fetchAllBooks() {
   try {
     return await googleSheetsUtils.getRows(config.BOOKS_DB);
   } catch (error) {
-    console.error(`${messages.FAILED_FETCH_DATA_FROM_DB} ${error.message}`);
-    throw new Error(messages.FAILED_ACCESS_DB);
+    console.error(`${messages.FAILED_READ_DB} ${error.message}`);
+    throw new Error(messages.FAILED_READ_DB);
+  }
+}
+
+async function fetchRequestedBook(rowNumber) {
+  try {
+    return await googleSheetsUtils.getRow(config.BOOKS_DB, rowNumber);
+  } catch (error) {
+    console.error(`${messages.FAILED_READ_DB} ${error.message}`);
+    throw new Error(messages.FAILED_READ_DB);
   }
 }
 
@@ -75,7 +84,11 @@ module.exports.handler = async (event) => {
   }
 
   try {
-    const rows = await fetchBookData();
+    const row = fetchRequestedBook(requestedBookID + 1);
+    console.log(`....row....`);
+    console.log(row);
+
+    const rows = await fetchAllBooks();
     const book = await processBookData(rows, requestedBookID);
     return await createResponse(book, requestedBookID);
 

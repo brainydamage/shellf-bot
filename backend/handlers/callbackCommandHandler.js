@@ -1,6 +1,10 @@
 const googleSheetsUtils = require("../utils/googleSheetsUtils");
 const config = require("../constants/config");
 const telegramUtils = require("../utils/telegramUtils");
+const messages = require("../constants/messages");
+const userMessages = require("../constants/userMessages");
+const commands = require("../constants/commands");
+const {logging} = require("googleapis/build/src/apis/logging");
 
 async function timestampToHumanReadable(timestamp) {
   const date = new Date(timestamp);
@@ -31,6 +35,7 @@ function transformArray(inputArray, returnDate) {
 
 module.exports.returnBook = async (chatID, body) => {
   await telegramUtils.deleteMessage(body);
+  const username = body.callback_query.message.chat.username;
 
   try {
     const match = body.callback_query.data.match(/_return_(\d+)/);
@@ -42,8 +47,7 @@ module.exports.returnBook = async (chatID, body) => {
     let bookRow = null;
 
     for (let i = 1; i < rows.length; i++) {
-
-      if (rows[i][4] === bookID) {
+      if (rows[i][4] === bookID && (rows[i].length < 8 || rows[i][7] === '')) {
         bookRowIndex = i;
         bookRow = rows[i];
         break;
@@ -53,20 +57,27 @@ module.exports.returnBook = async (chatID, body) => {
     const returnDate = await timestampToHumanReadable(Date.now());
     const range = `A${bookRowIndex + 1}:Z${bookRowIndex + 1}`;
     const data = transformArray(bookRow, returnDate);
-    await googleSheetsUtils.updateRow(range, data);
 
-    const message = `Спасибо, что вернул:а книгу на полку!`
-    await telegramUtils.sendMessage(chatID, message);
+    await googleSheetsUtils.updateRow(range, data);
+    await telegramUtils.sendMessage(chatID, userMessages.BOOK_RETURNED);
+
   } catch (error) {
-    console.error(`Failed to return a book`);
+    console.error(messages.FAILED_RETURN_BOOK);
     console.error(error.message);
     console.error(error);
-    if (error.message === 'Error reading database') {
-      //send the help contact to user
-    } else if (error.message === 'Error updating database') {
-      //send the help contact to user
-    } else if (error.message === 'Failed to send telegram message') {
-      //delete row from db and try send the help contact to user
+
+    try {
+      await telegramUtils.sendMessage(chatID, userMessages.SUPPORT);
+    } catch (nestedError) {
+      console.error(messages.FAILED_SEND_ERROR_TG);
+      console.error(nestedError.message);
+      console.error(nestedError);
+
+      // This could include alternative ways to notify the error, like
+      // sending an email alert or message to the team
+      const adminChatID = config.ADMIN_CHAT_ID;
+      const adminMessage = `${userMessages.ADMIN_ERROR}${username}, chatID: ${chatID}, команда: ${commands.RETURN_CALLBACK}`;
+      await telegramUtils.sendMessage(adminChatID, adminMessage);
     }
   }
 }

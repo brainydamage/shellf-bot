@@ -1,5 +1,7 @@
 const {Telegraf} = require('telegraf');
 const keyboardUtils = require("../utils/keyboardUtils");
+const messages = require("../constants/messages");
+const userMessages = require("../constants/userMessages");
 
 const TOKEN = process.env.TELEGRAM_TOKEN;
 const bot = new Telegraf(TOKEN);
@@ -10,7 +12,7 @@ module.exports.deleteMessage = async (body) => {
   let chatId = body.message?.from?.id || body.callback_query?.from?.id;
 
   if (messageId && chatId) {
-    console.log(`deleting message with ID ${messageId}`);
+    console.log(`${messages.DELETING_MSG_TG}${messageId}`);
     try {
       await bot.telegram.deleteMessage(chatId, messageId);
     } catch (error) {
@@ -18,9 +20,9 @@ module.exports.deleteMessage = async (body) => {
       // throw new Error('Failed to delete telegram message');
     }
   } else if (messageId) {
-    console.error(`No chat with ID ${chatId}`);
+    console.error(`${messages.NO_CHAT_TG}${chatId}`);
   } else if (chatId) {
-    console.error(`No message with ID ${messageId}`);
+    console.error(`${messages.NO_MESSAGE_TG}${messageId}`);
   }
 };
 
@@ -29,17 +31,21 @@ module.exports.sendMessage = async (chatId, message) => {
     await bot.telegram.sendMessage(chatId, message);
   } catch (error) {
     console.error(error);
-    throw new Error('Failed to send telegram message');
+    throw new Error(messages.FAILED_SEND_TG);
   }
 };
 
 module.exports.showBooksToReturn = async (chatId, arrayOfBooks) => {
   let keyboardArray = await keyboardUtils.getDatesKeyboardArray(arrayOfBooks);
 
-  const message = `Выбери книгу, которую хочешь вернуть:`;
-  await bot.telegram.sendMessage(chatId, message, {
-    reply_markup: {
-      inline_keyboard: keyboardArray,
-    },
-  });
+  try {
+    await bot.telegram.sendMessage(chatId, userMessages.CHOOSE_BOOK, {
+      reply_markup: {
+        inline_keyboard: keyboardArray,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    throw new Error(messages.FAILED_SEND_TG_KEYBOARD);
+  }
 };

@@ -1,4 +1,5 @@
 const config = require("../constants/config");
+const messages = require("../constants/messages");
 const {google} = require("googleapis");
 const {SSMClient, GetParameterCommand} = require("@aws-sdk/client-ssm");
 
@@ -13,7 +14,7 @@ async function getParameter(name, withDecryption = false) {
     const response = await ssmClient.send(command);
     return response.Parameter.Value;
   } catch (error) {
-    throw new Error(`Failed to get parameters from SSM`);
+    throw new Error(messages.FAILED_GET_SSM);
   }
 }
 
@@ -29,7 +30,7 @@ async function getGoogleSheets() {
 
     return google.sheets({version: 'v4', auth: client});
   } catch (error) {
-    throw new Error(`Failed to get Google Sheets object`);
+    throw new Error(messages.FAILED_GET_GOOGLE_SHEETS);
   }
 }
 
@@ -42,10 +43,30 @@ module.exports.getRows = async (range) => {
       {spreadsheetId, range});
     return response.data.values;
   } catch (error) {
-    console.error(`Failed to read database`);
+    console.error(messages.FAILED_READ_DB);
     console.error(error.message);
     console.error(error);
-    throw error;
+    throw new Error(messages.FAILED_READ_DB);
+  }
+};
+
+module.exports.getRow = async (sheetName, rowNumber) => {
+  try {
+    const spreadsheetId = config.SHEETS_ID;
+    const sheets = await getGoogleSheets();
+
+    const range = `${sheetName}!A${rowNumber}:D${rowNumber}`;
+
+    const response = await sheets.spreadsheets.values.get(
+      {spreadsheetId, range});
+
+    const rows = response.data.values;
+    return rows.length > 0 ? rows[0] : null;
+  } catch (error) {
+    console.error(messages.FAILED_READ_DB);
+    console.error(error.message);
+    console.error(error);
+    throw new Error(messages.FAILED_READ_DB);
   }
 };
 
@@ -59,18 +80,18 @@ module.exports.appendRow = async (range, data) => {
       values: [data],
     };
 
-    const res = await sheets.spreadsheets.values.append({
+    await sheets.spreadsheets.values.append({
       spreadsheetId,
       range,
       valueInputOption,
       resource,
     });
-    console.log(`Row appended to ${spreadsheetId}`);
+    console.log(`Row appended to ${spreadsheetId}, data: ${data}`);
   } catch (error) {
-    console.error(`Failed to update database`);
+    console.error(messages.FAILED_UPDATE_DB);
     console.error(error.message);
     console.error(error);
-    throw error;
+    throw new Error(messages.FAILED_UPDATE_DB);
   }
 };
 
@@ -90,11 +111,11 @@ module.exports.updateRow = async (range, data) => {
       valueInputOption,
       resource,
     });
-    console.log(`Row updated in ${spreadsheetId}`);
+    console.log(`Row updated in ${spreadsheetId}, data: ${data}`);
   } catch (error) {
-    console.error(`Failed to update row in database`);
+    console.error(messages.FAILED_UPDATE_ROW_DB);
     console.error(error.message);
     console.error(error);
-    throw error;
+    throw new Error(messages.FAILED_UPDATE_ROW_DB);
   }
 };

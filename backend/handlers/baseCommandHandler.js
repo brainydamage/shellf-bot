@@ -1,6 +1,9 @@
 const googleSheetsUtils = require("../utils/googleSheetsUtils");
-const config = require("../constants/config");
 const telegramUtils = require("../utils/telegramUtils");
+const config = require("../constants/config");
+const messages = require("../constants/messages");
+const userMessages = require("../constants/userMessages");
+const commands = require("../constants/commands");
 
 async function timestampToHumanReadable(timestamp) {
   const date = new Date(timestamp * 1000);
@@ -44,25 +47,38 @@ module.exports.borrowBook = async (chatID, body) => {
     await telegramUtils.deleteMessage(body);
 
     try {
+
       await googleSheetsUtils.appendRow(config.BOOKS_LOG, data);
       await telegramUtils.sendMessage(chatID,
-        `успех! пожалуйста, верни книгу до ${deadlineDate}`);
+        `${userMessages.BOOK_BORROWED}${deadlineDate}${userMessages.BOOK_BORROWED_ENDING}`);
+
     } catch (error) {
-      console.error(`Failed to borrow a book`);
+      console.error(messages.FAILED_BORROW_BOOK);
       console.error(error.message);
       console.error(error);
-      if (error.message === 'Error updating database') {
-        //send the help contact to user
-      } else if (error.message === 'Failed to send telegram message') {
-        //delete row from db and try send the help contact to user
+
+      try {
+        await telegramUtils.sendMessage(chatID, userMessages.SUPPORT);
+      } catch (nestedError) {
+        console.error(messages.FAILED_SEND_ERROR_TG);
+        console.error(nestedError.message);
+        console.error(nestedError);
+
+        // This could include alternative ways to notify the error, like
+        // sending an email alert or message to the team
+        const adminChatID = config.ADMIN_CHAT_ID;
+        const adminMessage = `${userMessages.ADMIN_ERROR}${username}, chatID: ${chatID}, команда: ${commands.START}`;
+        await telegramUtils.sendMessage(adminChatID, adminMessage);
       }
     }
   } else {
-    console.error("The message does not contain a valid book id");
+    console.error(messages.INVALID_BOOK_ID_BODY);
   }
 };
 
 module.exports.returnBook = async (chatID, body) => {
+  const username = body.message.from.username;
+
   try {
     const rows = await googleSheetsUtils.getRows(config.BOOKS_LOG);
 
@@ -83,6 +99,13 @@ module.exports.returnBook = async (chatID, body) => {
       if (sameChatID && isBookNotReturned) {
         const bookID = row[bookIDColumn];
         const bookTitle = row[titleColumn];
+
+        if (!bookTitle) {
+          console.log(`.....NO BOOK TITLE`);
+          const rows = await googleSheetsUtils.getRows(config.BOOKS_DB);
+
+        }
+
         const bookAuthor = row[authorColumn];
         const bookInfo = bookAuthor ? `${bookTitle}, ${bookAuthor}` :
           `${bookTitle}`;
@@ -96,9 +119,33 @@ module.exports.returnBook = async (chatID, body) => {
 
     if (arrayOfBooks.length > 0) {
       await telegramUtils.showBooksToReturn(chatID, arrayOfBooks);
+    } else {
+      await telegramUtils.sendMessage(chatID, userMessages.NO_BOOK_TO_RETURN);
     }
 
   } catch (error) {
+    console.error(messages.FAILED_RETURN_BOOK);
+    console.error(error.message);
+    console.error(error);
+
+    try {
+      await telegramUtils.sendMessage(chatID, userMessages.SUPPORT);
+    } catch (nestedError) {
+      console.error(messages.FAILED_SEND_ERROR_TG);
+      console.error(nestedError.message);
+      console.error(nestedError);
+
+      // This could include alternative ways to notify the error, like
+      // sending an email alert or message to the team
+      const adminChatID = config.ADMIN_CHAT_ID;
+      const adminMessage = `${userMessages.ADMIN_ERROR}${username}, chatID: ${chatID}, команда: ${commands.RETURN}`;
+      await telegramUtils.sendMessage(adminChatID, adminMessage);
+    }
 
   }
+}
+
+module.exports.wrongCommand = async (chatID, body) => {
+  await telegramUtils.deleteMessage(body);
+  await telegramUtils.sendMessage(chatID, userMessages.WRONG_COMMAND);
 }
