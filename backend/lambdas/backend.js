@@ -21,6 +21,18 @@ async function fetchRequestedBook(rowNumber) {
   }
 }
 
+async function extractBookDetails(row) {
+  const bookTitle = row[config.TITLE_COLUMN];
+  const bookAuthor = row[config.AUTHOR_COLUMN];
+  return {title: bookTitle, author: bookAuthor};
+}
+
+async function linearSearchForBook(requestedBookID) {
+  console.log(messages.WRONG_PLACE);
+  const rows = await fetchAllBooks();
+  return await processBookData(rows, requestedBookID);
+}
+
 async function processBookData(rows, requestedBookID) {
   let bookTitle = "";
   let bookAuthor = "";
@@ -84,12 +96,16 @@ module.exports.handler = async (event) => {
   }
 
   try {
-    const row = fetchRequestedBook(requestedBookID + 1);
-    console.log(`....row....`);
-    console.log(row);
+    let book;
+    const row = await fetchRequestedBook(requestedBookID + 1);
+    if (row && parseInt(row[config.ID_COLUMN], 10) === requestedBookID) {
+      // Found the book in the expected row
+      book = await extractBookDetails(row);
+    } else {
+      // Fallback to linear search
+      book = await linearSearchForBook(requestedBookID);
+    }
 
-    const rows = await fetchAllBooks();
-    const book = await processBookData(rows, requestedBookID);
     return await createResponse(book, requestedBookID);
 
   } catch (error) {
