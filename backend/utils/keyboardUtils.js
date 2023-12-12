@@ -1,4 +1,3 @@
-const {logging} = require("googleapis/build/src/apis/logging");
 module.exports.getDatesKeyboardArray = async (arrayOfBooks) => {
   let keyboardArray = [];
 
@@ -25,7 +24,18 @@ module.exports.getDatesKeyboardArray = async (arrayOfBooks) => {
   //   },
   // ])
 
-  console.log(keyboardArray);
+  return keyboardArray;
+};
+
+module.exports.getProlongKeyboard = async (bookID) => {
+  let keyboardArray = [];
+
+  keyboardArray.push([
+    {
+      text: 'продлить на 1 неделю',
+      callback_data: `_prolong_${bookID}`,
+    },
+  ])
 
   return keyboardArray;
 };

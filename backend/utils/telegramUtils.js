@@ -49,3 +49,31 @@ module.exports.showBooksToReturn = async (chatId, arrayOfBooks) => {
     throw new Error(messages.FAILED_SEND_TG_KEYBOARD);
   }
 };
+
+module.exports.remindToReturn = async (chatId, reminder) => {
+  let keyboardExtra;
+  if (!reminder.prolonged) {
+    const prolongKeyboard = await keyboardUtils.getProlongKeyboard(
+      reminder.bookID);
+    keyboardExtra = {
+      reply_markup: {
+        inline_keyboard: prolongKeyboard,
+      },
+    }
+  }
+
+  const bookInfo = reminder.author ? `${reminder.title}, ${reminder.author}` :
+    reminder.title;
+  const message = `${userMessages.REMINDER}${bookInfo}${userMessages.REMINDER_ENDING}`;
+
+  try {
+    if (keyboardExtra) {
+      await bot.telegram.sendMessage(chatId, message, keyboardExtra);
+    } else {
+      await bot.telegram.sendMessage(chatId, message);
+    }
+  } catch (error) {
+    console.error(error);
+    throw new Error(messages.FAILED_SEND_TG_PROLONG);
+  }
+};

@@ -36,6 +36,9 @@ module.exports.handler = async (event) => {
     if (data.startsWith(commands.RETURN_CALLBACK)) {
       // Handle the step when user selects the book to return
       await callbackCommandHandler.returnBook(chatID, body);
+    } else if (data.startsWith(commands.PROLONG_CALLBACK)) {
+      // Handle the step when user prolongs the book
+      await callbackCommandHandler.prolongBook(chatID, body);
     }
   } else {
     console.warn(messages.INVALID_PAYLOAD);

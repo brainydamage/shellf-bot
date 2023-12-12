@@ -87,6 +87,8 @@ module.exports.returnBook = async (chatID, body) => {
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
 
+      console.log(row);
+
       const chatIDColumn = config.CHATID_COLUMN;
       const bookIDColumn = config.BOOKID_COLUMN;
       const returnDateColumn = config.RETURN_COLUMN;
@@ -94,7 +96,8 @@ module.exports.returnBook = async (chatID, body) => {
       const authorColumn = config.AUTHOR_COLUMN_LOG;
 
       const sameChatID = row[chatIDColumn] === chatID.toString();
-      const isBookNotReturned = row[returnDateColumn] === '' || row.length < 8;
+      const isBookNotReturned = row[returnDateColumn] === '' || row.length <
+        config.COLUMNS_NUMBER;
 
       if (sameChatID && isBookNotReturned) {
         const bookID = row[bookIDColumn];

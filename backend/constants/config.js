@@ -12,13 +12,16 @@ const devConfig = {
   TITLE_COLUMN: 1,
   AUTHOR_COLUMN: 2,
 
+  DATE_COLUMN: 0,
   DEADLINE_COLUMN: 1,
   USERNAME_COLUMN: 2,
   CHATID_COLUMN: 3,
   BOOKID_COLUMN: 4,
   TITLE_COLUMN_LOG: 5,
   AUTHOR_COLUMN_LOG: 6,
-  RETURN_COLUMN: 7,
+  PROLONG_COLUMN: 7,
+  RETURN_COLUMN: 8,
+  COLUMNS_NUMBER: 9,
 };
 
 const prodConfig = {
@@ -35,13 +38,16 @@ const prodConfig = {
   TITLE_COLUMN: 2,
   AUTHOR_COLUMN: 3,
 
+  DATE_COLUMN: 0,
   DEADLINE_COLUMN: 1,
   USERNAME_COLUMN: 2,
   CHATID_COLUMN: 3,
   BOOKID_COLUMN: 4,
   TITLE_COLUMN_LOG: 5,
   AUTHOR_COLUMN_LOG: 6,
-  RETURN_COLUMN: 7,
+  PROLONG_COLUMN: 7,
+  RETURN_COLUMN: 8,
+  COLUMNS_NUMBER: 9,
 };
 
 const config = process.env.NODE_ENV === 'production' ? prodConfig : devConfig;

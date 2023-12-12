@@ -17,19 +17,24 @@ module.exports = {
 
   FAILED_BORROW_BOOK: 'Failed to borrow book',
   FAILED_RETURN_BOOK: 'Failed to return book',
+  FAILED_PROLONG_BOOK: 'Failed to prolong book',
 
   //TG
   FAILED_SEND_TG: 'Failed to send telegram message',
   FAILED_SEND_TG_KEYBOARD: 'Failed to send telegram message: list of books',
+  FAILED_SEND_TG_PROLONG: 'Failed to send telegram message: prolong book',
   FAILED_SEND_ERROR_TG: 'Nested error sending error(!) message via Telegram:',
   DELETING_MSG_TG: 'deleting message with ID ',
   NO_CHAT_TG: 'No chat with ID ',
   NO_MESSAGE_TG: 'No message with ID ',
 
   //Google Sheets
-  FAILED_GET_SSM: `Failed to get parameters from SSM`,
-  FAILED_GET_GOOGLE_SHEETS: `Failed to get Google Sheets object`,
-  FAILED_READ_DB: `Failed to read Google Sheets`,
-  FAILED_UPDATE_DB: `Failed to update Google Sheets`,
-  FAILED_UPDATE_ROW_DB: `Failed to update row in Google Sheets`,
+  FAILED_GET_SSM: 'Failed to get parameters from SSM',
+  FAILED_GET_GOOGLE_SHEETS: 'Failed to get Google Sheets object',
+  FAILED_READ_DB: 'Failed to read Google Sheets',
+  FAILED_UPDATE_DB: 'Failed to update Google Sheets',
+  FAILED_UPDATE_ROW_DB: 'Failed to update row in Google Sheets',
+
+  //Reminder
+  SENDING_REMINDER: 'sending reminder to '
 };
