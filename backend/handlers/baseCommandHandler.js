@@ -123,6 +123,8 @@ module.exports.returnBook = async (chatID, body) => {
       }
     }
 
+    await telegramUtils.deleteMessage(body);
+
     if (arrayOfBooks.length > 0) {
       await telegramUtils.showBooksToReturn(chatID, arrayOfBooks);
     } else {
@@ -150,9 +152,23 @@ module.exports.returnBook = async (chatID, body) => {
   }
 }
 
+module.exports.emptyStart = async (chatID, body) => {
+  console.log(`${chatID}${messages.EMPTY_START}`);
+
+  await telegramUtils.deleteMessage(body);
+  await telegramUtils.sendMessage(chatID, userMessages.EMPTY_START_COMMAND);
+}
+
 module.exports.wrongCommand = async (chatID, body) => {
   console.log(`${chatID}${messages.WRONG_COMMAND}${body.message.text}`);
 
   await telegramUtils.deleteMessage(body);
   await telegramUtils.sendMessage(chatID, userMessages.WRONG_COMMAND);
+}
+
+module.exports.showHelpMessage = async (chatID, body) => {
+  console.log(`${chatID}${messages.HELP_COMMAND}`);
+
+  await telegramUtils.deleteMessage(body);
+  await telegramUtils.sendMessage(chatID, userMessages.HELP_COMMAND);
 }

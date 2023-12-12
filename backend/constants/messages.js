@@ -12,6 +12,9 @@ module.exports = {
   NO_BOOK_RETURN: ' has no book to return',
   BOOK_PROLONG: ' prolonging book: ',
   WRONG_COMMAND: ' calling wrong command: ',
+  HELP_COMMAND: ' calling /HELP command',
+  EMPTY_START: ' calling /START command without bookID',
+  CANCELED: ' cancelled returning a book',
 
   INVALID_BOOK_ID_FORMAT: 'Invalid bookID format: ',
   INVALID_BOOK_ID_DATABASE: 'Invalid bookID in the database: ',

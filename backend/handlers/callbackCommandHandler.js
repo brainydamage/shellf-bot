@@ -173,6 +173,8 @@ module.exports.prolongBook = async (chatID, body) => {
   }
 }
 
-module.exports.cancel = async (body) => {
+module.exports.cancel = async (chatID, body) => {
+  console.log(`${chatID}${messages.CANCELED}`);
+
   await telegramUtils.deleteMessage(body);
 }

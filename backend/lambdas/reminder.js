@@ -56,7 +56,8 @@ module.exports.handler = async (event) => {
 
     // Logic to send messages
     for (const reminder of reminders) {
-      console.log(`${messages.SENDING_REMINDER}${reminder.chatID}`);
+      console.log(
+        `${messages.SENDING_REMINDER}${reminder.chatID}, bookID: ${reminder.bookID}, title: ${reminder.title}, author: ${reminder.author}`);
       await telegramUtils.remindToReturn(reminder.chatID, reminder);
     }
 

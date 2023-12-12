@@ -24,9 +24,17 @@ module.exports.handler = async (event) => {
 
   if (body && body.message && body.message.text) {
     if (body.message.text.startsWith(commands.START)) {
-      await baseCommandHandler.borrowBook(chatID, body);
+      const parts = body.message.text.split(' ');
+      if (parts.length === 1 && parts[0] === commands.START) {
+        // logic for '/start' without arguments
+        await baseCommandHandler.emptyStart(chatID, body);
+      } else {
+        await baseCommandHandler.borrowBook(chatID, body);
+      }
     } else if (body.message.text.startsWith(commands.RETURN)) {
       await baseCommandHandler.returnBook(chatID, body);
+    } else if (body.message.text.startsWith(commands.HELP)) {
+      await baseCommandHandler.showHelpMessage(chatID, body);
     } else {
       await baseCommandHandler.wrongCommand(chatID, body);
     }
@@ -40,7 +48,7 @@ module.exports.handler = async (event) => {
       // Handle the step when user prolongs the book
       await callbackCommandHandler.prolongBook(chatID, body);
     } else if (data.startsWith(commands.CANCEL)) {
-      await callbackCommandHandler.cancel(body);
+      await callbackCommandHandler.cancel(chatID, body);
     }
   } else {
     console.warn(messages.INVALID_PAYLOAD);
