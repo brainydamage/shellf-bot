@@ -42,7 +42,7 @@ functions:
   reminder_handler:
     handler: lambdas/reminder.handler
     events:
-      - schedule: cron(10 14 * * ? *)
+      - schedule: cron(0 13 * * ? *)
     #      - schedule: rate(2 minutes)
     environment:
       TELEGRAM_TOKEN: ${env:TELEGRAM_TOKEN_SHELLF}
