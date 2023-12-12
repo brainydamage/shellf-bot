@@ -4,15 +4,15 @@ const config = require('../constants/config');
 const messages = require('../constants/messages');
 const googleSheetsUtils = require("../utils/googleSheetsUtils");
 
-function isDeadlineInOneWeek(deadline) {
+function isDeadlineIn3Days(deadline) {
   const deadlineDate = parseDate(deadline);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const oneWeekInMilliseconds = 7 * 24 * 60 * 60 * 1000;
+  const threeDaysInMilliseconds = 3 * 24 * 60 * 60 * 1000;
   const timeDiff = deadlineDate.getTime() - today.getTime();
 
-  return timeDiff === oneWeekInMilliseconds;
+  return timeDiff === threeDaysInMilliseconds;
 }
 
 function parseDate(dateString) {
@@ -42,7 +42,7 @@ module.exports.handler = async (event) => {
         const deadline = row[deadlineColumn];
         const returned = row[returnedColumn];
 
-        if (!returned && isDeadlineInOneWeek(deadline)) {
+        if (!returned && isDeadlineIn3Days(deadline)) {
           reminders.push({
             chatID: row[chatIDColumn],
             bookID: row[bookIDColumn],

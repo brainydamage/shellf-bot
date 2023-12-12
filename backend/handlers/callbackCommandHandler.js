@@ -4,7 +4,6 @@ const telegramUtils = require("../utils/telegramUtils");
 const messages = require("../constants/messages");
 const userMessages = require("../constants/userMessages");
 const commands = require("../constants/commands");
-const {logging} = require("googleapis/build/src/apis/logging");
 
 async function timestampToHumanReadable(timestamp) {
   const date = new Date(timestamp);
@@ -21,10 +20,10 @@ async function timestampToHumanReadable(timestamp) {
   return date.toLocaleString('ru-RU', options);
 }
 
-async function addOneWeekAndFormat(timestamp) {
+async function add10DaysAndFormat(timestamp) {
   const date = new Date(timestamp * 1000);
 
-  date.setDate(date.getDate() + 7); // Add 7 days
+  date.setDate(date.getDate() + 10); // Add 10 days
 
   const day = date.getDate().toString().padStart(2, '0');
   const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -77,7 +76,7 @@ module.exports.returnBook = async (chatID, body) => {
     let bookRow = null;
 
     for (let i = 1; i < rows.length; i++) {
-      if (rows[i][config.CHATID_COLUMN] == chatID &&
+      if (rows[i][config.CHATID_COLUMN] === chatID.toString() &&
         rows[i][config.BOOKID_COLUMN] === bookID &&
         (rows[i].length < config.COLUMNS_NUMBER ||
           rows[i][config.RETURN_COLUMN] === '')) {
@@ -129,7 +128,7 @@ module.exports.prolongBook = async (chatID, body) => {
     let bookRow = null;
 
     for (let i = 1; i < rows.length; i++) {
-      if (rows[i][config.CHATID_COLUMN] == chatID &&
+      if (rows[i][config.CHATID_COLUMN] === chatID.toString() &&
         rows[i][config.BOOKID_COLUMN] === bookID &&
         (rows[i].length < config.COLUMNS_NUMBER - 1 ||
           rows[i][config.PROLONG_COLUMN] === '') &&
@@ -142,7 +141,7 @@ module.exports.prolongBook = async (chatID, body) => {
     }
 
     const timestamp = body.callback_query.message.date;
-    const deadlineDate = await addOneWeekAndFormat(timestamp);
+    const deadlineDate = await add10DaysAndFormat(timestamp);
     const prolongDate = await timestampToHumanReadable(Date.now());
 
     const range = `A${bookRowIndex + 1}:Z${bookRowIndex + 1}`;
