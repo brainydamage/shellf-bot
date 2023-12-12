@@ -39,6 +39,8 @@ module.exports.handler = async (event) => {
     } else if (data.startsWith(commands.PROLONG_CALLBACK)) {
       // Handle the step when user prolongs the book
       await callbackCommandHandler.prolongBook(chatID, body);
+    } else if (data.startsWith(commands.CANCEL)) {
+      await callbackCommandHandler.cancel(body);
     }
   } else {
     console.warn(messages.INVALID_PAYLOAD);

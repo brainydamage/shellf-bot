@@ -44,18 +44,6 @@ async function processBookData(rows, requestedBookID) {
   let bookTitle = "";
   let bookAuthor = "";
 
-  // If 'any' is requested, return a random book
-  if (requestedBookID === config.ANY) {
-    if (rows.length > 0) {
-      const randomIndex = Math.floor(Math.random() * rows.length);
-      const randomRow = rows[randomIndex];
-      bookTitle = randomRow[config.TITLE_COLUMN];
-      bookAuthor = randomRow[config.AUTHOR_COLUMN];
-      return {title: bookTitle, author: bookAuthor};
-    }
-    return null;
-  }
-
   // Search for a specific book by ID
   for (const row of rows) {
     const currentBookID = parseInt(row[config.ID_COLUMN], 10);
@@ -90,7 +78,7 @@ async function getBookData(requestedBookID) {
   }
 
   return book;
-};
+}
 
 async function getRows(range) {
   try {
@@ -106,7 +94,7 @@ async function getRows(range) {
     console.error(error);
     throw new Error(messages.FAILED_READ_DB);
   }
-};
+}
 
 async function getRow(sheetName, rowNumber) {
   try {
@@ -125,7 +113,7 @@ async function getRow(sheetName, rowNumber) {
     console.error(error);
     throw new Error(messages.FAILED_READ_DB);
   }
-};
+}
 
 async function appendRow(range, data) {
   try {
@@ -150,7 +138,7 @@ async function appendRow(range, data) {
     console.error(error);
     throw new Error(messages.FAILED_UPDATE_DB);
   }
-};
+}
 
 async function updateRow(range, data) {
   try {
@@ -161,8 +149,7 @@ async function updateRow(range, data) {
     const resource = {
       values: [data],
     };
-
-    const res = await sheets.spreadsheets.values.update({
+    await sheets.spreadsheets.values.update({
       spreadsheetId,
       range,
       valueInputOption,
@@ -180,7 +167,6 @@ async function updateRow(range, data) {
 module.exports = {
   getBookData,
   getRows,
-  getRow,
   appendRow,
   updateRow
 };

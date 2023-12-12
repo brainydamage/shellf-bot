@@ -41,7 +41,8 @@ functions:
       NODE_ENV: 'production'
   reminder_handler:
     handler: lambdas/reminder.handler
-    #    events:
+    events:
+      - schedule: cron(0 15 * * ? *)
     #      - schedule: rate(2 minutes)
     environment:
       TELEGRAM_TOKEN: ${env:TELEGRAM_TOKEN_SHELLF}

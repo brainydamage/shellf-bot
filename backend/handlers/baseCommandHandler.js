@@ -38,6 +38,8 @@ module.exports.borrowBook = async (chatID, body) => {
   let bookID;
   if (match && match[1]) {
     bookID = parseInt(match[1], 10);
+    console.log(`${chatID}${messages.BOOK_BORROW}${bookID}`);
+
     const username = bodyMessage.from.username;
     const timestamp = bodyMessage.date;
     const dateTime = await timestampToHumanReadable(timestamp);
@@ -64,19 +66,20 @@ module.exports.borrowBook = async (chatID, body) => {
         console.error(nestedError.message);
         console.error(nestedError);
 
-        // This could include alternative ways to notify the error, like
-        // sending an email alert or message to the team
         const adminChatID = config.ADMIN_CHAT_ID;
         const adminMessage = `${userMessages.ADMIN_ERROR}${username}, chatID: ${chatID}, команда: ${commands.START}`;
         await telegramUtils.sendMessage(adminChatID, adminMessage);
       }
     }
   } else {
-    console.error(messages.INVALID_BOOK_ID_BODY);
+    console.error(
+      `${messages.INVALID_BOOK_ID_BODY}: ${bodyMessage.text}, chatID: ${chatID}`);
   }
 };
 
 module.exports.returnBook = async (chatID, body) => {
+  console.log(`${chatID}${messages.BOOK_RETURN}`);
+
   const username = body.message.from.username;
 
   try {
@@ -86,8 +89,6 @@ module.exports.returnBook = async (chatID, body) => {
 
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
-
-      console.log(row);
 
       const chatIDColumn = config.CHATID_COLUMN;
       const bookIDColumn = config.BOOKID_COLUMN;
@@ -113,7 +114,7 @@ module.exports.returnBook = async (chatID, body) => {
         }
 
         const bookInfo = bookAuthor ? `${bookTitle}, ${bookAuthor}` :
-          `${bookTitle}`;
+          bookTitle;
 
         const bookToReturn = {
           [bookID]: `${bookInfo}`
@@ -125,6 +126,8 @@ module.exports.returnBook = async (chatID, body) => {
     if (arrayOfBooks.length > 0) {
       await telegramUtils.showBooksToReturn(chatID, arrayOfBooks);
     } else {
+      console.log(`${chatID}${messages.NO_BOOK_RETURN}`);
+
       await telegramUtils.sendMessage(chatID, userMessages.NO_BOOK_TO_RETURN);
     }
 
@@ -140,17 +143,16 @@ module.exports.returnBook = async (chatID, body) => {
       console.error(nestedError.message);
       console.error(nestedError);
 
-      // This could include alternative ways to notify the error, like
-      // sending an email alert or message to the team
       const adminChatID = config.ADMIN_CHAT_ID;
       const adminMessage = `${userMessages.ADMIN_ERROR}${username}, chatID: ${chatID}, команда: ${commands.RETURN}`;
       await telegramUtils.sendMessage(adminChatID, adminMessage);
     }
-
   }
 }
 
 module.exports.wrongCommand = async (chatID, body) => {
+  console.log(`${chatID}${messages.WRONG_COMMAND}${body.message.text}`);
+
   await telegramUtils.deleteMessage(body);
   await telegramUtils.sendMessage(chatID, userMessages.WRONG_COMMAND);
 }

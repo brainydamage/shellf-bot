@@ -4,6 +4,15 @@ module.exports = {
   BOT_HANDLER_TRIGGER: 'bot handler triggered',
   REMINDER_HANDLER_TRIGGER: 'reminder handler triggered',
 
+  BOOK_REQUESTED: 'requested book ID ',
+  BOOK_FOUND: 'requested book: ',
+  BOOK_BORROW: ' borrowing book ID: ',
+  BOOK_RETURN: ' returning some book',
+  BOOK_RETURN_ID: ' returning book ID: ',
+  NO_BOOK_RETURN: ' has no book to return',
+  BOOK_PROLONG: ' prolonging book: ',
+  WRONG_COMMAND: ' calling wrong command: ',
+
   INVALID_BOOK_ID_FORMAT: 'Invalid bookID format: ',
   INVALID_BOOK_ID_DATABASE: 'Invalid bookID in the database: ',
   INVALID_BOOK_ID_BODY: 'Invalid bookID in the event body',

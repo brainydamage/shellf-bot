@@ -1,6 +1,5 @@
 const devConfig = {
   REGION: 'eu-central-1',
-  ANY: 'any',
   CLIENT_EMAIL: 'shellf_client_email',
   CLIENT_PRIVATE_KEY: 'shellf_private_key',
   SCOPE: 'https://www.googleapis.com/auth/spreadsheets',
@@ -26,7 +25,6 @@ const devConfig = {
 
 const prodConfig = {
   REGION: 'eu-central-1',
-  ANY: 'any',
   CLIENT_EMAIL: 'shellf_client_email',
   CLIENT_PRIVATE_KEY: 'shellf_private_key',
   SCOPE: 'https://www.googleapis.com/auth/spreadsheets',

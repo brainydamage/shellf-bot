@@ -17,12 +17,12 @@ module.exports.getDatesKeyboardArray = async (arrayOfBooks) => {
     });
   });
 
-  // keyboardArray.push([
-  //   {
-  //     text: 'Отмена',
-  //     callback_data: `_cancel`,
-  //   },
-  // ])
+  keyboardArray.push([
+    {
+      text: 'отмена',
+      callback_data: `_cancel`,
+    },
+  ])
 
   return keyboardArray;
 };

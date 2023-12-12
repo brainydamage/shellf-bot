@@ -70,6 +70,8 @@ module.exports.returnBook = async (chatID, body) => {
     const match = body.callback_query.data.match(/_return_(\d+)/);
     const bookID = match[1];
 
+    console.log(`${chatID}${messages.BOOK_RETURN_ID}${bookID}`);
+
     const rows = await googleSheetsUtils.getRows(config.BOOKS_LOG);
 
     let bookRowIndex = -1;
@@ -105,8 +107,6 @@ module.exports.returnBook = async (chatID, body) => {
       console.error(nestedError.message);
       console.error(nestedError);
 
-      // This could include alternative ways to notify the error, like
-      // sending an email alert or message to the team
       const adminChatID = config.ADMIN_CHAT_ID;
       const adminMessage = `${userMessages.ADMIN_ERROR}${username}, chatID: ${chatID}, команда: ${commands.RETURN_CALLBACK}`;
       await telegramUtils.sendMessage(adminChatID, adminMessage);
@@ -121,6 +121,8 @@ module.exports.prolongBook = async (chatID, body) => {
   try {
     const match = body.callback_query.data.match(/_prolong_(\d+)/);
     const bookID = match[1];
+
+    console.log(`${chatID}${messages.BOOK_PROLONG}${bookID}`);
 
     const rows = await googleSheetsUtils.getRows(config.BOOKS_LOG);
 
@@ -164,11 +166,13 @@ module.exports.prolongBook = async (chatID, body) => {
       console.error(nestedError.message);
       console.error(nestedError);
 
-      // This could include alternative ways to notify the error, like
-      // sending an email alert or message to the team
       const adminChatID = config.ADMIN_CHAT_ID;
       const adminMessage = `${userMessages.ADMIN_ERROR}${username}, chatID: ${chatID}, команда: ${commands.PROLONG_CALLBACK}`;
       await telegramUtils.sendMessage(adminChatID, adminMessage);
     }
   }
+}
+
+module.exports.cancel = async (body) => {
+  await telegramUtils.deleteMessage(body);
 }
