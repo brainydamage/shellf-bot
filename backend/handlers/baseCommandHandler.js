@@ -5,7 +5,7 @@ const messages = require("../constants/messages");
 const userMessages = require("../constants/userMessages");
 const commands = require("../constants/commands");
 
-async function timestampToHumanReadable(timestamp) {
+function timestampToHumanReadable(timestamp) {
   const date = new Date(timestamp * 1000);
 
   const options = {
@@ -20,7 +20,7 @@ async function timestampToHumanReadable(timestamp) {
   return date.toLocaleString('ru-RU', options);
 }
 
-async function addOneMonthAndFormat(timestamp) {
+function addOneMonthAndFormat(timestamp) {
   const date = new Date(timestamp * 1000);
 
   date.setMonth(date.getMonth() + 1); // Add one month
@@ -32,18 +32,38 @@ async function addOneMonthAndFormat(timestamp) {
   return `${day}.${month}.${year}`;
 }
 
+async function sendMessage(username, chatID, message, commandName) {
+  try {
+    await telegramUtils.sendMessage(chatID, message);
+  } catch (error) {
+    console.error(messages.FAILED_SEND_ERROR_TG);
+    console.error(error.message);
+    console.error(error);
+
+    const adminChatID = config.ADMIN_CHAT_ID;
+    const adminMessage = `${userMessages.ADMIN_ERROR}username: ${username}, chatID: ${chatID}, команда: ${commandName}`;
+    await telegramUtils.sendMessage(adminChatID, adminMessage);
+  }
+}
+
 module.exports.borrowBook = async (chatID, body) => {
   const bodyMessage = body.message;
   const match = bodyMessage.text.match(/\/start (\d+)/);
-  let bookID;
+
   if (match && match[1]) {
-    bookID = parseInt(match[1], 10);
+    const bookID = parseInt(match[1], 10);
     console.log(`${chatID}${messages.BOOK_BORROW}${bookID}`);
+
+    if (isNaN(bookID)) {
+      console.error(
+        `${messages.INVALID_BOOK_ID_BODY}: ${bodyMessage.text}, chatID: ${chatID}`);
+      return;
+    }
 
     const username = bodyMessage.from.username;
     const timestamp = bodyMessage.date;
-    const dateTime = await timestampToHumanReadable(timestamp);
-    const deadlineDate = await addOneMonthAndFormat(timestamp);
+    const dateTime = timestampToHumanReadable(timestamp);
+    const deadlineDate = addOneMonthAndFormat(timestamp);
     const data = [dateTime, deadlineDate, username, chatID, bookID];
 
     await telegramUtils.deleteMessage(body);
@@ -51,25 +71,16 @@ module.exports.borrowBook = async (chatID, body) => {
     try {
 
       await googleSheetsUtils.appendRow(config.BOOKS_LOG, data);
-      await telegramUtils.sendMessage(chatID,
-        `${userMessages.BOOK_BORROWED}${deadlineDate}${userMessages.BOOK_BORROWED_ENDING}`);
+      await sendMessage(username, chatID,
+        `${userMessages.BOOK_BORROWED}${deadlineDate}${userMessages.BOOK_BORROWED_ENDING}`,
+        commands.START);
 
     } catch (error) {
       console.error(messages.FAILED_BORROW_BOOK);
       console.error(error.message);
       console.error(error);
 
-      try {
-        await telegramUtils.sendMessage(chatID, userMessages.SUPPORT);
-      } catch (nestedError) {
-        console.error(messages.FAILED_SEND_ERROR_TG);
-        console.error(nestedError.message);
-        console.error(nestedError);
-
-        const adminChatID = config.ADMIN_CHAT_ID;
-        const adminMessage = `${userMessages.ADMIN_ERROR}${username}, chatID: ${chatID}, команда: ${commands.START}`;
-        await telegramUtils.sendMessage(adminChatID, adminMessage);
-      }
+      await sendMessage(username, chatID, userMessages.SUPPORT, commands.START);
     }
   } else {
     console.error(
@@ -113,8 +124,7 @@ module.exports.returnBook = async (chatID, body) => {
           bookAuthor = book.author;
         }
 
-        const bookInfo = bookAuthor ? `${bookTitle}, ${bookAuthor}` :
-          bookTitle;
+        const bookInfo = bookAuthor ? `${bookTitle}, ${bookAuthor}` : bookTitle;
 
         const bookToReturn = {
           [bookID]: `${bookInfo}`
@@ -130,7 +140,8 @@ module.exports.returnBook = async (chatID, body) => {
     } else {
       console.log(`${chatID}${messages.NO_BOOK_RETURN}`);
 
-      await telegramUtils.sendMessage(chatID, userMessages.NO_BOOK_TO_RETURN);
+      await sendMessage(username, chatID, userMessages.NO_BOOK_TO_RETURN,
+        commands.RETURN);
     }
 
   } catch (error) {
@@ -138,17 +149,8 @@ module.exports.returnBook = async (chatID, body) => {
     console.error(error.message);
     console.error(error);
 
-    try {
-      await telegramUtils.sendMessage(chatID, userMessages.SUPPORT);
-    } catch (nestedError) {
-      console.error(messages.FAILED_SEND_ERROR_TG);
-      console.error(nestedError.message);
-      console.error(nestedError);
-
-      const adminChatID = config.ADMIN_CHAT_ID;
-      const adminMessage = `${userMessages.ADMIN_ERROR}${username}, chatID: ${chatID}, команда: ${commands.RETURN}`;
-      await telegramUtils.sendMessage(adminChatID, adminMessage);
-    }
+    await sendMessage(username, chatID, userMessages.NO_BOOK_TO_RETURN,
+      commands.RETURN);
   }
 }
 

@@ -48,6 +48,7 @@ module.exports.handler = async (event) => {
             bookID: row[bookIDColumn],
             title: row[titleColumn],
             author: row[authorColumn],
+            deadline: deadline,
             prolonged: row[prolongedColumn],
           });
         }

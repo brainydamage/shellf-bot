@@ -49,6 +49,8 @@ module.exports.handler = async (event) => {
       await callbackCommandHandler.prolongBook(chatID, body);
     } else if (data.startsWith(commands.CANCEL)) {
       await callbackCommandHandler.cancel(chatID, body);
+    } else if (data.startsWith(commands.HOW_TO_RETURN)) {
+      await callbackCommandHandler.howToReturn(chatID, body);
     }
   } else {
     console.warn(messages.INVALID_PAYLOAD);
