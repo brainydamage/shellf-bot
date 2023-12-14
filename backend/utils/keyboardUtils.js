@@ -37,5 +37,12 @@ module.exports.getProlongKeyboard = async (bookID) => {
     },
   ])
 
+  keyboardArray.push([
+    {
+      text: 'как вернуть?',
+      callback_data: `_how_to_return`,
+    },
+  ])
+
   return keyboardArray;
 };

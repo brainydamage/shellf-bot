@@ -178,3 +178,10 @@ module.exports.cancel = async (chatID, body) => {
 
   await telegramUtils.deleteMessage(body);
 }
+
+module.exports.howToReturn = async (chatID, body) => {
+  console.log(`${chatID}${messages.HOW_TO_RETURN}`);
+
+  // await telegramUtils.deleteMessage(body);
+  await telegramUtils.sendMessage(chatID, userMessages.HOW_TO_RETURN);
+}

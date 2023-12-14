@@ -15,6 +15,7 @@ module.exports = {
   HELP_COMMAND: ' calling /HELP command',
   EMPTY_START: ' calling /START command without bookID',
   CANCELED: ' cancelled returning a book',
+  HOW_TO_RETURN: ' asks how to return',
 
   INVALID_BOOK_ID_FORMAT: 'Invalid bookID format: ',
   INVALID_BOOK_ID_DATABASE: 'Invalid bookID in the database: ',

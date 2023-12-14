@@ -64,7 +64,7 @@ module.exports.remindToReturn = async (chatId, reminder) => {
 
   const bookInfo = reminder.author ? `${reminder.title}, ${reminder.author}` :
     reminder.title;
-  const message = `${userMessages.REMINDER}${bookInfo}${userMessages.REMINDER_ENDING}`;
+  const message = `${userMessages.REMINDER}${reminder.deadline}:\n\n${bookInfo}${userMessages.REMINDER_ENDING}`;
 
   try {
     if (keyboardExtra) {
