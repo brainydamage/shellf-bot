@@ -88,12 +88,16 @@ module.exports.returnBook = async (chatID, body) => {
       }
     }
 
-    const returnDate = await timestampToHumanReadable(Date.now());
-    const range = `A${bookRowIndex + 1}:Z${bookRowIndex + 1}`;
-    const data = setReturnDateForRowArray(bookRow, returnDate);
+    if (bookRowIndex !== -1 && bookRow !== null) {
+      const returnDate = await timestampToHumanReadable(Date.now());
+      const range = `A${bookRowIndex + 1}:Z${bookRowIndex + 1}`;
+      const data = setReturnDateForRowArray(bookRow, returnDate);
 
-    await googleSheetsUtils.updateRow(range, data);
-    await telegramUtils.sendMessage(chatID, userMessages.BOOK_RETURNED);
+      await googleSheetsUtils.updateRow(range, data);
+      await telegramUtils.sendMessage(chatID, userMessages.BOOK_RETURNED);
+    } else {
+      console.warn(`${messages.WARN_RETURN_BOOK}`);
+    }
 
   } catch (error) {
     console.error(messages.FAILED_RETURN_BOOK);
@@ -142,17 +146,21 @@ module.exports.prolongBook = async (chatID, body) => {
       }
     }
 
-    const timestamp = body.callback_query.message.date;
-    const deadlineDate = await add10DaysAndFormat(timestamp);
-    const prolongDate = await timestampToHumanReadable(Date.now());
+    if (bookRowIndex !== -1 && bookRow !== null) {
+      const timestamp = body.callback_query.message.date;
+      const deadlineDate = await add10DaysAndFormat(timestamp);
+      const prolongDate = await timestampToHumanReadable(Date.now());
 
-    const range = `A${bookRowIndex + 1}:Z${bookRowIndex + 1}`;
-    const data = setProlongAndDeadlineDatesForRowArray(bookRow, prolongDate,
-      deadlineDate);
+      const range = `A${bookRowIndex + 1}:Z${bookRowIndex + 1}`;
+      const data = setProlongAndDeadlineDatesForRowArray(bookRow, prolongDate,
+        deadlineDate);
 
-    await googleSheetsUtils.updateRow(range, data);
-    await telegramUtils.sendMessage(chatID,
-      `${userMessages.BOOK_BORROWED}${deadlineDate}`);
+      await googleSheetsUtils.updateRow(range, data);
+      await telegramUtils.sendMessage(chatID,
+        `${userMessages.BOOK_BORROWED}${deadlineDate}`);
+    } else {
+      console.warn(`${messages.WARN_PROLONG_BOOK}`);
+    }
 
   } catch (error) {
     console.error(messages.FAILED_PROLONG_BOOK);
@@ -179,9 +187,8 @@ module.exports.cancel = async (chatID, body) => {
   await telegramUtils.deleteMessage(body);
 }
 
-module.exports.howToReturn = async (chatID, body) => {
+module.exports.howToReturn = async (chatID) => {
   console.log(`${chatID}${messages.HOW_TO_RETURN}`);
 
-  await telegramUtils.deleteMessage(body);
   await telegramUtils.sendMessage(chatID, userMessages.HOW_TO_RETURN);
 }

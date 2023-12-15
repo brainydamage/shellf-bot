@@ -31,6 +31,8 @@ module.exports = {
   FAILED_BORROW_BOOK: 'Failed to borrow book',
   FAILED_RETURN_BOOK: 'Failed to return book',
   FAILED_PROLONG_BOOK: 'Failed to prolong book',
+  WARN_PROLONG_BOOK: 'Row with book to PROLONG is not found, probably "double click" situation',
+  WARN_RETURN_BOOK: 'Row with book to RETURN is not found, probably "double click" situation',
 
   //TG
   FAILED_SEND_TG: 'Failed to send telegram message',

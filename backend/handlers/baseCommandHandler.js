@@ -41,7 +41,8 @@ async function sendMessage(username, chatID, message, commandName) {
     console.error(error);
 
     const adminChatID = config.ADMIN_CHAT_ID;
-    const adminMessage = `${userMessages.ADMIN_ERROR}username: ${username}, chatID: ${chatID}, команда: ${commandName}`;
+    username = username && `username: @${username}`;
+    const adminMessage = `${userMessages.ADMIN_ERROR}${username}, chatID: ${chatID}, команда: ${commandName}`;
     await telegramUtils.sendMessage(adminChatID, adminMessage);
   }
 }
@@ -69,7 +70,6 @@ module.exports.borrowBook = async (chatID, body) => {
     await telegramUtils.deleteMessage(body);
 
     try {
-
       await googleSheetsUtils.appendRow(config.BOOKS_LOG, data);
       await sendMessage(username, chatID,
         `${userMessages.BOOK_BORROWED}${deadlineDate}${userMessages.BOOK_BORROWED_ENDING}`,

@@ -50,7 +50,7 @@ module.exports.handler = async (event) => {
     } else if (data.startsWith(commands.CANCEL)) {
       await callbackCommandHandler.cancel(chatID, body);
     } else if (data.startsWith(commands.HOW_TO_RETURN)) {
-      await callbackCommandHandler.howToReturn(chatID, body);
+      await callbackCommandHandler.howToReturn(chatID);
     }
   } else {
     console.warn(messages.INVALID_PAYLOAD);
