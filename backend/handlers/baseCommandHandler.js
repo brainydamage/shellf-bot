@@ -180,7 +180,7 @@ module.exports.support = async (chatID, body) => {
 
   await telegramUtils.deleteMessage(body);
 
-  const supportMessage = `${userMessages.DONATE}${config.TINKOFF_LINK}\n${config.PAYPAL_LINK}`;
+  const supportMessage = `${userMessages.DONATE}${config.TINKOFF_LINK}\n\n${config.PAYPAL_LINK}`;
   await telegramUtils.sendFormattedMessage(chatID, supportMessage,
     'MarkdownV2');
 }
