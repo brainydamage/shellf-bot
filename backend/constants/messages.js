@@ -13,6 +13,7 @@ module.exports = {
   BOOK_PROLONG: ' prolonging book: ',
   WRONG_COMMAND: ' calling wrong command: ',
   HELP_COMMAND: ' calling /HELP command',
+  SUPPORT_COMMAND: ' calling /SUPPORT command',
   EMPTY_START: ' calling /START command without bookID',
   CANCELED: ' cancelled returning a book',
   HOW_TO_RETURN: ' asks how to return',

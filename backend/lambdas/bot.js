@@ -35,6 +35,8 @@ module.exports.handler = async (event) => {
       await baseCommandHandler.returnBook(chatID, body);
     } else if (body.message.text.startsWith(commands.HELP)) {
       await baseCommandHandler.showHelpMessage(chatID, body);
+    } else if (body.message.text.startsWith(commands.SUPPORT)) {
+      await baseCommandHandler.support(chatID, body);
     } else {
       await baseCommandHandler.wrongCommand(chatID, body);
     }

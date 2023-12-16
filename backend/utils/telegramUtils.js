@@ -35,6 +35,18 @@ module.exports.sendMessage = async (chatId, message) => {
   }
 };
 
+module.exports.sendFormattedMessage = async (chatId, message, parseMode) => {
+  try {
+    await bot.telegram.sendMessage(chatId, message, {
+      parse_mode: parseMode,
+      disable_web_page_preview: true
+    });
+  } catch (error) {
+    console.error(error);
+    throw new Error(messages.FAILED_SEND_TG);
+  }
+};
+
 module.exports.showBooksToReturn = async (chatId, arrayOfBooks) => {
   let keyboardArray = await keyboardUtils.getDatesKeyboardArray(arrayOfBooks);
 

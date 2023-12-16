@@ -21,6 +21,9 @@ const devConfig = {
   PROLONG_COLUMN: 7,
   RETURN_COLUMN: 8,
   COLUMNS_NUMBER: 9,
+
+  TINKOFF_LINK: 'https://www.tinkoff.ru/collectmoney/crowd/anderson.layma1/latFj82826/?short_link=165fWSttnKA&httpMethod=GET',
+  PAYPAL_LINK: 'paypal.me/shelllf',
 };
 
 const prodConfig = {
@@ -46,6 +49,9 @@ const prodConfig = {
   PROLONG_COLUMN: 7,
   RETURN_COLUMN: 8,
   COLUMNS_NUMBER: 9,
+
+  TINKOFF_LINK: '[tinkoff](https://www.tinkoff.ru/collectmoney/crowd/anderson.layma1/latFj82826/?short_link=165fWSttnKA&httpMethod=GET)',
+  PAYPAL_LINK: '[paypal](https://www.paypal.com/paypalme/shelllf)',
 };
 
 const config = process.env.NODE_ENV === 'production' ? prodConfig : devConfig;

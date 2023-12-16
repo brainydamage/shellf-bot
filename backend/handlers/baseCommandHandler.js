@@ -174,3 +174,13 @@ module.exports.showHelpMessage = async (chatID, body) => {
   await telegramUtils.deleteMessage(body);
   await telegramUtils.sendMessage(chatID, userMessages.HELP_COMMAND);
 }
+
+module.exports.support = async (chatID, body) => {
+  console.log(`${chatID}${messages.SUPPORT_COMMAND}`);
+
+  await telegramUtils.deleteMessage(body);
+
+  const supportMessage = `${userMessages.DONATE}${config.TINKOFF_LINK}\n${config.PAYPAL_LINK}`;
+  await telegramUtils.sendFormattedMessage(chatID, supportMessage,
+    'MarkdownV2');
+}
