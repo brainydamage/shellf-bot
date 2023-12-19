@@ -23,6 +23,7 @@ module.exports = {
   INVALID_BOOK_ID_BODY: 'Invalid bookID in the event body',
   INVALID_PAYLOAD: 'Invalid or strange payload',
   NOT_VALID_BOOK_ID: 'Not valid book id',
+  INVALID_ROW_NUMBER: 'Could not extract row number from updated range',
 
   NO_BOOKS_AVAILABLE: 'No books available',
   WRONG_PLACE: 'book is on the wrong place, searching...',
@@ -30,6 +31,7 @@ module.exports = {
   BOOK_NOT_FOUND: 'Book not found',
 
   FAILED_BORROW_BOOK: 'Failed to borrow book',
+  FAILED_GET_BOOK_DATA: 'Failed to get book data while borrowing',
   FAILED_RETURN_BOOK: 'Failed to return book',
   FAILED_PROLONG_BOOK: 'Failed to prolong book',
   WARN_PROLONG_BOOK: 'Row with book to PROLONG is not found, probably "double click" situation',

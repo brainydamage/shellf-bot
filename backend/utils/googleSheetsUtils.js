@@ -68,7 +68,7 @@ async function getBookData(requestedBookID) {
   let book;
 
   const row = await getRow(config.BOOKS_DB,
-    requestedBookID + 1);
+    requestedBookID + 1, "A", "D");
   if (row && parseInt(row[config.ID_COLUMN], 10) === requestedBookID) {
     // Found the book in the expected row
     book = await extractBookDetails(row);
@@ -96,11 +96,11 @@ async function getRows(range) {
   }
 }
 
-async function getRow(sheetName, rowNumber) {
+async function getRow(sheetName, rowNumber, firstColumn, lastColumn) {
   try {
     const spreadsheetId = config.SHEETS_ID;
     const sheets = await getGoogleSheets();
-    const range = `${sheetName}!A${rowNumber}:D${rowNumber}`;
+    const range = `${sheetName}!${firstColumn}${rowNumber}:${lastColumn}${rowNumber}`;
 
     const response = await sheets.spreadsheets.values.get(
       {spreadsheetId, range});
@@ -125,13 +125,14 @@ async function appendRow(range, data) {
       values: [data],
     };
 
-    await sheets.spreadsheets.values.append({
+    const result = await sheets.spreadsheets.values.append({
       spreadsheetId,
       range,
       valueInputOption,
       resource,
     });
     console.log(`Row appended to ${spreadsheetId}, data: ${data}`);
+    return result;
   } catch (error) {
     console.error(messages.FAILED_UPDATE_DB);
     console.error(error.message);
@@ -166,6 +167,7 @@ async function updateRow(range, data) {
 
 module.exports = {
   getBookData,
+  getRow,
   getRows,
   appendRow,
   updateRow

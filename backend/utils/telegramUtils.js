@@ -35,10 +35,10 @@ module.exports.sendMessage = async (chatId, message) => {
   }
 };
 
-module.exports.sendFormattedMessage = async (chatId, message, parseMode) => {
+module.exports.sendFormattedMessage = async (chatId, message) => {
   try {
     await bot.telegram.sendMessage(chatId, message, {
-      parse_mode: parseMode,
+      parse_mode: "Markdown",
       disable_web_page_preview: true
     });
   } catch (error) {

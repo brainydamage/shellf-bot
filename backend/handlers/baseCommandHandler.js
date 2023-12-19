@@ -34,7 +34,7 @@ function addOneMonthAndFormat(timestamp) {
 
 async function sendMessage(username, chatID, message, commandName) {
   try {
-    await telegramUtils.sendMessage(chatID, message);
+    await telegramUtils.sendFormattedMessage(chatID, message);
   } catch (error) {
     console.error(messages.FAILED_SEND_ERROR_TG);
     console.error(error.message);
@@ -69,11 +69,41 @@ module.exports.borrowBook = async (chatID, body) => {
 
     await telegramUtils.deleteMessage(body);
 
+    let message = `${userMessages.BOOK_BORROWED}*${deadlineDate}*`;
+    let rowNumber;
+
     try {
-      await googleSheetsUtils.appendRow(config.BOOKS_LOG, data);
-      await sendMessage(username, chatID,
-        `${userMessages.BOOK_BORROWED}${deadlineDate}${userMessages.BOOK_BORROWED_ENDING}`,
-        commands.START);
+      const response = await googleSheetsUtils.appendRow(config.BOOKS_LOG,
+        data);
+      const updatedRange = response.data.updates.updatedRange;
+      const rowNumberRegex = /!A(\d+):/;
+      const match = updatedRange.match(rowNumberRegex);
+
+      if (match && match.length > 1) {
+        rowNumber = parseInt(match[1], 10);
+
+        try {
+          const row = await googleSheetsUtils.getRow(config.BOOKS_LOG,
+            rowNumber,
+            "E", "H");
+          if (row && parseInt(row[0], 10) === bookID) {
+            // Found the book in the expected row
+            const book = {title: row[1], author: row[2], shelf: row[3]};
+            const bookInfo = book.author ? `${book.title}, ${book.author}` :
+              book.title;
+
+            message += ` на полку *${book.shelf}*:\n\n${bookInfo}`;
+          }
+
+        } catch (innerError) {
+          console.error(messages.FAILED_GET_BOOK_DATA);
+          console.error(innerError.message);
+          console.error(innerError);
+        }
+
+      } else {
+        console.error(messages.INVALID_ROW_NUMBER);
+      }
 
     } catch (error) {
       console.error(messages.FAILED_BORROW_BOOK);
@@ -81,7 +111,12 @@ module.exports.borrowBook = async (chatID, body) => {
       console.error(error);
 
       await sendMessage(username, chatID, userMessages.SUPPORT, commands.START);
+      return;
     }
+
+    message += `${userMessages.BOOK_BORROWED_ENDING}`;
+    await sendMessage(username, chatID, message, commands.START);
+
   } else {
     console.error(
       `${messages.INVALID_BOOK_ID_BODY}: ${bodyMessage.text}, chatID: ${chatID}`);
@@ -181,6 +216,5 @@ module.exports.support = async (chatID, body) => {
   await telegramUtils.deleteMessage(body);
 
   const supportMessage = `${userMessages.DONATE}${config.TINKOFF_LINK}\n${config.PAYPAL_LINK}`;
-  await telegramUtils.sendFormattedMessage(chatID, supportMessage,
-    'MarkdownV2');
+  await telegramUtils.sendFormattedMessage(chatID, supportMessage);
 }
