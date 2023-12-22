@@ -50,6 +50,7 @@ async function sendMessage(username, chatID, message, commandName) {
 module.exports.borrowBook = async (chatID, body) => {
   const bodyMessage = body.message;
   const match = bodyMessage.text.match(/\/start (\d+)/);
+  const username = bodyMessage.from.username;
 
   if (match && match[1]) {
     const bookID = parseInt(match[1], 10);
@@ -61,7 +62,6 @@ module.exports.borrowBook = async (chatID, body) => {
       return;
     }
 
-    const username = bodyMessage.from.username;
     const timestamp = bodyMessage.date;
     const dateTime = timestampToHumanReadable(timestamp);
     const deadlineDate = addOneMonthAndFormat(timestamp);
@@ -84,8 +84,7 @@ module.exports.borrowBook = async (chatID, body) => {
 
         try {
           const row = await googleSheetsUtils.getRow(config.BOOKS_LOG,
-            rowNumber,
-            "E", "H");
+            rowNumber, "E", "H");
           if (row && parseInt(row[0], 10) === bookID) {
             // Found the book in the expected row
             const book = {title: row[1], author: row[2], shelf: row[3]};
@@ -212,6 +211,7 @@ module.exports.showHelpMessage = async (chatID, body) => {
 
 module.exports.support = async (chatID, body) => {
   console.log(`${chatID}${messages.SUPPORT_COMMAND}`);
+  const username = body.message.from.username;
 
   await telegramUtils.deleteMessage(body);
 
