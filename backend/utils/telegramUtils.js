@@ -26,6 +26,25 @@ module.exports.deleteMessage = async (body) => {
   }
 };
 
+module.exports.deleteMessageNew = async (parsedBody) => {
+  const messageID = parsedBody.messageID;
+  const chatID = parsedBody.chatID;
+
+  if (messageID && chatID) {
+    try {
+      await bot.telegram.deleteMessage(chatID, messageID);
+    } catch (error) {
+      // console.error(error);
+      //log failed to delete tg message?
+    }
+  }
+  // else if (messageID) {
+  //   console.error(`${messages.NO_CHAT_TG}${chatID}`);
+  // } else if (chatID) {
+  //   console.error(`${messages.NO_MESSAGE_TG}${messageID}`);
+  // }
+};
+
 module.exports.sendMessage = async (chatId, message) => {
   try {
     await bot.telegram.sendMessage(chatId, message);

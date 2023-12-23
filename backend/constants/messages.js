@@ -9,7 +9,7 @@ module.exports = {
   BOOK_BORROW: ' borrowing book ID: ',
   BOOK_RETURN: ' returning some book',
   BOOK_RETURN_ID: ' returning book ID: ',
-  NO_BOOK_RETURN: ' has no book to return',
+  NO_BOOK_RETURN: 'user has no book to return',
   BOOK_PROLONG: ' prolonging book: ',
   WRONG_COMMAND: ' calling wrong command: ',
   HELP_COMMAND: ' calling /HELP command',
@@ -27,7 +27,7 @@ module.exports = {
 
   NO_BOOKS_AVAILABLE: 'No books available',
   WRONG_PLACE: 'book is on the wrong place, searching...',
-  EMPTY_TITLE_LOG: 'title is empty, searching in books db...',
+  EMPTY_TITLE_LOG: 'book title is empty, searching in books db...',
   BOOK_NOT_FOUND: 'Book not found',
 
   FAILED_BORROW_BOOK: 'Failed to borrow book',

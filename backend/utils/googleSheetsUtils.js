@@ -89,9 +89,9 @@ async function getRows(range) {
       {spreadsheetId, range});
     return response.data.values;
   } catch (error) {
-    console.error(messages.FAILED_READ_DB);
-    console.error(error.message);
-    console.error(error);
+    // console.error(messages.FAILED_READ_DB);
+    // console.error(error.message);
+    // console.error(error);
     throw new Error(messages.FAILED_READ_DB);
   }
 }
@@ -108,9 +108,9 @@ async function getRow(sheetName, rowNumber, firstColumn, lastColumn) {
     const rows = response.data.values;
     return rows.length > 0 ? rows[0] : null;
   } catch (error) {
-    console.error(messages.FAILED_READ_DB);
-    console.error(error.message);
-    console.error(error);
+    // console.error(messages.FAILED_READ_DB);
+    // console.error(error.message);
+    // console.error(error);
     throw new Error(messages.FAILED_READ_DB);
   }
 }
@@ -134,9 +134,9 @@ async function appendRow(range, data) {
     console.log(`Row appended to ${spreadsheetId}, data: ${data}`);
     return result;
   } catch (error) {
-    console.error(messages.FAILED_UPDATE_DB);
-    console.error(error.message);
-    console.error(error);
+    // console.error(messages.FAILED_UPDATE_DB);
+    // console.error(error.message);
+    // console.error(error);
     throw new Error(messages.FAILED_UPDATE_DB);
   }
 }
@@ -158,9 +158,9 @@ async function updateRow(range, data) {
     });
     console.log(`Row updated in ${spreadsheetId}, data: ${data}`);
   } catch (error) {
-    console.error(messages.FAILED_UPDATE_ROW_DB);
-    console.error(error.message);
-    console.error(error);
+    // console.error(messages.FAILED_UPDATE_ROW_DB);
+    // console.error(error.message);
+    // console.error(error);
     throw new Error(messages.FAILED_UPDATE_ROW_DB);
   }
 }
