@@ -2,6 +2,8 @@ const {Telegraf} = require('telegraf');
 const keyboardUtils = require("../utils/keyboardUtils");
 const messages = require("../constants/messages");
 const userMessages = require("../constants/userMessages");
+const log = require("npmlog");
+const config = require("../constants/config");
 
 const TOKEN = process.env.TELEGRAM_TOKEN;
 const bot = new Telegraf(TOKEN);
@@ -34,15 +36,9 @@ module.exports.deleteMessageNew = async (parsedBody) => {
     try {
       await bot.telegram.deleteMessage(chatID, messageID);
     } catch (error) {
-      // console.error(error);
       //log failed to delete tg message?
     }
   }
-  // else if (messageID) {
-  //   console.error(`${messages.NO_CHAT_TG}${chatID}`);
-  // } else if (chatID) {
-  //   console.error(`${messages.NO_MESSAGE_TG}${messageID}`);
-  // }
 };
 
 module.exports.sendMessage = async (chatId, message) => {
@@ -54,15 +50,36 @@ module.exports.sendMessage = async (chatId, message) => {
   }
 };
 
-module.exports.sendFormattedMessage = async (chatId, message) => {
+module.exports.sendFormattedMessage = async (message, parsedBody) => {
+  const commandName = parsedBody.command || parsedBody.callback;
+
   try {
-    await bot.telegram.sendMessage(chatId, message, {
-      parse_mode: "Markdown",
-      disable_web_page_preview: true
+    await bot.telegram.sendMessage(parsedBody.chatID, message, {
+      parse_mode: "Markdown", disable_web_page_preview: true
     });
   } catch (error) {
-    console.error(error);
-    throw new Error(messages.FAILED_SEND_TG);
+    log.error('telegram-utils',
+      `Reason: "%s", TG Message: "%s", Username: %s, ChatID: %s, CommandName: %s, ErrorMessage: %s`,
+      messages.FAILED_SEND_TG, message, parsedBody.username, parsedBody.chatID,
+      commandName, error.message);
+
+    // Send error notification to admin
+    const adminChatID = config.ADMIN_CHAT_ID;
+    const formattedUsername = parsedBody.username ?
+      `username: @${parsedBody.username}` : 'unknown username';
+    const adminMessage = `${userMessages.ADMIN_ERROR}${formattedUsername}, chatID: ${parsedBody.chatID}, command: ${commandName}, error: ${error.message}`;
+
+    try {
+      await bot.telegram.sendMessage(adminChatID, adminMessage);
+    } catch (adminError) {
+      log.error('telegram-utils',
+        `Reason: "%s", TG Message: "%s", ChatID: %s, CommandName: %s, ErrorMessage: %s`,
+        messages.FAILED_SEND_TG_ADMIN, adminMessage, adminChatID, commandName,
+        error.message);
+    }
+
+    // throw error;
+
   }
 };
 
@@ -76,7 +93,7 @@ module.exports.showBooksToReturn = async (chatId, arrayOfBooks) => {
       },
     });
   } catch (error) {
-    console.error(error);
+    //log?
     throw new Error(messages.FAILED_SEND_TG_KEYBOARD);
   }
 };

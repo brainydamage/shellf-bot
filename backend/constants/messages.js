@@ -38,7 +38,8 @@ module.exports = {
   WARN_RETURN_BOOK: 'Row with book to RETURN is not found, probably "double click" situation',
 
   //TG
-  FAILED_SEND_TG: 'Failed to send telegram message',
+  FAILED_SEND_TG: 'Failed to send telegram message to user',
+  FAILED_SEND_TG_ADMIN: 'Failed to send telegram message to admin',
   FAILED_SEND_TG_KEYBOARD: 'Failed to send telegram message: list of books',
   FAILED_SEND_TG_PROLONG: 'Failed to send telegram message: prolong book',
   FAILED_SEND_ERROR_TG: 'Nested error sending error(!) message via Telegram:',

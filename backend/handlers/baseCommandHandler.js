@@ -33,21 +33,6 @@ function addOneMonthAndFormat(timestamp) {
   return `${day}.${month}.${year}`;
 }
 
-async function sendMessage(username, chatID, message, commandName) {
-  try {
-    await telegramUtils.sendFormattedMessage(chatID, message);
-  } catch (error) {
-    log.error('base-command-handler',
-      `Error: %s, Username: %s, ChatID: %s, Message: %s`,
-      messages.FAILED_SEND_ERROR_TG, username, chatID, error.message);
-
-    const adminChatID = config.ADMIN_CHAT_ID;
-    username = username && `username: @${username}`;
-    const adminMessage = `${userMessages.ADMIN_ERROR}${username}, chatID: ${chatID}, команда: ${commandName}`;
-    await telegramUtils.sendMessage(adminChatID, adminMessage);
-  }
-}
-
 module.exports.borrowBook = async (parsedBody) => {
   const timestamp = Math.floor(Date.now() / 1000);
   const dateTime = timestampToHumanReadable(timestamp);
@@ -83,36 +68,28 @@ module.exports.borrowBook = async (parsedBody) => {
 
       } catch (innerError) {
         log.error('base-command-handler',
-          `Error: %s, Username: %s, ChatID: %s, Message: %s`,
+          `Reason: "%s", Username: %s, ChatID: %s, ErrorMessage: %s`,
           messages.FAILED_GET_BOOK_DATA, parsedBody.username, parsedBody.chatID,
           innerError.message);
 
-        console.log(innerError);
+        console.error(innerError);
       }
-
-    } else {
-      log.error('base-command-handler',
-        `Error: %s, Username: %s, ChatID: %s, updatedRange: %s`,
-        messages.INVALID_ROW_NUMBER, parsedBody.username, parsedBody.chatID,
-        updatedRange);
     }
 
   } catch (error) {
     log.error('base-command-handler',
-      `Error: %s, Username: %s, ChatID: %s, Message: %s`,
+      `Reason: "%s", Username: %s, ChatID: %s, ErrorMessage: %s`,
       messages.FAILED_BORROW_BOOK, parsedBody.username, parsedBody.chatID,
       error.message);
 
-    console.log(error);
+    console.error(error);
 
-    await sendMessage(parsedBody.username, parsedBody.chatID,
-      userMessages.SUPPORT, commands.START);
+    await telegramUtils.sendFormattedMessage(userMessages.SUPPORT, parsedBody);
     return;
   }
 
   message += `${userMessages.BOOK_BORROWED_ENDING}`;
-  await sendMessage(parsedBody.username, parsedBody.chatID, message,
-    commands.START);
+  await telegramUtils.sendFormattedMessage(message, parsedBody);
 };
 
 module.exports.returnBook = async (parsedBody) => {
@@ -139,10 +116,6 @@ module.exports.returnBook = async (parsedBody) => {
         let bookAuthor = row[authorColumn];
 
         if (!bookTitle) {
-          log.info('base-command-handler',
-            `message: "%s", bookID: %s, rowNumber: %s`,
-            messages.EMPTY_TITLE_LOG, bookID, i + 1);
-
           const book = await googleSheetsUtils.getBookData(
             parseInt(bookID, 10));
           bookTitle = book.title;
@@ -150,10 +123,14 @@ module.exports.returnBook = async (parsedBody) => {
         }
 
         const bookInfo = bookAuthor ? `${bookTitle}, ${bookAuthor}` : bookTitle;
+        const rowNumber = i + 1;
 
         const bookToReturn = {
-          [bookID]: `${bookInfo}`
-        }
+          bookID: bookID,
+          bookInfo: bookInfo,
+          rowNumber: rowNumber
+        };
+
         arrayOfBooks.push(bookToReturn);
       }
     }
@@ -163,22 +140,19 @@ module.exports.returnBook = async (parsedBody) => {
     if (arrayOfBooks.length > 0) {
       await telegramUtils.showBooksToReturn(parsedBody.chatID, arrayOfBooks);
     } else {
-      log.info('base-command-handler',
-        `message: "%s", username: %s, chatID: %s`, messages.NO_BOOK_RETURN,
-        parsedBody.username, parsedBody.chatID);
-
-      await sendMessage(parsedBody.username, parsedBody.chatID,
-        userMessages.NO_BOOK_TO_RETURN, commands.RETURN);
+      await telegramUtils.sendFormattedMessage(userMessages.NO_BOOK_TO_RETURN,
+        parsedBody);
     }
 
   } catch (error) {
     log.error('base-command-handler',
-      `Error: %s, Username: %s, ChatID: %s, Message: %s`,
+      `Reason: "%s", Username: %s, ChatID: %s, ErrorMessage: %s`,
       messages.FAILED_RETURN_BOOK, parsedBody.username, parsedBody.chatID,
       error.message);
 
-    await sendMessage(parsedBody.username, parsedBody.chatID,
-      userMessages.NO_BOOK_TO_RETURN, commands.RETURN);
+    console.error(error);
+
+    await telegramUtils.sendFormattedMessage(userMessages.SUPPORT, parsedBody);
   }
 }
 
@@ -203,5 +177,5 @@ module.exports.support = async (parsedBody) => {
   await telegramUtils.deleteMessageNew(parsedBody);
 
   const supportMessage = `${userMessages.DONATE}${config.TINKOFF_LINK}\n${config.PAYPAL_LINK}`;
-  await telegramUtils.sendFormattedMessage(parsedBody.chatID, supportMessage);
+  await telegramUtils.sendFormattedMessage(supportMessage, parsedBody);
 }

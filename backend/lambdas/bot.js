@@ -12,6 +12,7 @@ function parseBody(body) {
     username: 'no_username',
     command: null,
     callback: null,
+    rowNumber: null,
     bookID: null,
     statusChange: null,
   };
@@ -42,11 +43,17 @@ function parseBody(body) {
 
     // Generalized extraction of bookID from callback data
     const parts = parsed.callback.split('_');
-    const lastPart = parts[parts.length - 1];
 
-    if (/^\d+$/.test(lastPart)) {
-      // If the last part is a number, set it as bookID
-      parsed.bookID = parseInt(lastPart, 10);
+    // Assuming format: _return_{bookID}_row{rowNumber}
+    if (parts.length === 4 && parts[1] === 'return') {
+      parsed.bookID = parseInt(parts[2], 10);
+
+      // Extract rowNumber from the last part
+      const rowPart = parts[parts.length - 1];
+      const rowNumberMatch = rowPart.match(/^row(\d+)$/);
+      if (rowNumberMatch && rowNumberMatch[1]) {
+        parsed.rowNumber = parseInt(rowNumberMatch[1], 10);
+      }
     }
   } else if (body.my_chat_member) {
     parsed.chatID = body.my_chat_member.chat.id;
@@ -57,7 +64,7 @@ function parseBody(body) {
     if (oldStatus === 'member' && newStatus === 'kicked') {
       parsed.statusChange = 'bot_kicked';
     } else if (oldStatus === 'kicked' && newStatus === 'member') {
-      parsed.statusChange = 'bot_readded';
+      parsed.statusChange = 'bot_unblocked';
     }
   }
 
@@ -77,9 +84,22 @@ module.exports.handler = async (event) => {
     log.error('bot', 'chatID is null: %j', body);
   }
 
+  // Check if the chat type is 'private'
+  if (body.message && body.message.chat.type !== 'private' ||
+    body.callback_query && body.callback_query.message.chat.type !==
+    'private') {
+    log.info('bot', 'non-private interaction skipped: %j', body);
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({message: "Non-private interaction, skipped"}),
+    };
+  }
+
+
   if (parsedBody.command) {
     log.info('bot-interactions',
-      'command: %s, bookID: %s, username: %s, chatID: %s', parsedBody.command,
+      'Command: %s, BookID: %s, Username: %s, ChatID: %s', parsedBody.command,
       parsedBody.bookID, parsedBody.username, parsedBody.chatID);
 
     if (parsedBody.command.startsWith(commands.START)) {
@@ -99,8 +119,12 @@ module.exports.handler = async (event) => {
     }
 
   } else if (parsedBody.callback) {
+    log.info('bot-interactions',
+      'Callback: %s, BookID: %s, Username: %s, ChatID: %s', parsedBody.callback,
+      parsedBody.bookID, parsedBody.username, parsedBody.chatID);
+
     if (parsedBody.callback.startsWith(commands.RETURN_CALLBACK)) {
-      await callbackCommandHandler.returnBook(chatID, body);
+      await callbackCommandHandler.returnBook(parsedBody);
     } else if (parsedBody.callback.startsWith(commands.PROLONG_CALLBACK)) {
       await callbackCommandHandler.prolongBook(chatID, body);
     } else if (parsedBody.callback === commands.CANCEL) {
@@ -108,8 +132,14 @@ module.exports.handler = async (event) => {
     } else if (parsedBody.callback === commands.HOW_TO_RETURN) {
       await callbackCommandHandler.howToReturn(chatID);
     }
+
   } else if (parsedBody.statusChange) {
     //user kicked or re-added the bot - what to do?
+    log.info('bot-interactions',
+      'StatusChange: %s, BookID: %s, Username: %s, ChatID: %s',
+      parsedBody.statusChange,
+      parsedBody.bookID, parsedBody.username, parsedBody.chatID);
+
   } else {
     log.warn('bot', `${messages.INVALID_PAYLOAD}: %j`, body);
   }

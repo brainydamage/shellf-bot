@@ -4,6 +4,7 @@ const telegramUtils = require("../utils/telegramUtils");
 const messages = require("../constants/messages");
 const userMessages = require("../constants/userMessages");
 const commands = require("../constants/commands");
+const log = require("npmlog");
 
 async function timestampToHumanReadable(timestamp) {
   const date = new Date(timestamp);
@@ -62,59 +63,36 @@ function setProlongAndDeadlineDatesForRowArray(inputArray, prolongDate,
   return transformedArray;
 }
 
-module.exports.returnBook = async (chatID, body) => {
-  await telegramUtils.deleteMessage(body);
-  const username = body.callback_query.message.chat.username;
+module.exports.returnBook = async (parsedBody) => {
+  await telegramUtils.deleteMessageNew(parsedBody);
 
   try {
-    const match = body.callback_query.data.match(/_return_(\d+)/);
-    const bookID = match[1];
+    const bookRow = await googleSheetsUtils.getRow(config.BOOKS_LOG,
+      parsedBody.rowNumber,
+      "A", "K");
 
-    console.log(`${chatID}${messages.BOOK_RETURN_ID}${bookID}`);
-
-    const rows = await googleSheetsUtils.getRows(config.BOOKS_LOG);
-
-    let bookRowIndex = -1;
-    let bookRow = null;
-
-    for (let i = 1; i < rows.length; i++) {
-      if (rows[i][config.CHATID_COLUMN] === chatID.toString() &&
-        rows[i][config.BOOKID_COLUMN] === bookID &&
-        (rows[i].length < config.COLUMNS_NUMBER ||
-          rows[i][config.RETURN_COLUMN] === '')) {
-        bookRowIndex = i;
-        bookRow = rows[i];
-        break;
-      }
-    }
-
-    if (bookRowIndex !== -1 && bookRow !== null) {
+    if (bookRow && bookRow.length < config.COLUMNS_NUMBER) {
       const returnDate = await timestampToHumanReadable(Date.now());
-      const range = `A${bookRowIndex + 1}:Z${bookRowIndex + 1}`;
-      const data = setReturnDateForRowArray(bookRow, returnDate);
+      const dataForRow = setReturnDateForRowArray(bookRow, returnDate);
 
-      await googleSheetsUtils.updateRow(range, data);
-      await telegramUtils.sendMessage(chatID, userMessages.BOOK_RETURNED);
+      const range = `A${parsedBody.rowNumber}:Z${parsedBody.rowNumber}`;
+      await googleSheetsUtils.updateRow(range, dataForRow);
+      await telegramUtils.sendFormattedMessage(userMessages.BOOK_RETURNED,
+        parsedBody);
+
     } else {
-      console.warn(`${messages.WARN_RETURN_BOOK}`);
+      // Handle case where row was not found or double-click
+      // console.warn(`${messages.WARN_RETURN_BOOK}`);
     }
-
   } catch (error) {
-    console.error(messages.FAILED_RETURN_BOOK);
-    console.error(error.message);
+    log.error('callback-command-handler',
+      `Reason: "%s", Username: %s, ChatID: %s, ErrorMessage: %s`,
+      messages.FAILED_RETURN_BOOK, parsedBody.username, parsedBody.chatID,
+      error.message);
+
     console.error(error);
 
-    try {
-      await telegramUtils.sendMessage(chatID, userMessages.SUPPORT);
-    } catch (nestedError) {
-      console.error(messages.FAILED_SEND_ERROR_TG);
-      console.error(nestedError.message);
-      console.error(nestedError);
-
-      const adminChatID = config.ADMIN_CHAT_ID;
-      const adminMessage = `${userMessages.ADMIN_ERROR}${username}, chatID: ${chatID}, команда: ${commands.RETURN_CALLBACK}`;
-      await telegramUtils.sendMessage(adminChatID, adminMessage);
-    }
+    await telegramUtils.sendFormattedMessage(userMessages.SUPPORT, parsedBody);
   }
 }
 

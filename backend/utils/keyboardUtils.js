@@ -2,19 +2,16 @@ module.exports.getDatesKeyboardArray = async (arrayOfBooks) => {
   let keyboardArray = [];
 
   arrayOfBooks.forEach(book => {
-    Object.entries(book).forEach(([bookID, bookInfo]) => {
-      // console.log(`Book ID: ${bookID}, Book Info: ${bookInfo}`);
+    const {bookID, bookInfo, rowNumber} = book;
 
-      const innerArray = [
-        {
-          text: `${bookInfo}`,
-          callback_data: `_return_${bookID}`,
-        },
-      ];
+    const innerArray = [
+      {
+        text: `${bookInfo}`,
+        callback_data: `_return_${bookID}_row${rowNumber}`,
+      },
+    ];
 
-      keyboardArray.push(innerArray);
-
-    });
+    keyboardArray.push(innerArray);
   });
 
   keyboardArray.push([
