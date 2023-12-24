@@ -8,7 +8,7 @@ const config = require("../constants/config");
 const TOKEN = process.env.TELEGRAM_TOKEN;
 const bot = new Telegraf(TOKEN);
 
-module.exports.deleteMessage = async (parsedBody) => {
+async function deleteMessage(parsedBody) {
   const messageID = parsedBody.messageID;
   const chatID = parsedBody.chatID;
 
@@ -19,51 +19,48 @@ module.exports.deleteMessage = async (parsedBody) => {
       //log failed to delete tg message?
     }
   }
-};
+}
 
-module.exports.sendMessage = async (chatId, message) => {
+async function sendMessage(chatId, message) {
   try {
     await bot.telegram.sendMessage(chatId, message);
   } catch (error) {
-    console.error(error);
-    throw new Error(messages.FAILED_SEND_TG);
+    // console.error(error);
+    // throw new Error(messages.FAILED_SEND_TG);
   }
-};
+}
 
-module.exports.sendFormattedMessage = async (message, parsedBody) => {
-  const commandName = parsedBody.command || parsedBody.callback;
-
+async function sendFormattedMessage(message, parsedBody) {
   try {
     await bot.telegram.sendMessage(parsedBody.chatID, message, {
       parse_mode: "Markdown", disable_web_page_preview: true
     });
   } catch (error) {
-    log.error('telegram-utils',
-      `Reason: "%s", TG Message: "%s", Username: %s, ChatID: %s, CommandName: %s, ErrorMessage: %s`,
-      messages.FAILED_SEND_TG, message, parsedBody.username, parsedBody.chatID,
-      commandName, error.message);
+    // console.error(error);
 
-    // Send error notification to admin
-    const adminChatID = config.ADMIN_CHAT_ID;
-    const formattedUsername = parsedBody.username ?
-      `username: @${parsedBody.username}` : 'unknown username';
-    const adminMessage = `${userMessages.ADMIN_ERROR}${formattedUsername}, chatID: ${parsedBody.chatID}, command: ${commandName}, error: ${error.message}`;
-
-    try {
-      await bot.telegram.sendMessage(adminChatID, adminMessage);
-    } catch (adminError) {
-      log.error('telegram-utils',
-        `Reason: "%s", TG Message: "%s", ChatID: %s, CommandName: %s, ErrorMessage: %s`,
-        messages.FAILED_SEND_TG_ADMIN, adminMessage, adminChatID, commandName,
-        error.message);
-    }
-
-    // throw error;
-
+    throw new Error(messages.FAILED_SEND_TG);
+    // await sendAdminMessage(error.message);
   }
-};
+}
 
-module.exports.showBooksToReturn = async (chatId, arrayOfBooks) => {
+async function sendAdminMessage(errorMessage, parsedBody) {
+  const commandName = parsedBody.command || parsedBody.callback;
+  const adminChatID = config.ADMIN_CHAT_ID;
+  const formattedUsername = parsedBody.username ?
+    `username: @${parsedBody.username}` : 'unknown username';
+  const adminMessage = `${userMessages.ADMIN_ERROR}${formattedUsername}, chatID: ${parsedBody.chatID}, command: ${commandName}, errorMessage: ${errorMessage}`;
+
+  try {
+    await bot.telegram.sendMessage(adminChatID, adminMessage);
+  } catch (error) {
+    log.error('telegram-utils',
+      `Reason: "%s", Username: %s, ChatID: %s, ErrorMessage: %s`,
+      messages.FAILED_SEND_TG_ADMIN, parsedBody.username, parsedBody.chatID,
+      error.message);
+  }
+}
+
+async function showBooksToReturn(chatId, arrayOfBooks) {
   let keyboardArray = await keyboardUtils.getDatesKeyboardArray(arrayOfBooks);
 
   try {
@@ -73,12 +70,12 @@ module.exports.showBooksToReturn = async (chatId, arrayOfBooks) => {
       },
     });
   } catch (error) {
-    //log?
-    throw new Error(messages.FAILED_SEND_TG_KEYBOARD);
+    // console.error(error);
+    // throw new Error(messages.FAILED_SEND_TG_KEYBOARD);
   }
-};
+}
 
-module.exports.remindToReturn = async (chatId, reminder) => {
+async function remindToReturn(chatId, reminder) {
   let keyboardExtra;
   if (!reminder.prolonged) {
     const prolongKeyboard = await keyboardUtils.getProlongKeyboard(
@@ -101,7 +98,16 @@ module.exports.remindToReturn = async (chatId, reminder) => {
       await bot.telegram.sendMessage(chatId, message);
     }
   } catch (error) {
-    console.error(error);
-    throw new Error(messages.FAILED_SEND_TG_PROLONG);
+    // console.error(error);
+    // throw new Error(messages.FAILED_SEND_TG_PROLONG);
   }
+}
+
+module.exports = {
+  deleteMessage,
+  sendMessage,
+  sendFormattedMessage,
+  sendAdminMessage,
+  showBooksToReturn,
+  remindToReturn
 };

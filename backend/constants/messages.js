@@ -8,6 +8,7 @@ module.exports = {
 
   //Fail
   FAILED_BORROW_BOOK: 'Failed to borrow book',
+  FAILED_APPEND_ROW: 'Failed to append a row while borrowing',
   FAILED_GET_BOOK_DATA: 'Failed to get book data while borrowing',
   FAILED_RETURN_BOOK: 'Failed to return book',
   FAILED_PROLONG_BOOK: 'Failed to prolong book',

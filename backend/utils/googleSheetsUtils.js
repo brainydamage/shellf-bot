@@ -30,6 +30,8 @@ async function getGoogleSheets() {
 
     return google.sheets({version: 'v4', auth: client});
   } catch (error) {
+    // console.error(error);
+
     throw new Error(messages.FAILED_GET_GOOGLE_SHEETS);
   }
 }
@@ -88,6 +90,8 @@ async function getRows(range) {
       {spreadsheetId, range});
     return response.data.values;
   } catch (error) {
+    // console.error(error);
+
     throw new Error(messages.FAILED_READ_DB);
   }
 }
@@ -104,6 +108,8 @@ async function getRow(sheetName, rowNumber, firstColumn, lastColumn) {
     const rows = response.data.values;
     return rows.length > 0 ? rows[0] : null;
   } catch (error) {
+    // console.error(error);
+
     throw new Error(messages.FAILED_READ_DB);
   }
 }
@@ -129,6 +135,8 @@ async function appendRow(range, data) {
 
     return result;
   } catch (error) {
+    // console.error(error);
+
     throw new Error(messages.FAILED_UPDATE_DB);
   }
 }
@@ -151,6 +159,8 @@ async function updateRow(range, data) {
     console.log(`Row updated in ${spreadsheetId}, data: ${data}`);
 
   } catch (error) {
+    // console.error(error);
+
     throw new Error(messages.FAILED_UPDATE_ROW_DB);
   }
 }

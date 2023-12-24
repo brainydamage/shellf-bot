@@ -41,10 +41,10 @@ module.exports.borrowBook = async (parsedBody) => {
 
   await telegramUtils.deleteMessage(parsedBody);
 
-  let message = `${userMessages.BOOK_BORROWED}*${deadlineDate}*`;
-  let rowNumber;
-
   try {
+    let message = `${userMessages.BOOK_BORROWED}*${deadlineDate}*`;
+    let rowNumber;
+
     const response = await googleSheetsUtils.appendRow(config.BOOKS_LOG, data);
     const updatedRange = response.data.updates.updatedRange;
     const rowNumberRegex = /!A(\d+):/;
@@ -53,47 +53,53 @@ module.exports.borrowBook = async (parsedBody) => {
     if (match && match.length > 1) {
       rowNumber = parseInt(match[1], 10);
 
-      try {
-        const row = await googleSheetsUtils.getRow(config.BOOKS_LOG, rowNumber,
-          "E", "H");
-        if (row && parseInt(row[0], 10) === parsedBody.bookID) {
-          // Found the book in the expected row
-          const book = {title: row[1], author: row[2], shelf: row[3]};
-          const bookInfo = book.author ? `${book.title}, ${book.author}` :
-            book.title;
+      const row = await googleSheetsUtils.getRow(config.BOOKS_LOG, rowNumber,
+        "E", "H");
+      if (row && parseInt(row[0], 10) === parsedBody.bookID) {
+        // Found the book in the expected row
+        const book = {title: row[1], author: row[2], shelf: row[3]};
+        const bookInfo = book.author ? `${book.title}, ${book.author}` :
+          book.title;
 
-          message += ` на полку *${book.shelf}*:\n\n${bookInfo}`;
-        }
-
-      } catch (innerError) {
-        log.error('base-command-handler',
-          `Reason: "%s", Username: %s, ChatID: %s, ErrorMessage: %s`,
-          messages.FAILED_GET_BOOK_DATA, parsedBody.username, parsedBody.chatID,
-          innerError.message);
-
-        console.error(innerError);
+        message += ` на полку *${book.shelf}*:\n\n${bookInfo}`;
       }
     }
 
+    message += `${userMessages.BOOK_BORROWED_ENDING}`;
+    await telegramUtils.sendFormattedMessage(message, parsedBody);
+
+    log.info('base-command-handler',
+      'Success: "%s", Command: %s, BookID: %s, Username: %s, ChatID: %s',
+      messages.BOOK_BORROWED, parsedBody.command, parsedBody.bookID,
+      parsedBody.username, parsedBody.chatID);
+
   } catch (error) {
-    log.error('base-command-handler',
-      `Reason: "%s", Username: %s, ChatID: %s, ErrorMessage: %s`,
-      messages.FAILED_BORROW_BOOK, parsedBody.username, parsedBody.chatID,
-      error.message);
+    if (error.message === messages.FAILED_SEND_TG) {
+      log.error('base-command-handler',
+        `Reason: "%s", Username: %s, ChatID: %s, ErrorMessage: %s`,
+        messages.FAILED_SEND_TG, parsedBody.username, parsedBody.chatID,
+        error.message);
+    } else if (error.message === messages.FAILED_READ_DB) {
+      log.error('base-command-handler',
+        `Reason: "%s", Username: %s, ChatID: %s, ErrorMessage: %s`,
+        messages.FAILED_GET_BOOK_DATA, parsedBody.username, parsedBody.chatID,
+        error.message);
+    } else if (error.message === messages.FAILED_UPDATE_DB) {
+      log.error('base-command-handler',
+        `Reason: "%s", Username: %s, ChatID: %s, ErrorMessage: %s`,
+        messages.FAILED_APPEND_ROW, parsedBody.username, parsedBody.chatID,
+        error.message);
+    } else {
+      log.error('base-command-handler',
+        `Reason: "%s", Username: %s, ChatID: %s, ErrorMessage: %s`,
+        messages.FAILED_BORROW_BOOK, parsedBody.username, parsedBody.chatID,
+        error.message);
+    }
 
     console.error(error);
 
-    await telegramUtils.sendFormattedMessage(userMessages.SUPPORT, parsedBody);
-    return;
+    await telegramUtils.sendAdminMessage(error.message, parsedBody);
   }
-
-  message += `${userMessages.BOOK_BORROWED_ENDING}`;
-  await telegramUtils.sendFormattedMessage(message, parsedBody);
-
-  log.info('base-command-handler',
-    'Success: "%s", Command: %s, BookID: %s, Username: %s, ChatID: %s',
-    messages.BOOK_BORROWED, parsedBody.command, parsedBody.bookID,
-    parsedBody.username, parsedBody.chatID);
 };
 
 module.exports.returnBook = async (parsedBody) => {
@@ -130,9 +136,7 @@ module.exports.returnBook = async (parsedBody) => {
         const rowNumber = i + 1;
 
         const bookToReturn = {
-          bookID: bookID,
-          bookInfo: bookInfo,
-          rowNumber: rowNumber
+          bookID: bookID, bookInfo: bookInfo, rowNumber: rowNumber
         };
 
         arrayOfBooks.push(bookToReturn);
