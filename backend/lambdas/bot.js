@@ -45,7 +45,9 @@ function parseBody(body) {
     const parts = parsed.callback.split('_');
 
     // Assuming format: _return_{bookID}_row{rowNumber}
-    if (parts.length === 4 && parts[1] === 'return') {
+    if ((parsed.callback.startsWith(commands.RETURN_CALLBACK) ||
+        parsed.callback.startsWith(commands.PROLONG_CALLBACK)) && parts.length ===
+      4) {
       parsed.bookID = parseInt(parts[2], 10);
 
       // Extract rowNumber from the last part
@@ -74,11 +76,6 @@ function parseBody(body) {
 module.exports.handler = async (event) => {
   const body = JSON.parse(event.body);
   const parsedBody = parseBody(body);
-  // log.info('bot', 'parsed body: %j', parsedBody);
-
-  let chatID = body.message ? body.message.chat.id :
-    body.callback_query ? body.callback_query.message.chat.id :
-      body.my_chat_member ? body.my_chat_member.chat.id : 0;
 
   if (parsedBody.chatID === 0) {
     log.error('bot', 'chatID is null: %j', body);
@@ -126,19 +123,19 @@ module.exports.handler = async (event) => {
     if (parsedBody.callback.startsWith(commands.RETURN_CALLBACK)) {
       await callbackCommandHandler.returnBook(parsedBody);
     } else if (parsedBody.callback.startsWith(commands.PROLONG_CALLBACK)) {
-      await callbackCommandHandler.prolongBook(chatID, body);
+      await callbackCommandHandler.prolongBook(parsedBody);
     } else if (parsedBody.callback === commands.CANCEL) {
-      await callbackCommandHandler.cancel(chatID, body);
+      await callbackCommandHandler.cancel(parsedBody);
     } else if (parsedBody.callback === commands.HOW_TO_RETURN) {
-      await callbackCommandHandler.howToReturn(chatID);
+      await callbackCommandHandler.howToReturn(parsedBody);
     }
 
   } else if (parsedBody.statusChange) {
     //user kicked or re-added the bot - what to do?
     log.info('bot-interactions',
       'StatusChange: %s, BookID: %s, Username: %s, ChatID: %s',
-      parsedBody.statusChange,
-      parsedBody.bookID, parsedBody.username, parsedBody.chatID);
+      parsedBody.statusChange, parsedBody.bookID, parsedBody.username,
+      parsedBody.chatID);
 
   } else {
     log.warn('bot', `${messages.INVALID_PAYLOAD}: %j`, body);

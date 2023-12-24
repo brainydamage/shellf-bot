@@ -131,6 +131,8 @@ async function appendRow(range, data) {
       valueInputOption,
       resource,
     });
+
+    //todo NORMAL SUCCESS MSG
     console.log(`Row appended to ${spreadsheetId}, data: ${data}`);
     return result;
   } catch (error) {

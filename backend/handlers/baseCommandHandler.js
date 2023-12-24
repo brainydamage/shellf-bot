@@ -3,7 +3,6 @@ const telegramUtils = require("../utils/telegramUtils");
 const config = require("../constants/config");
 const messages = require("../constants/messages");
 const userMessages = require("../constants/userMessages");
-const commands = require("../constants/commands");
 const log = require('npmlog');
 
 function timestampToHumanReadable(timestamp) {
@@ -40,7 +39,7 @@ module.exports.borrowBook = async (parsedBody) => {
   const data = [dateTime, deadlineDate, parsedBody.username, parsedBody.chatID,
     parsedBody.bookID];
 
-  await telegramUtils.deleteMessageNew(parsedBody);
+  await telegramUtils.deleteMessage(parsedBody);
 
   let message = `${userMessages.BOOK_BORROWED}*${deadlineDate}*`;
   let rowNumber;
@@ -135,7 +134,7 @@ module.exports.returnBook = async (parsedBody) => {
       }
     }
 
-    await telegramUtils.deleteMessageNew(parsedBody);
+    await telegramUtils.deleteMessage(parsedBody);
 
     if (arrayOfBooks.length > 0) {
       await telegramUtils.showBooksToReturn(parsedBody.chatID, arrayOfBooks);
@@ -157,24 +156,24 @@ module.exports.returnBook = async (parsedBody) => {
 }
 
 module.exports.emptyStart = async (parsedBody) => {
-  await telegramUtils.deleteMessageNew(parsedBody);
+  await telegramUtils.deleteMessage(parsedBody);
   await telegramUtils.sendMessage(parsedBody.chatID,
     userMessages.EMPTY_START_COMMAND);
 }
 
 module.exports.wrongCommand = async (parsedBody) => {
-  await telegramUtils.deleteMessageNew(parsedBody);
+  await telegramUtils.deleteMessage(parsedBody);
   await telegramUtils.sendMessage(parsedBody.chatID,
     userMessages.WRONG_COMMAND);
 }
 
 module.exports.showHelpMessage = async (parsedBody) => {
-  await telegramUtils.deleteMessageNew(parsedBody);
+  await telegramUtils.deleteMessage(parsedBody);
   await telegramUtils.sendMessage(parsedBody.chatID, userMessages.HELP_COMMAND);
 }
 
 module.exports.support = async (parsedBody) => {
-  await telegramUtils.deleteMessageNew(parsedBody);
+  await telegramUtils.deleteMessage(parsedBody);
 
   const supportMessage = `${userMessages.DONATE}${config.TINKOFF_LINK}\n${config.PAYPAL_LINK}`;
   await telegramUtils.sendFormattedMessage(supportMessage, parsedBody);

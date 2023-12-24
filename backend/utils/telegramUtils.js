@@ -8,27 +8,7 @@ const config = require("../constants/config");
 const TOKEN = process.env.TELEGRAM_TOKEN;
 const bot = new Telegraf(TOKEN);
 
-module.exports.deleteMessage = async (body) => {
-  let messageId = body.message?.message_id ||
-    body.callback_query?.message?.message_id;
-  let chatId = body.message?.from?.id || body.callback_query?.from?.id;
-
-  if (messageId && chatId) {
-    console.log(`${messages.DELETING_MSG_TG}${messageId}`);
-    try {
-      await bot.telegram.deleteMessage(chatId, messageId);
-    } catch (error) {
-      console.error(error);
-      // throw new Error('Failed to delete telegram message');
-    }
-  } else if (messageId) {
-    console.error(`${messages.NO_CHAT_TG}${chatId}`);
-  } else if (chatId) {
-    console.error(`${messages.NO_MESSAGE_TG}${messageId}`);
-  }
-};
-
-module.exports.deleteMessageNew = async (parsedBody) => {
+module.exports.deleteMessage = async (parsedBody) => {
   const messageID = parsedBody.messageID;
   const chatID = parsedBody.chatID;
 
@@ -102,7 +82,7 @@ module.exports.remindToReturn = async (chatId, reminder) => {
   let keyboardExtra;
   if (!reminder.prolonged) {
     const prolongKeyboard = await keyboardUtils.getProlongKeyboard(
-      reminder.bookID);
+      reminder.bookID, reminder.rowNumber);
     keyboardExtra = {
       reply_markup: {
         inline_keyboard: prolongKeyboard,

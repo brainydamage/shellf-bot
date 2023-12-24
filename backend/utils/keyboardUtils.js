@@ -24,13 +24,13 @@ module.exports.getDatesKeyboardArray = async (arrayOfBooks) => {
   return keyboardArray;
 };
 
-module.exports.getProlongKeyboard = async (bookID) => {
+module.exports.getProlongKeyboard = async (bookID, rowNumber) => {
   let keyboardArray = [];
 
   keyboardArray.push([
     {
       text: 'продлить на 1 неделю',
-      callback_data: `_prolong_${bookID}`,
+      callback_data: `_prolong_${bookID}_row${rowNumber}`,
     },
   ])
 

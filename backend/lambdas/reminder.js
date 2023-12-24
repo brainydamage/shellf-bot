@@ -21,8 +21,6 @@ function parseDate(dateString) {
 }
 
 module.exports.handler = async (event) => {
-  console.log(messages.REMINDER_HANDLER_TRIGGER);
-
   const deadlineColumn = config.DEADLINE_COLUMN;
   const returnedColumn = config.RETURN_COLUMN;
   const prolongedColumn = config.PROLONG_COLUMN;
@@ -30,7 +28,6 @@ module.exports.handler = async (event) => {
   const titleColumn = config.TITLE_COLUMN_LOG;
   const authorColumn = config.AUTHOR_COLUMN_LOG;
   const chatIDColumn = config.CHATID_COLUMN;
-  // const usernameColumn = config.USERNAME_COLUMN;
 
   try {
     const rows = await googleSheetsUtils.getRows(config.BOOKS_LOG);
@@ -50,6 +47,7 @@ module.exports.handler = async (event) => {
             author: row[authorColumn],
             deadline: deadline,
             prolonged: row[prolongedColumn],
+            rowNumber: i + 1,
           });
         }
       }
