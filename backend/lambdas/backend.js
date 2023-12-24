@@ -32,7 +32,7 @@ module.exports.handler = async (event) => {
 
       return {
         statusCode: 200, body: JSON.stringify({
-          bookInfo: bookInfo,
+          title: book.title, author: book.author,
         }, null, 2),
       };
     } else {
