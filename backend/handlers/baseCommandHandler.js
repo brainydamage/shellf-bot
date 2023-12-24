@@ -89,6 +89,11 @@ module.exports.borrowBook = async (parsedBody) => {
 
   message += `${userMessages.BOOK_BORROWED_ENDING}`;
   await telegramUtils.sendFormattedMessage(message, parsedBody);
+
+  log.info('base-command-handler',
+    'Success: "%s", Command: %s, BookID: %s, Username: %s, ChatID: %s',
+    messages.BOOK_BORROWED, parsedBody.command, parsedBody.bookID,
+    parsedBody.username, parsedBody.chatID);
 };
 
 module.exports.returnBook = async (parsedBody) => {

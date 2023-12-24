@@ -78,6 +78,11 @@ module.exports.returnBook = async (parsedBody) => {
       await telegramUtils.sendFormattedMessage(userMessages.BOOK_RETURNED,
         parsedBody);
 
+      log.info('callback-command-handler',
+        'Success: "%s", Callback: %s, BookID: %s, Username: %s, ChatID: %s',
+        messages.BOOK_RETURNED, parsedBody.callback, parsedBody.bookID,
+        parsedBody.username, parsedBody.chatID);
+
     } else {
       // Handle case where row was not found or double-click
       // console.warn(`${messages.WARN_RETURN_BOOK}`);
@@ -119,9 +124,14 @@ module.exports.prolongBook = async (parsedBody) => {
       await telegramUtils.sendFormattedMessage(
         `${userMessages.BOOK_BORROWED}${deadlineDate}`, parsedBody.chatID);
 
+      log.info('callback-command-handler',
+        'Success: "%s", Callback: %s, BookID: %s, Username: %s, ChatID: %s',
+        messages.BOOK_PROLONGED, parsedBody.callback, parsedBody.bookID,
+        parsedBody.username, parsedBody.chatID);
+
     } else {
       // Handle case where row was not found or double-click
-      // console.warn(`${messages.WARN_RETURN_BOOK}`);
+      // console.warn(`${messages.WARN_PROLONG_BOOK}`);
     }
   } catch (error) {
     log.error('callback-command-handler',
@@ -140,9 +150,6 @@ module.exports.cancel = async (parsedBody) => {
 }
 
 module.exports.howToReturn = async (parsedBody) => {
-  log.info('callback-command-handler', 'Callback: %s, Username: %s, ChatID: %s',
-    parsedBody.callback, parsedBody.username, parsedBody.chatID);
-
   await telegramUtils.sendMessage(parsedBody.chatID,
     userMessages.HOW_TO_RETURN);
 }

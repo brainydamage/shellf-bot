@@ -3,6 +3,7 @@ const telegramUtils = require('../utils/telegramUtils');
 const config = require('../constants/config');
 const messages = require('../constants/messages');
 const googleSheetsUtils = require("../utils/googleSheetsUtils");
+const log = require("npmlog");
 
 function isDeadlineIn3Days(deadline) {
   const deadlineDate = parseDate(deadline);
@@ -55,15 +56,20 @@ module.exports.handler = async (event) => {
 
     // Logic to send messages
     for (const reminder of reminders) {
-      console.log(
-        `${messages.SENDING_REMINDER}${reminder.chatID}, bookID: ${reminder.bookID}, title: ${reminder.title}, author: ${reminder.author}`);
+      log.info('reminder',
+        'Message: "%s", ChatID: %s, BookID: %s, Title: %s, Author: %s',
+        messages.SENDING_REMINDER, reminder.chatID, reminder.bookID,
+        reminder.title, reminder.author);
+
       await telegramUtils.remindToReturn(reminder.chatID, reminder);
     }
 
   } catch (error) {
+    log.error('reminder', `Reason: "%s", ErrorMessage: %s`,
+      messages.FAILED_REMINDER, error.message);
+
     console.error(error);
   }
-
 
   return {
     statusCode: 200, body: JSON.stringify({

@@ -59,7 +59,6 @@ async function processBookData(rows, requestedBookID) {
 }
 
 async function linearSearchForBook(requestedBookID) {
-  console.log(messages.WRONG_PLACE);
   const rows = await getRows(config.BOOKS_DB);
   return await processBookData(rows, requestedBookID);
 }
@@ -89,9 +88,6 @@ async function getRows(range) {
       {spreadsheetId, range});
     return response.data.values;
   } catch (error) {
-    // console.error(messages.FAILED_READ_DB);
-    // console.error(error.message);
-    // console.error(error);
     throw new Error(messages.FAILED_READ_DB);
   }
 }
@@ -108,9 +104,6 @@ async function getRow(sheetName, rowNumber, firstColumn, lastColumn) {
     const rows = response.data.values;
     return rows.length > 0 ? rows[0] : null;
   } catch (error) {
-    // console.error(messages.FAILED_READ_DB);
-    // console.error(error.message);
-    // console.error(error);
     throw new Error(messages.FAILED_READ_DB);
   }
 }
@@ -132,13 +125,10 @@ async function appendRow(range, data) {
       resource,
     });
 
-    //todo NORMAL SUCCESS MSG
     console.log(`Row appended to ${spreadsheetId}, data: ${data}`);
+
     return result;
   } catch (error) {
-    // console.error(messages.FAILED_UPDATE_DB);
-    // console.error(error.message);
-    // console.error(error);
     throw new Error(messages.FAILED_UPDATE_DB);
   }
 }
@@ -159,10 +149,8 @@ async function updateRow(range, data) {
       resource,
     });
     console.log(`Row updated in ${spreadsheetId}, data: ${data}`);
+
   } catch (error) {
-    // console.error(messages.FAILED_UPDATE_ROW_DB);
-    // console.error(error.message);
-    // console.error(error);
     throw new Error(messages.FAILED_UPDATE_ROW_DB);
   }
 }

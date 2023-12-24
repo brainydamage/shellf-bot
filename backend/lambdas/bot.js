@@ -85,7 +85,7 @@ module.exports.handler = async (event) => {
   if (body.message && body.message.chat.type !== 'private' ||
     body.callback_query && body.callback_query.message.chat.type !==
     'private') {
-    log.info('bot', 'non-private interaction skipped: %j', body);
+    log.info('bot-interactions', 'non-private interaction skipped: %j', body);
 
     return {
       statusCode: 200,

@@ -24,8 +24,7 @@ window.onload = function () {
         document.getElementById('borrow-button').style.display = 'block';
 
       })
-      .catch(error => {
-        // console.error('Error:', error);
+      .catch(() => {
         document.getElementById('book-info').style.display = 'block';
         document.getElementById('help-button').style.display = 'block';
 
