@@ -93,7 +93,6 @@ module.exports.handler = async (event) => {
     };
   }
 
-
   if (parsedBody.command) {
     log.info('bot-interactions',
       'Command: %s, BookID: %s, Username: %s, ChatID: %s', parsedBody.command,
