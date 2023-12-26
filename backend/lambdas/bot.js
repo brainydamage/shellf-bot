@@ -21,11 +21,13 @@ function parseBody(body) {
     parsed.messageID = body.message.message_id;
     parsed.chatID = body.message.chat.id;
     parsed.username = body.message.from.username || 'no_username';
-    parsed.command = body.message.text;
+    parsed.command = body.message.text.split(' ')[0];
+
+    const command = body.message.text;
 
     // Extract bookID from /start command
-    if (parsed.command.startsWith(commands.START)) {
-      const parts = parsed.command.split(' ');
+    if (command.startsWith(commands.START)) {
+      const parts = command.split(' ');
       if (parts.length === 2) {
         const potentialBookID = parts[1];
         if (/^\d+$/.test(potentialBookID)) {
@@ -38,7 +40,6 @@ function parseBody(body) {
     parsed.messageID = body.callback_query.message.message_id;
     parsed.chatID = body.callback_query.message.chat.id;
     parsed.username = body.callback_query.from.username || 'no_username';
-
     parsed.callback = body.callback_query.data;
 
     // Generalized extraction of bookID from callback data
@@ -56,7 +57,11 @@ function parseBody(body) {
       if (rowNumberMatch && rowNumberMatch[1]) {
         parsed.rowNumber = parseInt(rowNumberMatch[1], 10);
       }
+
+      // Construct the callback field
+      parsed.callback = parts[0] + '_' + parts[1];
     }
+
   } else if (body.my_chat_member) {
     parsed.chatID = body.my_chat_member.chat.id;
     parsed.username = body.my_chat_member.from.username || 'no_username';
@@ -78,7 +83,7 @@ module.exports.handler = async (event) => {
   const parsedBody = parseBody(body);
 
   if (parsedBody.chatID === 0) {
-    log.error('bot', 'chatID is null: %j', body);
+    log.error('bot-interactions', 'chatID is null: %j', body);
   }
 
   // Check if the chat type is 'private'
@@ -119,9 +124,9 @@ module.exports.handler = async (event) => {
       'Callback: %s, BookID: %s, Username: %s, ChatID: %s', parsedBody.callback,
       parsedBody.bookID, parsedBody.username, parsedBody.chatID);
 
-    if (parsedBody.callback.startsWith(commands.RETURN_CALLBACK)) {
+    if (parsedBody.callback === commands.RETURN_CALLBACK) {
       await callbackCommandHandler.returnBook(parsedBody);
-    } else if (parsedBody.callback.startsWith(commands.PROLONG_CALLBACK)) {
+    } else if (parsedBody.callback === commands.PROLONG_CALLBACK) {
       await callbackCommandHandler.prolongBook(parsedBody);
     } else if (parsedBody.callback === commands.CANCEL) {
       await callbackCommandHandler.cancel(parsedBody);
@@ -137,7 +142,7 @@ module.exports.handler = async (event) => {
       parsedBody.chatID);
 
   } else {
-    log.warn('bot', `${messages.INVALID_PAYLOAD}: %j`, body);
+    log.warn('bot-interactions', `${messages.INVALID_PAYLOAD}: %j`, body);
   }
 
   return {

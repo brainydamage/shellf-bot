@@ -50,16 +50,19 @@ module.exports.borrowBook = async (parsedBody) => {
     const rowNumberRegex = /!A(\d+):/;
     const match = updatedRange.match(rowNumberRegex);
 
+    let bookInfo;
+    let shelf;
     if (match && match.length > 1) {
       rowNumber = parseInt(match[1], 10);
 
       const row = await googleSheetsUtils.getRow(config.BOOKS_LOG, rowNumber,
         "E", "H");
+
       if (row && parseInt(row[0], 10) === parsedBody.bookID) {
         // Found the book in the expected row
         const book = {title: row[1], author: row[2], shelf: row[3]};
-        const bookInfo = book.author ? `${book.title}, ${book.author}` :
-          book.title;
+        bookInfo = book.author ? `${book.title}, ${book.author}` : book.title;
+        shelf = book.shelf;
 
         message += ` на полку *${book.shelf}*:\n\n${bookInfo}`;
       }
@@ -69,9 +72,9 @@ module.exports.borrowBook = async (parsedBody) => {
     await telegramUtils.sendFormattedMessage(message, parsedBody);
 
     log.info('base-command-handler',
-      'Success: "%s", Command: %s, BookID: %s, Username: %s, ChatID: %s',
-      messages.BOOK_BORROWED, parsedBody.command, parsedBody.bookID,
-      parsedBody.username, parsedBody.chatID);
+      'Success: "%s", Command: %s, BookID: %s, BookInfo: %s, Shelf: %s, Username: %s, ChatID: %s',
+      messages.BOOK_BORROWED, parsedBody.command, parsedBody.bookID, bookInfo,
+      shelf, parsedBody.username, parsedBody.chatID);
 
   } catch (error) {
     if (error.message === messages.FAILED_SEND_TG) {

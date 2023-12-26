@@ -2,7 +2,7 @@ const {Telegraf} = require('telegraf');
 const keyboardUtils = require("../utils/keyboardUtils");
 const messages = require("../constants/messages");
 const userMessages = require("../constants/userMessages");
-const log = require("npmlog");
+const log = require('npmlog');
 const config = require("../constants/config");
 
 const TOKEN = process.env.TELEGRAM_TOKEN;

@@ -3,7 +3,7 @@ const config = require("../constants/config");
 const telegramUtils = require("../utils/telegramUtils");
 const messages = require("../constants/messages");
 const userMessages = require("../constants/userMessages");
-const log = require("npmlog");
+const log = require('npmlog');
 
 async function timestampToHumanReadable(timestamp) {
   const date = new Date(timestamp);
@@ -70,6 +70,22 @@ module.exports.returnBook = async (parsedBody) => {
       parsedBody.rowNumber, "A", "K");
 
     if (bookRow && bookRow.length < config.COLUMNS_NUMBER) {
+      const bookTitle = bookRow[config.TITLE_COLUMN_LOG];
+      const bookAuthor = bookRow[config.AUTHOR_COLUMN_LOG];
+      const bookInfo = bookAuthor ? `${bookTitle}, ${bookAuthor}` : bookTitle;
+
+      //24.12.2023, 16:55
+      const dateBorrowedStr = bookRow[config.DATE_COLUMN];
+      const dateBorrowedParts = dateBorrowedStr.split(', ');
+      const [day, month, year] = dateBorrowedParts[0].split('.').map(Number);
+      const [hours, minutes] = dateBorrowedParts[1].split(':').map(Number);
+
+      const dateBorrowed = new Date(year, month - 1, day, hours, minutes);
+      const currentDate = new Date();
+
+      const timeDiff = currentDate.getTime() - dateBorrowed.getTime();
+      const daysBorrowed = Math.ceil(timeDiff / (1000 * 3600 * 24));
+
       const returnDate = await timestampToHumanReadable(Date.now());
       const dataForRow = setReturnDateForRowArray(bookRow, returnDate);
 
@@ -79,9 +95,9 @@ module.exports.returnBook = async (parsedBody) => {
         parsedBody);
 
       log.info('callback-command-handler',
-        'Success: "%s", Callback: %s, BookID: %s, Username: %s, ChatID: %s',
+        'Success: "%s", Callback: %s, BookID: %s, BookInfo: %s, DaysBorrowed: %s, Username: %s, ChatID: %s',
         messages.BOOK_RETURNED, parsedBody.callback, parsedBody.bookID,
-        parsedBody.username, parsedBody.chatID);
+        bookInfo, daysBorrowed, parsedBody.username, parsedBody.chatID);
 
     } else {
       // Handle case where row was not found or double-click
