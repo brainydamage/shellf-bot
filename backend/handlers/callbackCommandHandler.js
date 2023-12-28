@@ -3,7 +3,7 @@ const config = require("../constants/config");
 const telegramUtils = require("../utils/telegramUtils");
 const messages = require("../constants/messages");
 const userMessages = require("../constants/userMessages");
-const log = require('npmlog');
+const log = require('../utils/customLogger');
 
 async function timestampToHumanReadable(timestamp) {
   const date = new Date(timestamp);

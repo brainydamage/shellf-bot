@@ -1,7 +1,7 @@
 'use strict';
 const messages = require('../constants/messages');
 const googleSheetsUtils = require('../utils/googleSheetsUtils');
-const log = require('npmlog');
+const log = require('../utils/customLogger');
 
 module.exports.handler = async (event) => {
   let requestedBookID = event.pathParameters.bookID;

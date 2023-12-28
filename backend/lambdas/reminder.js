@@ -3,7 +3,7 @@ const telegramUtils = require('../utils/telegramUtils');
 const config = require('../constants/config');
 const messages = require('../constants/messages');
 const googleSheetsUtils = require("../utils/googleSheetsUtils");
-const log = require('npmlog');
+const log = require('../utils/customLogger');
 
 function isDeadlineIn3Days(deadline) {
   const deadlineDate = parseDate(deadline);

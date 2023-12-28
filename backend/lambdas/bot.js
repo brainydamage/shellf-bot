@@ -3,7 +3,7 @@ const messages = require('../constants/messages');
 const commands = require('../constants/commands');
 const baseCommandHandler = require('../handlers/baseCommandHandler');
 const callbackCommandHandler = require('../handlers/callbackCommandHandler');
-const log = require('npmlog');
+const log = require('../utils/customLogger');
 
 function parseBody(body) {
   let parsed = {
