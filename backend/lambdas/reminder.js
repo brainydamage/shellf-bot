@@ -3,6 +3,7 @@ const telegramUtils = require('../utils/telegramUtils');
 const config = require('../constants/config');
 const messages = require('../constants/messages');
 const googleSheetsUtils = require("../utils/googleSheetsUtils");
+const log = require('../utils/customLogger');
 
 function isDeadlineIn3Days(deadline) {
   const deadlineDate = parseDate(deadline);
@@ -21,8 +22,6 @@ function parseDate(dateString) {
 }
 
 module.exports.handler = async (event) => {
-  console.log(messages.REMINDER_HANDLER_TRIGGER);
-
   const deadlineColumn = config.DEADLINE_COLUMN;
   const returnedColumn = config.RETURN_COLUMN;
   const prolongedColumn = config.PROLONG_COLUMN;
@@ -30,7 +29,6 @@ module.exports.handler = async (event) => {
   const titleColumn = config.TITLE_COLUMN_LOG;
   const authorColumn = config.AUTHOR_COLUMN_LOG;
   const chatIDColumn = config.CHATID_COLUMN;
-  // const usernameColumn = config.USERNAME_COLUMN;
 
   try {
     const rows = await googleSheetsUtils.getRows(config.BOOKS_LOG);
@@ -50,6 +48,7 @@ module.exports.handler = async (event) => {
             author: row[authorColumn],
             deadline: deadline,
             prolonged: row[prolongedColumn],
+            rowNumber: i + 1,
           });
         }
       }
@@ -57,15 +56,20 @@ module.exports.handler = async (event) => {
 
     // Logic to send messages
     for (const reminder of reminders) {
-      console.log(
-        `${messages.SENDING_REMINDER}${reminder.chatID}, bookID: ${reminder.bookID}, title: ${reminder.title}, author: ${reminder.author}`);
+      log.info('reminder',
+        'Message: "%s", ChatID: %s, BookID: %s, Title: %s, Author: %s',
+        messages.SENDING_REMINDER, reminder.chatID, reminder.bookID,
+        reminder.title, reminder.author);
+
       await telegramUtils.remindToReturn(reminder.chatID, reminder);
     }
 
   } catch (error) {
+    log.error('reminder', `Reason: "%s", ErrorMessage: %s`,
+      messages.FAILED_REMINDER, error.message);
+
     console.error(error);
   }
-
 
   return {
     statusCode: 200, body: JSON.stringify({

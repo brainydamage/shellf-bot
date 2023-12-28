@@ -3,59 +3,146 @@ const messages = require('../constants/messages');
 const commands = require('../constants/commands');
 const baseCommandHandler = require('../handlers/baseCommandHandler');
 const callbackCommandHandler = require('../handlers/callbackCommandHandler');
+const log = require('../utils/customLogger');
 
-module.exports.handler = async (event) => {
-  console.log(messages.BOT_HANDLER_TRIGGER);
+function parseBody(body) {
+  let parsed = {
+    messageID: null,
+    chatID: null,
+    username: 'no_username',
+    command: null,
+    callback: null,
+    rowNumber: null,
+    bookID: null,
+    statusChange: null,
+  };
 
-  const body = JSON.parse(event.body);
-  console.log(JSON.stringify(body));
+  if (body.message) {
+    parsed.messageID = body.message.message_id;
+    parsed.chatID = body.message.chat.id;
+    parsed.username = body.message.from.username || 'no_username';
+    parsed.command = body.message.text.split(' ')[0];
 
-  let chatID = body.message ?
-    body.message.chat.id :
-    body.callback_query ?
-      body.callback_query.message.chat.id :
-      body.my_chat_member ? body.my_chat_member.chat.id : 0;
+    const command = body.message.text;
 
-  console.log(`chatID is ${chatID}`);
+    // Extract bookID from /start command
+    if (command.startsWith(commands.START)) {
+      const parts = command.split(' ');
+      if (parts.length === 2) {
+        const potentialBookID = parts[1];
+        if (/^\d+$/.test(potentialBookID)) {
+          parsed.bookID = parseInt(potentialBookID, 10);
+        }
+      }
+    }
 
-  if (chatID === 0) {
-    console.error(`!!! CHAT ID IS NULL !!!`);
+  } else if (body.callback_query) {
+    parsed.messageID = body.callback_query.message.message_id;
+    parsed.chatID = body.callback_query.message.chat.id;
+    parsed.username = body.callback_query.from.username || 'no_username';
+    parsed.callback = body.callback_query.data;
+
+    // Generalized extraction of bookID from callback data
+    const parts = parsed.callback.split('_');
+
+    // Assuming format: _return_{bookID}_row{rowNumber}
+    if ((parsed.callback.startsWith(commands.RETURN_CALLBACK) ||
+        parsed.callback.startsWith(commands.PROLONG_CALLBACK)) && parts.length ===
+      4) {
+      parsed.bookID = parseInt(parts[2], 10);
+
+      // Extract rowNumber from the last part
+      const rowPart = parts[parts.length - 1];
+      const rowNumberMatch = rowPart.match(/^row(\d+)$/);
+      if (rowNumberMatch && rowNumberMatch[1]) {
+        parsed.rowNumber = parseInt(rowNumberMatch[1], 10);
+      }
+
+      // Construct the callback field
+      parsed.callback = parts[0] + '_' + parts[1];
+    }
+
+  } else if (body.my_chat_member) {
+    parsed.chatID = body.my_chat_member.chat.id;
+    parsed.username = body.my_chat_member.from.username || 'no_username';
+    const oldStatus = body.my_chat_member.old_chat_member.status;
+    const newStatus = body.my_chat_member.new_chat_member.status;
+
+    if (oldStatus === 'member' && newStatus === 'kicked') {
+      parsed.statusChange = 'bot_kicked';
+    } else if (oldStatus === 'kicked' && newStatus === 'member') {
+      parsed.statusChange = 'bot_unblocked';
+    }
   }
 
-  if (body && body.message && body.message.text) {
-    if (body.message.text.startsWith(commands.START)) {
-      const parts = body.message.text.split(' ');
-      if (parts.length === 1 && parts[0] === commands.START) {
-        // logic for '/start' without arguments
-        await baseCommandHandler.emptyStart(chatID, body);
+  return parsed;
+}
+
+module.exports.handler = async (event) => {
+  const body = JSON.parse(event.body);
+  const parsedBody = parseBody(body);
+
+  if (parsedBody.chatID === 0) {
+    log.error('bot-interactions', 'chatID is null: %j', body);
+  }
+
+  // Check if the chat type is 'private'
+  if (body.message && body.message.chat.type !== 'private' ||
+    body.callback_query && body.callback_query.message.chat.type !==
+    'private') {
+    log.info('bot-interactions', 'non-private interaction skipped: %j', body);
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({message: "Non-private interaction, skipped"}),
+    };
+  }
+
+  if (parsedBody.command) {
+    log.info('bot-interactions',
+      'Command: %s, BookID: %s, Username: %s, ChatID: %s', parsedBody.command,
+      parsedBody.bookID, parsedBody.username, parsedBody.chatID);
+
+    if (parsedBody.command.startsWith(commands.START)) {
+      if (!parsedBody.bookID) {
+        await baseCommandHandler.emptyStart(parsedBody);
       } else {
-        await baseCommandHandler.borrowBook(chatID, body);
+        await baseCommandHandler.borrowBook(parsedBody);
       }
-    } else if (body.message.text.startsWith(commands.RETURN)) {
-      await baseCommandHandler.returnBook(chatID, body);
-    } else if (body.message.text.startsWith(commands.HELP)) {
-      await baseCommandHandler.showHelpMessage(chatID, body);
-    } else if (body.message.text.startsWith(commands.SUPPORT)) {
-      await baseCommandHandler.support(chatID, body);
+    } else if (parsedBody.command === commands.RETURN) {
+      await baseCommandHandler.returnBook(parsedBody);
+    } else if (parsedBody.command === commands.HELP) {
+      await baseCommandHandler.showHelpMessage(parsedBody);
+    } else if (parsedBody.command === commands.SUPPORT) {
+      await baseCommandHandler.support(parsedBody);
     } else {
-      await baseCommandHandler.wrongCommand(chatID, body);
+      await baseCommandHandler.wrongCommand(parsedBody);
     }
 
-  } else if (body && body.callback_query && body.callback_query.data) {
-    const data = body.callback_query.data;
-    if (data.startsWith(commands.RETURN_CALLBACK)) {
-      // Handle the step when user selects the book to return
-      await callbackCommandHandler.returnBook(chatID, body);
-    } else if (data.startsWith(commands.PROLONG_CALLBACK)) {
-      // Handle the step when user prolongs the book
-      await callbackCommandHandler.prolongBook(chatID, body);
-    } else if (data.startsWith(commands.CANCEL)) {
-      await callbackCommandHandler.cancel(chatID, body);
-    } else if (data.startsWith(commands.HOW_TO_RETURN)) {
-      await callbackCommandHandler.howToReturn(chatID);
+  } else if (parsedBody.callback) {
+    log.info('bot-interactions',
+      'Callback: %s, BookID: %s, Username: %s, ChatID: %s', parsedBody.callback,
+      parsedBody.bookID, parsedBody.username, parsedBody.chatID);
+
+    if (parsedBody.callback === commands.RETURN_CALLBACK) {
+      await callbackCommandHandler.returnBook(parsedBody);
+    } else if (parsedBody.callback === commands.PROLONG_CALLBACK) {
+      await callbackCommandHandler.prolongBook(parsedBody);
+    } else if (parsedBody.callback === commands.CANCEL) {
+      await callbackCommandHandler.cancel(parsedBody);
+    } else if (parsedBody.callback === commands.HOW_TO_RETURN) {
+      await callbackCommandHandler.howToReturn(parsedBody);
     }
+
+  } else if (parsedBody.statusChange) {
+    //user kicked or re-added the bot - what to do?
+    log.info('bot-interactions',
+      'StatusChange: %s, BookID: %s, Username: %s, ChatID: %s',
+      parsedBody.statusChange, parsedBody.bookID, parsedBody.username,
+      parsedBody.chatID);
+
   } else {
-    console.warn(messages.INVALID_PAYLOAD);
+    log.warn('bot-interactions', `${messages.INVALID_PAYLOAD}: %j`, body);
   }
 
   return {

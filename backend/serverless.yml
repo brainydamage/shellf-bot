@@ -3,14 +3,17 @@ app: shellf-bot
 service: shellf-bot
 frameworkVersion: "3"
 
+dashboard:
+  disableMonitoring: true
+
 provider:
   name: aws
   runtime: nodejs18.x
   memorySize: 256
   timeout: 15 # in seconds
   region: eu-central-1
-  tracing:
-    lambda: true
+  #  tracing:
+  #    lambda: true
   httpApi:
     cors: true
 

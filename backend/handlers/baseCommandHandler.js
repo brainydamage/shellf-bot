@@ -3,7 +3,7 @@ const telegramUtils = require("../utils/telegramUtils");
 const config = require("../constants/config");
 const messages = require("../constants/messages");
 const userMessages = require("../constants/userMessages");
-const commands = require("../constants/commands");
+const log = require('../utils/customLogger');
 
 function timestampToHumanReadable(timestamp) {
   const date = new Date(timestamp * 1000);
@@ -32,106 +32,84 @@ function addOneMonthAndFormat(timestamp) {
   return `${day}.${month}.${year}`;
 }
 
-async function sendMessage(username, chatID, message, commandName) {
+module.exports.borrowBook = async (parsedBody) => {
+  const timestamp = Math.floor(Date.now() / 1000);
+  const dateTime = timestampToHumanReadable(timestamp);
+  const deadlineDate = addOneMonthAndFormat(timestamp);
+  const data = [dateTime, deadlineDate, parsedBody.username, parsedBody.chatID,
+    parsedBody.bookID];
+
+  await telegramUtils.deleteMessage(parsedBody);
+
   try {
-    await telegramUtils.sendFormattedMessage(chatID, message);
-  } catch (error) {
-    console.error(messages.FAILED_SEND_ERROR_TG);
-    console.error(error.message);
-    console.error(error);
-
-    const adminChatID = config.ADMIN_CHAT_ID;
-    username = username && `username: @${username}`;
-    const adminMessage = `${userMessages.ADMIN_ERROR}${username}, chatID: ${chatID}, команда: ${commandName}`;
-    await telegramUtils.sendMessage(adminChatID, adminMessage);
-  }
-}
-
-module.exports.borrowBook = async (chatID, body) => {
-  const bodyMessage = body.message;
-  const match = bodyMessage.text.match(/\/start (\d+)/);
-  const username = bodyMessage.from.username;
-
-  if (match && match[1]) {
-    const bookID = parseInt(match[1], 10);
-    console.log(`${chatID}${messages.BOOK_BORROW}${bookID}`);
-
-    if (isNaN(bookID)) {
-      console.error(
-        `${messages.INVALID_BOOK_ID_BODY}: ${bodyMessage.text}, chatID: ${chatID}`);
-      return;
-    }
-
-    const timestamp = bodyMessage.date;
-    const dateTime = timestampToHumanReadable(timestamp);
-    const deadlineDate = addOneMonthAndFormat(timestamp);
-    const data = [dateTime, deadlineDate, username, chatID, bookID];
-
-    await telegramUtils.deleteMessage(body);
-
     let message = `${userMessages.BOOK_BORROWED}*${deadlineDate}*`;
     let rowNumber;
 
-    try {
-      const response = await googleSheetsUtils.appendRow(config.BOOKS_LOG,
-        data);
-      const updatedRange = response.data.updates.updatedRange;
-      const rowNumberRegex = /!A(\d+):/;
-      const match = updatedRange.match(rowNumberRegex);
+    const response = await googleSheetsUtils.appendRow(config.BOOKS_LOG, data);
+    const updatedRange = response.data.updates.updatedRange;
+    const rowNumberRegex = /!A(\d+):/;
+    const match = updatedRange.match(rowNumberRegex);
 
-      if (match && match.length > 1) {
-        rowNumber = parseInt(match[1], 10);
+    let bookInfo;
+    let shelf;
+    if (match && match.length > 1) {
+      rowNumber = parseInt(match[1], 10);
 
-        try {
-          const row = await googleSheetsUtils.getRow(config.BOOKS_LOG,
-            rowNumber, "E", "H");
-          if (row && parseInt(row[0], 10) === bookID) {
-            // Found the book in the expected row
-            const book = {title: row[1], author: row[2], shelf: row[3]};
-            const bookInfo = book.author ? `${book.title}, ${book.author}` :
-              book.title;
+      const row = await googleSheetsUtils.getRow(config.BOOKS_LOG, rowNumber,
+        "E", "H");
 
-            message += ` на полку *${book.shelf}*:\n\n${bookInfo}`;
-          }
+      if (row && parseInt(row[0], 10) === parsedBody.bookID) {
+        // Found the book in the expected row
+        const book = {title: row[1], author: row[2], shelf: row[3]};
+        bookInfo = book.author ? `${book.title}, ${book.author}` : book.title;
+        shelf = book.shelf;
 
-        } catch (innerError) {
-          console.error(messages.FAILED_GET_BOOK_DATA);
-          console.error(innerError.message);
-          console.error(innerError);
-        }
-
-      } else {
-        console.error(messages.INVALID_ROW_NUMBER);
+        message += ` на полку *${book.shelf}*:\n\n${bookInfo}`;
       }
-
-    } catch (error) {
-      console.error(messages.FAILED_BORROW_BOOK);
-      console.error(error.message);
-      console.error(error);
-
-      await sendMessage(username, chatID, userMessages.SUPPORT, commands.START);
-      return;
     }
 
     message += `${userMessages.BOOK_BORROWED_ENDING}`;
-    await sendMessage(username, chatID, message, commands.START);
+    await telegramUtils.sendFormattedMessage(message, parsedBody);
 
-  } else {
-    console.error(
-      `${messages.INVALID_BOOK_ID_BODY}: ${bodyMessage.text}, chatID: ${chatID}`);
+    log.info('base-command-handler',
+      'Success: "%s", Command: %s, BookID: %s, BookInfo: %s, Shelf: %s, Username: %s, ChatID: %s',
+      messages.BOOK_BORROWED, parsedBody.command, parsedBody.bookID, bookInfo,
+      shelf, parsedBody.username, parsedBody.chatID);
+
+  } catch (error) {
+    if (error.message === messages.FAILED_SEND_TG) {
+      log.error('base-command-handler',
+        `Reason: "%s", Username: %s, ChatID: %s, ErrorMessage: %s`,
+        messages.FAILED_SEND_TG, parsedBody.username, parsedBody.chatID,
+        error.message);
+    } else if (error.message === messages.FAILED_READ_DB) {
+      log.error('base-command-handler',
+        `Reason: "%s", Username: %s, ChatID: %s, ErrorMessage: %s`,
+        messages.FAILED_GET_BOOK_DATA, parsedBody.username, parsedBody.chatID,
+        error.message);
+    } else if (error.message === messages.FAILED_UPDATE_DB) {
+      log.error('base-command-handler',
+        `Reason: "%s", Username: %s, ChatID: %s, ErrorMessage: %s`,
+        messages.FAILED_APPEND_ROW, parsedBody.username, parsedBody.chatID,
+        error.message);
+    } else {
+      log.error('base-command-handler',
+        `Reason: "%s", Username: %s, ChatID: %s, ErrorMessage: %s`,
+        messages.FAILED_BORROW_BOOK, parsedBody.username, parsedBody.chatID,
+        error.message);
+    }
+
+    console.error(error);
+
+    await telegramUtils.sendAdminMessage(error.message, parsedBody);
   }
 };
 
-module.exports.returnBook = async (chatID, body) => {
-  console.log(`${chatID}${messages.BOOK_RETURN}`);
-
-  const username = body.message.from.username;
-
+module.exports.returnBook = async (parsedBody) => {
   try {
     const rows = await googleSheetsUtils.getRows(config.BOOKS_LOG);
 
     let arrayOfBooks = [];
-
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
 
@@ -141,7 +119,7 @@ module.exports.returnBook = async (chatID, body) => {
       const titleColumn = config.TITLE_COLUMN_LOG;
       const authorColumn = config.AUTHOR_COLUMN_LOG;
 
-      const sameChatID = row[chatIDColumn] === chatID.toString();
+      const sameChatID = row[chatIDColumn] === parsedBody.chatID.toString();
       const isBookNotReturned = row[returnDateColumn] === '' || row.length <
         config.COLUMNS_NUMBER;
 
@@ -151,7 +129,6 @@ module.exports.returnBook = async (chatID, body) => {
         let bookAuthor = row[authorColumn];
 
         if (!bookTitle) {
-          console.log(messages.EMPTY_TITLE_LOG);
           const book = await googleSheetsUtils.getBookData(
             parseInt(bookID, 10));
           bookTitle = book.title;
@@ -159,62 +136,57 @@ module.exports.returnBook = async (chatID, body) => {
         }
 
         const bookInfo = bookAuthor ? `${bookTitle}, ${bookAuthor}` : bookTitle;
+        const rowNumber = i + 1;
 
         const bookToReturn = {
-          [bookID]: `${bookInfo}`
-        }
+          bookID: bookID, bookInfo: bookInfo, rowNumber: rowNumber
+        };
+
         arrayOfBooks.push(bookToReturn);
       }
     }
 
-    await telegramUtils.deleteMessage(body);
+    await telegramUtils.deleteMessage(parsedBody);
 
     if (arrayOfBooks.length > 0) {
-      await telegramUtils.showBooksToReturn(chatID, arrayOfBooks);
+      await telegramUtils.showBooksToReturn(parsedBody.chatID, arrayOfBooks);
     } else {
-      console.log(`${chatID}${messages.NO_BOOK_RETURN}`);
-
-      await sendMessage(username, chatID, userMessages.NO_BOOK_TO_RETURN,
-        commands.RETURN);
+      await telegramUtils.sendFormattedMessage(userMessages.NO_BOOK_TO_RETURN,
+        parsedBody);
     }
 
   } catch (error) {
-    console.error(messages.FAILED_RETURN_BOOK);
-    console.error(error.message);
+    log.error('base-command-handler',
+      `Reason: "%s", Username: %s, ChatID: %s, ErrorMessage: %s`,
+      messages.FAILED_RETURN_BOOK, parsedBody.username, parsedBody.chatID,
+      error.message);
+
     console.error(error);
 
-    await sendMessage(username, chatID, userMessages.NO_BOOK_TO_RETURN,
-      commands.RETURN);
+    await telegramUtils.sendFormattedMessage(userMessages.SUPPORT, parsedBody);
   }
 }
 
-module.exports.emptyStart = async (chatID, body) => {
-  console.log(`${chatID}${messages.EMPTY_START}`);
-
-  await telegramUtils.deleteMessage(body);
-  await telegramUtils.sendMessage(chatID, userMessages.EMPTY_START_COMMAND);
+module.exports.emptyStart = async (parsedBody) => {
+  await telegramUtils.deleteMessage(parsedBody);
+  await telegramUtils.sendMessage(parsedBody.chatID,
+    userMessages.EMPTY_START_COMMAND);
 }
 
-module.exports.wrongCommand = async (chatID, body) => {
-  console.log(`${chatID}${messages.WRONG_COMMAND}${body.message.text}`);
-
-  await telegramUtils.deleteMessage(body);
-  await telegramUtils.sendMessage(chatID, userMessages.WRONG_COMMAND);
+module.exports.wrongCommand = async (parsedBody) => {
+  await telegramUtils.deleteMessage(parsedBody);
+  await telegramUtils.sendMessage(parsedBody.chatID,
+    userMessages.WRONG_COMMAND);
 }
 
-module.exports.showHelpMessage = async (chatID, body) => {
-  console.log(`${chatID}${messages.HELP_COMMAND}`);
-
-  await telegramUtils.deleteMessage(body);
-  await telegramUtils.sendMessage(chatID, userMessages.HELP_COMMAND);
+module.exports.showHelpMessage = async (parsedBody) => {
+  await telegramUtils.deleteMessage(parsedBody);
+  await telegramUtils.sendMessage(parsedBody.chatID, userMessages.HELP_COMMAND);
 }
 
-module.exports.support = async (chatID, body) => {
-  console.log(`${chatID}${messages.SUPPORT_COMMAND}`);
-  const username = body.message.from.username;
-
-  await telegramUtils.deleteMessage(body);
+module.exports.support = async (parsedBody) => {
+  await telegramUtils.deleteMessage(parsedBody);
 
   const supportMessage = `${userMessages.DONATE}${config.TINKOFF_LINK}\n${config.PAYPAL_LINK}`;
-  await telegramUtils.sendFormattedMessage(chatID, supportMessage);
+  await telegramUtils.sendFormattedMessage(supportMessage, parsedBody);
 }

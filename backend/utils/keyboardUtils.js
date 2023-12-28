@@ -2,19 +2,16 @@ module.exports.getDatesKeyboardArray = async (arrayOfBooks) => {
   let keyboardArray = [];
 
   arrayOfBooks.forEach(book => {
-    Object.entries(book).forEach(([bookID, bookInfo]) => {
-      // console.log(`Book ID: ${bookID}, Book Info: ${bookInfo}`);
+    const {bookID, bookInfo, rowNumber} = book;
 
-      const innerArray = [
-        {
-          text: `${bookInfo}`,
-          callback_data: `_return_${bookID}`,
-        },
-      ];
+    const innerArray = [
+      {
+        text: `${bookInfo}`,
+        callback_data: `_return_${bookID}_row${rowNumber}`,
+      },
+    ];
 
-      keyboardArray.push(innerArray);
-
-    });
+    keyboardArray.push(innerArray);
   });
 
   keyboardArray.push([
@@ -27,13 +24,13 @@ module.exports.getDatesKeyboardArray = async (arrayOfBooks) => {
   return keyboardArray;
 };
 
-module.exports.getProlongKeyboard = async (bookID) => {
+module.exports.getProlongKeyboard = async (bookID, rowNumber) => {
   let keyboardArray = [];
 
   keyboardArray.push([
     {
       text: 'продлить на 1 неделю',
-      callback_data: `_prolong_${bookID}`,
+      callback_data: `_prolong_${bookID}_row${rowNumber}`,
     },
   ])
 
