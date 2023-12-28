@@ -1,0 +1,8 @@
+{
+  "name": "synclogs",
+  "version": "1.0.0",
+  "dependencies": {
+    "aws-sdk": "^2.1526.0",
+    "csv-parser": "^3.0.0"
+  }
+}
