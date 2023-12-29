@@ -16,15 +16,14 @@ function isDeadlineIn(deadline, days) {
   return timeDiff === threeDaysInMilliseconds;
 }
 
-function isBorrowedOver(borrowed, days) {
+function countDaysOnHands(borrowed) {
   const borrowedDate = parseDate(borrowed);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const fortyDaysInMilliseconds = days * 24 * 60 * 60 * 1000;
   const timeDiff = today.getTime() - borrowedDate.getTime();
 
-  return timeDiff === fortyDaysInMilliseconds;
+  return timeDiff / 24 / 60 / 60 / 1000;
 }
 
 function parseDate(dateString) {
@@ -74,19 +73,10 @@ module.exports.handler = async (event) => {
               prolonged: row[prolongedColumn],
               rowNumber: i + 1,
             });
-          } else if (isBorrowedOver(borrowed, config.OVERDUE_DAYS)) {
-            overdueBooks.push({
-              chatID: row[chatIDColumn],
-              username: row[usernameColumn],
-              bookID: row[bookIDColumn],
-              title: row[titleColumn],
-              author: row[authorColumn],
-              shelf: row[shelfColumn],
-              deadline: deadline,
-              prolonged: row[prolongedColumn],
-              rowNumber: i + 1,
-            })
-          } else if (isBorrowedOver(borrowed, config.LOST_DAYS)) {
+          }
+
+          const daysOnHands = countDaysOnHands(borrowed);
+          if (daysOnHands > config.LOST_DAYS) {
             lostBooks.push({
               chatID: row[chatIDColumn],
               username: row[usernameColumn],
@@ -94,9 +84,22 @@ module.exports.handler = async (event) => {
               title: row[titleColumn],
               author: row[authorColumn],
               shelf: row[shelfColumn],
-              deadline: deadline,
-              prolonged: row[prolongedColumn],
-              rowNumber: i + 1,
+              lostDays: daysOnHands - config.LOST_DAYS, // deadline: deadline,
+              // prolonged: row[prolongedColumn],
+              // rowNumber: i + 1,
+            })
+          } else if (daysOnHands > config.OVERDUE_DAYS) {
+            overdueBooks.push({
+              chatID: row[chatIDColumn],
+              username: row[usernameColumn],
+              bookID: row[bookIDColumn],
+              title: row[titleColumn],
+              author: row[authorColumn],
+              shelf: row[shelfColumn],
+              overdueDays: daysOnHands -
+                config.OVERDUE_DAYS, // deadline: deadline,
+              // prolonged: row[prolongedColumn],
+              // rowNumber: i + 1,
             })
           }
         }
@@ -122,9 +125,10 @@ module.exports.handler = async (event) => {
         `${overdueBook.title}, ${overdueBook.author}` : overdueBook.title;
 
       log.info('reminder',
-        'Status: "%s", BookID: %s, BookInfo: %s, Shelf: %s, Username: %s, ChatID: %s',
+        'Status: "%s", BookID: %s, BookInfo: %s, Shelf: %s, OverdueDays: %s, Username: %s, ChatID: %s',
         messages.SENDING_OVERDUE, overdueBook.bookID, bookInfo,
-        overdueBook.shelf, overdueBook.username, overdueBook.chatID);
+        overdueBook.shelf, overdueBook.overdueDays, overdueBook.username,
+        overdueBook.chatID);
 
       // await telegramUtils.remindOverdue(overdueBook.chatID, overdueBook);
     }
@@ -135,9 +139,9 @@ module.exports.handler = async (event) => {
         `${lostBook.title}, ${lostBook.author}` : lostBook.title;
 
       log.info('reminder',
-        'Status: "%s", BookID: %s, BookInfo: %s, Shelf: %s, Username: %s, ChatID: %s',
+        'Status: "%s", BookID: %s, BookInfo: %s, Shelf: %s, LostDays: %s, Username: %s, ChatID: %s',
         messages.SENDING_LOST, lostBook.bookID, bookInfo, lostBook.shelf,
-        lostBook.username, lostBook.chatID);
+        lostBook.lostDays, lostBook.username, lostBook.chatID);
 
       // await telegramUtils.remindLost(overdueBook.chatID, lostBook);
     }

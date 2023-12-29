@@ -26,7 +26,7 @@ module.exports = {
   FAILED_SEND_TG: 'Failed to send telegram message to user',
   FAILED_SEND_TG_ADMIN: 'Failed to send telegram message to admin',
   FAILED_SEND_TG_KEYBOARD: 'Failed to send telegram message: list of books',
-  FAILED_SEND_TG_PROLONG: 'Failed to send telegram message: prolong book',
+  FAILED_SEND_TG_REMINDER: 'Failed to send telegram message: reminder',
 
   //Google Sheets
   FAILED_GET_SSM: 'Failed to get parameters from SSM',

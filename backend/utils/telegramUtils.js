@@ -90,7 +90,7 @@ async function remindToReturn(chatId, reminder) {
 
   const bookInfo = reminder.author ? `${reminder.title}, ${reminder.author}` :
     reminder.title;
-  const message = `${userMessages.REMINDER}*${reminder.deadline} на полку *${reminder.shelf}*:\n\n${bookInfo}${userMessages.REMINDER_ENDING}`;
+  const message = `${userMessages.REMINDER}*${reminder.deadline}* на полку *${reminder.shelf}*:\n\n${bookInfo}${userMessages.REMINDER_ENDING}`;
 
   try {
     if (keyboardExtra) {
@@ -101,8 +101,12 @@ async function remindToReturn(chatId, reminder) {
       });
     }
   } catch (error) {
-    // console.error(error);
-    // throw new Error(messages.FAILED_SEND_TG_PROLONG);
+    log.error('telegram-utils',
+      `Reason: "%s", Username: %s, ChatID: %s, ErrorMessage: %s`,
+      messages.FAILED_SEND_TG_REMINDER, reminder.username, reminder.chatID,
+      error.message);
+
+    // throw new Error(messages.FAILED_SEND_TG_REMINDER);
   }
 }
 
