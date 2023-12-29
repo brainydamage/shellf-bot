@@ -23,6 +23,10 @@ const devConfig = {
   RETURN_COLUMN: 9,
   COLUMNS_NUMBER: 10,
 
+  REMIND_DAYS: 3,
+  OVERDUE_DAYS: 40,
+  LOST_DAYS: 60,
+
   TINKOFF_LINK: 'https://www.tinkoff.ru/collectmoney/crowd/anderson.layma1/latFj82826/?short_link=165fWSttnKA&httpMethod=GET',
   PAYPAL_LINK: 'paypal.me/shelllf',
 };
@@ -51,6 +55,10 @@ const prodConfig = {
   PROLONG_COLUMN: 8,
   RETURN_COLUMN: 9,
   COLUMNS_NUMBER: 10,
+
+  REMIND_DAYS: 3,
+  OVERDUE_DAYS: 40,
+  LOST_DAYS: 60,
 
   TINKOFF_LINK: '[tinkoff](https://www.tinkoff.ru/collectmoney/crowd/anderson.layma1/latFj82826/?short_link=165fWSttnKA&httpMethod=GET)',
   PAYPAL_LINK: '[paypal](https://www.paypal.com/paypalme/shelllf)',

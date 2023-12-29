@@ -36,6 +36,8 @@ module.exports = {
   FAILED_UPDATE_ROW_DB: 'Failed to update row in Google Sheets',
 
   //Reminder
-  SENDING_REMINDER: 'Sending reminder...',
+  SENDING_REMINDER: 'Sending reminder',
+  SENDING_OVERDUE: 'Tracking overdue book',
+  SENDING_LOST: 'Tracking lost book',
   FAILED_REMINDER: 'Failed to handle reminder',
 };

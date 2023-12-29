@@ -81,6 +81,7 @@ async function remindToReturn(chatId, reminder) {
     const prolongKeyboard = await keyboardUtils.getProlongKeyboard(
       reminder.bookID, reminder.rowNumber);
     keyboardExtra = {
+      parse_mode: "Markdown",
       reply_markup: {
         inline_keyboard: prolongKeyboard,
       },
@@ -89,13 +90,15 @@ async function remindToReturn(chatId, reminder) {
 
   const bookInfo = reminder.author ? `${reminder.title}, ${reminder.author}` :
     reminder.title;
-  const message = `${userMessages.REMINDER}${reminder.deadline}:\n\n${bookInfo}${userMessages.REMINDER_ENDING}`;
+  const message = `${userMessages.REMINDER}*${reminder.deadline} на полку *${reminder.shelf}*:\n\n${bookInfo}${userMessages.REMINDER_ENDING}`;
 
   try {
     if (keyboardExtra) {
       await bot.telegram.sendMessage(chatId, message, keyboardExtra);
     } else {
-      await bot.telegram.sendMessage(chatId, message);
+      await bot.telegram.sendMessage(chatId, message, {
+        parse_mode: "Markdown",
+      });
     }
   } catch (error) {
     // console.error(error);
