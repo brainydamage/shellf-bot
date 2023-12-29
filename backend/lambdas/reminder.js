@@ -84,7 +84,8 @@ module.exports.handler = async (event) => {
               title: row[titleColumn],
               author: row[authorColumn],
               shelf: row[shelfColumn],
-              lostDays: daysOnHands - config.LOST_DAYS, // deadline: deadline,
+              lostDays: daysOnHands - config.LOST_DAYS,
+              // deadline: deadline,
               // prolonged: row[prolongedColumn],
               // rowNumber: i + 1,
             })
@@ -96,8 +97,8 @@ module.exports.handler = async (event) => {
               title: row[titleColumn],
               author: row[authorColumn],
               shelf: row[shelfColumn],
-              overdueDays: daysOnHands -
-                config.OVERDUE_DAYS, // deadline: deadline,
+              overdueDays: daysOnHands - config.OVERDUE_DAYS,
+              // deadline: deadline,
               // prolonged: row[prolongedColumn],
               // rowNumber: i + 1,
             })
