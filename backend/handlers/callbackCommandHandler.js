@@ -73,6 +73,7 @@ module.exports.returnBook = async (parsedBody) => {
       const bookTitle = bookRow[config.TITLE_COLUMN_LOG];
       const bookAuthor = bookRow[config.AUTHOR_COLUMN_LOG];
       const bookInfo = bookAuthor ? `${bookTitle}, ${bookAuthor}` : bookTitle;
+      const shelf = bookRow[config.SHELF_COLUMN_LOG];
 
       //24.12.2023, 16:55
       const dateBorrowedStr = bookRow[config.DATE_COLUMN];
@@ -95,9 +96,9 @@ module.exports.returnBook = async (parsedBody) => {
         parsedBody);
 
       log.info('callback-command-handler',
-        'Success: "%s", Callback: %s, BookID: %s, BookInfo: %s, DaysBorrowed: %s, Username: %s, ChatID: %s',
+        'Success: "%s", Callback: %s, BookID: %s, BookInfo: %s, DaysBorrowed: %s, Username: %s, ChatID: %s, Shelf: %s',
         messages.BOOK_RETURNED, parsedBody.callback, parsedBody.bookID,
-        bookInfo, daysBorrowed, parsedBody.username, parsedBody.chatID);
+        bookInfo, daysBorrowed, parsedBody.username, parsedBody.chatID, shelf);
 
     } else {
       // Handle case where row was not found or double-click
@@ -140,6 +141,8 @@ module.exports.prolongBook = async (parsedBody) => {
       await telegramUtils.sendFormattedMessage(
         `${userMessages.BOOK_BORROWED}${deadlineDate}`, parsedBody.chatID);
 
+
+      //TODO add some fields to the log!!! see returnBook above
       log.info('callback-command-handler',
         'Success: "%s", Callback: %s, BookID: %s, Username: %s, ChatID: %s',
         messages.BOOK_PROLONGED, parsedBody.callback, parsedBody.bookID,
