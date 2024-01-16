@@ -128,7 +128,7 @@ module.exports.prolongBook = async (parsedBody) => {
       (bookRow.length < config.COLUMNS_NUMBER ||
         bookRow[config.RETURN_COLUMN] === '')) {
 
-      const timestamp = body.callback_query.message.date;
+      const timestamp = parsedBody.date;
       const deadlineDate = await add10DaysAndFormat(timestamp);
       const prolongDate = await timestampToHumanReadable(Date.now());
 
@@ -137,16 +137,20 @@ module.exports.prolongBook = async (parsedBody) => {
         prolongDate, deadlineDate);
       await googleSheetsUtils.updateRow(range, dataForRow);
 
-      //todo date in bold, add shelf name to message (see borrowBook)
-      await telegramUtils.sendFormattedMessage(
-        `${userMessages.BOOK_BORROWED}${deadlineDate}`, parsedBody.chatID);
+      const bookTitle = bookRow[config.TITLE_COLUMN_LOG];
+      const bookAuthor = bookRow[config.AUTHOR_COLUMN_LOG];
+      const bookInfo = bookAuthor ? `${bookTitle}, ${bookAuthor}` : bookTitle;
 
+      const shelf = bookRow[config.SHELF_COLUMN_LOG];
+
+      let message = `${userMessages.BOOK_BORROWED}*${deadlineDate}* на полку *${shelf}*:\n\n${bookInfo}${userMessages.BOOK_BORROWED_ENDING}`;
+      await telegramUtils.sendFormattedMessage(message, parsedBody);
 
       //TODO add some fields to the log!!! see returnBook above
       log.info('callback-command-handler',
-        'Success: "%s", Callback: %s, BookID: %s, Username: %s, ChatID: %s',
+        'Success: "%s", Callback: %s, BookID: %s, BookInfo: %s, Username: %s, ChatID: %s, Shelf: %s, ',
         messages.BOOK_PROLONGED, parsedBody.callback, parsedBody.bookID,
-        parsedBody.username, parsedBody.chatID);
+        bookInfo, parsedBody.username, parsedBody.chatID, shelf);
 
     } else {
       // Handle case where row was not found or double-click

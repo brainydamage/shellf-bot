@@ -7,6 +7,7 @@ const log = require('../utils/customLogger');
 
 function parseBody(body) {
   let parsed = {
+    date: null,
     messageID: null,
     chatID: null,
     username: 'no_username',
@@ -39,6 +40,7 @@ function parseBody(body) {
   } else if (body.callback_query) {
     parsed.messageID = body.callback_query.message.message_id;
     parsed.chatID = body.callback_query.message.chat.id;
+    parsed.date = body.callback_query.message.date;
     parsed.username = body.callback_query.from.username || 'no_username';
     parsed.callback = body.callback_query.data;
 
