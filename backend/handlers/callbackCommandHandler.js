@@ -106,8 +106,8 @@ module.exports.returnBook = async (parsedBody) => {
     }
   } catch (error) {
     log.error('callback-command-handler',
-      `Reason: "%s", BookID: %s, Username: %s, ChatID: %s, ErrorMessage: %s`,
-      messages.FAILED_RETURN_BOOK, parsedBody.bookID, parsedBody.username,
+      `Reason: "%s", Username: %s, BookID: %s, ChatID: %s, ErrorMessage: %s`,
+      messages.FAILED_RETURN_BOOK, parsedBody.username, parsedBody.bookID,
       parsedBody.chatID, error.message);
 
     console.error(error);
@@ -158,8 +158,8 @@ module.exports.prolongBook = async (parsedBody) => {
     }
   } catch (error) {
     log.error('callback-command-handler',
-      `Reason: "%s", BookID: %s, Username: %s, ChatID: %s, ErrorMessage: %s`,
-      messages.FAILED_PROLONG_BOOK, parsedBody.bookID, parsedBody.username,
+      `Reason: "%s", Username: %s, BookID: %s, ChatID: %s, ErrorMessage: %s`,
+      messages.FAILED_PROLONG_BOOK, parsedBody.username, parsedBody.bookID,
       parsedBody.chatID, error.message);
 
     console.error(error);
