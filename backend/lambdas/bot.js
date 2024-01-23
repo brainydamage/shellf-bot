@@ -88,6 +88,10 @@ module.exports.handler = async (event) => {
     log.error('bot-interactions', 'chatID is null: %j', body);
   }
 
+  if (parsedBody.username === 'no_username') {
+    log.warn('bot-interactions', 'username is not set: %j', body);
+  }
+
   // Check if the chat type is 'private'
   if (body.message && body.message.chat.type !== 'private' ||
     body.callback_query && body.callback_query.message.chat.type !==

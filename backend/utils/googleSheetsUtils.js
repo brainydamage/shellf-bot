@@ -22,8 +22,7 @@ async function getGoogleSheets() {
   try {
     const clientEmail = await getParameter(config.CLIENT_EMAIL);
     const privateKey = (await getParameter(config.CLIENT_PRIVATE_KEY,
-      true)).replace(
-      /\\n/g, '\n');
+      true)).replace(/\\n/g, '\n');
 
     const client = new google.auth.JWT(clientEmail, null, privateKey,
       [config.SCOPE]);
@@ -68,8 +67,7 @@ async function linearSearchForBook(requestedBookID) {
 async function getBookData(requestedBookID) {
   let book;
 
-  const row = await getRow(config.BOOKS_DB,
-    requestedBookID + 1, "A", "D");
+  const row = await getRow(config.BOOKS_DB, requestedBookID + 1, "A", "D");
   if (row && parseInt(row[config.ID_COLUMN], 10) === requestedBookID) {
     // Found the book in the expected row
     book = await extractBookDetails(row);
@@ -125,10 +123,7 @@ async function appendRow(range, data) {
     };
 
     const result = await sheets.spreadsheets.values.append({
-      spreadsheetId,
-      range,
-      valueInputOption,
-      resource,
+      spreadsheetId, range, valueInputOption, resource,
     });
 
     console.log(`Row appended to ${spreadsheetId}, data: ${data}`);
@@ -151,10 +146,7 @@ async function updateRow(range, data) {
       values: [data],
     };
     await sheets.spreadsheets.values.update({
-      spreadsheetId,
-      range,
-      valueInputOption,
-      resource,
+      spreadsheetId, range, valueInputOption, resource,
     });
     console.log(`Row updated in ${spreadsheetId}, data: ${data}`);
 
@@ -166,9 +158,5 @@ async function updateRow(range, data) {
 }
 
 module.exports = {
-  getBookData,
-  getRow,
-  getRows,
-  appendRow,
-  updateRow
+  getBookData, getRow, getRows, appendRow, updateRow
 };

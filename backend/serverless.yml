@@ -10,7 +10,7 @@ provider:
   name: aws
   runtime: nodejs18.x
   memorySize: 256
-  timeout: 15 # in seconds
+  #  timeout: 15 # in seconds
   region: eu-central-1
   #  tracing:
   #    lambda: true
@@ -29,6 +29,7 @@ provider:
 functions:
   bot_handler:
     handler: lambdas/bot.handler
+    timeout: 10
     events:
       - httpApi: POST /rentBook
     environment:
@@ -36,6 +37,7 @@ functions:
       NODE_ENV: 'production'
   backend_handler:
     handler: lambdas/backend.handler
+    timeout: 5
     events:
       - httpApi:
           method: GET
@@ -44,6 +46,7 @@ functions:
       NODE_ENV: 'production'
   reminder_handler:
     handler: lambdas/reminder.handler
+    timeout: 5
     events:
       - schedule: cron(0 13 * * ? *)
     #      - schedule: rate(2 minutes)
