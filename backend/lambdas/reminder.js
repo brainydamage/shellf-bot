@@ -36,16 +36,16 @@ function parseDate(dateString) {
 }
 
 module.exports.handler = async (event) => {
-  const borrowedColumn = config.DATE_COLUMN;
-  const deadlineColumn = config.DEADLINE_COLUMN;
-  const returnedColumn = config.RETURN_COLUMN;
-  const prolongedColumn = config.PROLONG_COLUMN;
-  const bookIDColumn = config.BOOKID_COLUMN;
+  const borrowedColumn = config.DATE_COLUMN_LOG;
+  const deadlineColumn = config.DEADLINE_COLUMN_LOG;
+  const returnedColumn = config.RETURN_COLUMN_LOG;
+  const prolongedColumn = config.PROLONG_COLUMN_LOG;
+  const bookIDColumn = config.BOOKID_COLUMN_LOG;
   const titleColumn = config.TITLE_COLUMN_LOG;
   const authorColumn = config.AUTHOR_COLUMN_LOG;
   const shelfColumn = config.SHELF_COLUMN_LOG;
-  const chatIDColumn = config.CHATID_COLUMN;
-  const usernameColumn = config.USERNAME_COLUMN;
+  const chatIDColumn = config.CHATID_COLUMN_LOG;
+  const usernameColumn = config.USERNAME_COLUMN_LOG;
 
   try {
     const rows = await googleSheetsUtils.getRows(config.BOOKS_LOG);

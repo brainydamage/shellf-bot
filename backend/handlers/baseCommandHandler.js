@@ -55,12 +55,17 @@ module.exports.borrowBook = async (parsedBody) => {
     if (match && match.length > 1) {
       rowNumber = parseInt(match[1], 10);
 
-      const row = await googleSheetsUtils.getRow(config.BOOKS_LOG, rowNumber,
-        "E", "H");
+      const bookRow = await googleSheetsUtils.getRow(config.BOOKS_LOG,
+        rowNumber);
 
-      if (row && parseInt(row[0], 10) === parsedBody.bookID) {
+      if (bookRow && parseInt(bookRow[config.BOOKID_COLUMN_LOG], 10) ===
+        parsedBody.bookID) {
         // Found the book in the expected row
-        const book = {title: row[1], author: row[2], shelf: row[3]};
+        const book = {
+          title: bookRow[config.TITLE_COLUMN_LOG],
+          author: bookRow[config.AUTHOR_COLUMN_LOG],
+          shelf: bookRow[config.SHELF_COLUMN_LOG]
+        };
         bookInfo = book.author ? `${book.title}, ${book.author}` : book.title;
         shelf = book.shelf;
 
@@ -113,15 +118,15 @@ module.exports.returnBook = async (parsedBody) => {
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
 
-      const chatIDColumn = config.CHATID_COLUMN;
-      const bookIDColumn = config.BOOKID_COLUMN;
-      const returnDateColumn = config.RETURN_COLUMN;
+      const chatIDColumn = config.CHATID_COLUMN_LOG;
+      const bookIDColumn = config.BOOKID_COLUMN_LOG;
+      const returnDateColumn = config.RETURN_COLUMN_LOG;
       const titleColumn = config.TITLE_COLUMN_LOG;
       const authorColumn = config.AUTHOR_COLUMN_LOG;
 
       const sameChatID = row[chatIDColumn] === parsedBody.chatID.toString();
       const isBookNotReturned = row[returnDateColumn] === '' || row.length <
-        config.COLUMNS_NUMBER;
+        config.LOG_COLUMNS_NUMBER;
 
       if (sameChatID && isBookNotReturned) {
         const bookID = row[bookIDColumn];

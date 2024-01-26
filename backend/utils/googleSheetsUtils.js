@@ -1,43 +1,10 @@
 const config = require("../constants/config");
 const messages = require("../constants/messages");
-const {google} = require("googleapis");
-const {SSMClient, GetParameterCommand} = require("@aws-sdk/client-ssm");
-
-const ssmClient = new SSMClient({region: config.REGION});
-
-async function getParameter(name, withDecryption = false) {
-  try {
-    const command = new GetParameterCommand({
-      Name: name, WithDecryption: withDecryption
-    });
-
-    const response = await ssmClient.send(command);
-    return response.Parameter.Value;
-  } catch (error) {
-    throw new Error(messages.FAILED_GET_SSM);
-  }
-}
-
-async function getGoogleSheets() {
-  try {
-    const clientEmail = await getParameter(config.CLIENT_EMAIL);
-    const privateKey = (await getParameter(config.CLIENT_PRIVATE_KEY,
-      true)).replace(/\\n/g, '\n');
-
-    const client = new google.auth.JWT(clientEmail, null, privateKey,
-      [config.SCOPE]);
-
-    return google.sheets({version: 'v4', auth: client});
-  } catch (error) {
-    // console.error(error);
-
-    throw new Error(messages.FAILED_GET_GOOGLE_SHEETS);
-  }
-}
+const {getGoogleSheetsClient} = require('./googleSheetsClient');
 
 async function extractBookDetails(row) {
-  const bookTitle = row[config.TITLE_COLUMN];
-  const bookAuthor = row[config.AUTHOR_COLUMN];
+  const bookTitle = row[config.TITLE_COLUMN_DB];
+  const bookAuthor = row[config.AUTHOR_COLUMN_DB];
   return {title: bookTitle, author: bookAuthor};
 }
 
@@ -47,10 +14,10 @@ async function processBookData(rows, requestedBookID) {
 
   // Search for a specific book by ID
   for (const row of rows) {
-    const currentBookID = parseInt(row[config.ID_COLUMN], 10);
+    const currentBookID = parseInt(row[config.BOOKID_COLUMN_DB], 10);
     if (!isNaN(currentBookID) && currentBookID === requestedBookID) {
-      bookTitle = row[config.TITLE_COLUMN];
-      bookAuthor = row[config.AUTHOR_COLUMN];
+      bookTitle = row[config.TITLE_COLUMN_DB];
+      bookAuthor = row[config.AUTHOR_COLUMN_DB];
       return {title: bookTitle, author: bookAuthor};
     }
   }
@@ -67,8 +34,8 @@ async function linearSearchForBook(requestedBookID) {
 async function getBookData(requestedBookID) {
   let book;
 
-  const row = await getRow(config.BOOKS_DB, requestedBookID + 1, "A", "D");
-  if (row && parseInt(row[config.ID_COLUMN], 10) === requestedBookID) {
+  const row = await getRow(config.BOOKS_DB, requestedBookID + 1);
+  if (row && parseInt(row[config.BOOKID_COLUMN_DB], 10) === requestedBookID) {
     // Found the book in the expected row
     book = await extractBookDetails(row);
   } else {
@@ -79,10 +46,24 @@ async function getBookData(requestedBookID) {
   return book;
 }
 
+function getColumnLetter(columnNumber) {
+  let letter = '';
+  let base = 26;
+  let tempNumber = columnNumber;
+
+  while (tempNumber >= 0) {
+    let remainder = tempNumber % base;
+    letter = String.fromCharCode(65 + remainder) + letter;
+    tempNumber = Math.floor(tempNumber / base) - 1;
+  }
+
+  return letter;
+}
+
 async function getRows(range) {
   try {
     const spreadsheetId = config.SHEETS_ID;
-    const sheets = await getGoogleSheets();
+    const sheets = await getGoogleSheetsClient();
 
     const response = await sheets.spreadsheets.values.get(
       {spreadsheetId, range});
@@ -94,11 +75,17 @@ async function getRows(range) {
   }
 }
 
-async function getRow(sheetName, rowNumber, firstColumn, lastColumn) {
+async function getRow(sheetName, rowNumber, firstColumn = 0,
+                      lastColumn = null) {
   try {
+    const firstColLetter = getColumnLetter(firstColumn);
+    const lastColLetter = lastColumn !== null ? getColumnLetter(lastColumn) :
+      '';
+
     const spreadsheetId = config.SHEETS_ID;
-    const sheets = await getGoogleSheets();
-    const range = `${sheetName}!${firstColumn}${rowNumber}:${lastColumn}${rowNumber}`;
+    const sheets = await getGoogleSheetsClient();
+
+    const range = `${sheetName}!${firstColLetter}${rowNumber}:${lastColLetter}${rowNumber}`;
 
     const response = await sheets.spreadsheets.values.get(
       {spreadsheetId, range});
@@ -115,7 +102,7 @@ async function getRow(sheetName, rowNumber, firstColumn, lastColumn) {
 async function appendRow(range, data) {
   try {
     const spreadsheetId = config.SHEETS_ID;
-    const sheets = await getGoogleSheets();
+    const sheets = await getGoogleSheetsClient();
 
     const valueInputOption = 'USER_ENTERED';
     const resource = {
@@ -139,7 +126,7 @@ async function appendRow(range, data) {
 async function updateRow(range, data) {
   try {
     const spreadsheetId = config.SHEETS_ID;
-    const sheets = await getGoogleSheets();
+    const sheets = await getGoogleSheetsClient();
 
     const valueInputOption = 'USER_ENTERED';
     const resource = {
