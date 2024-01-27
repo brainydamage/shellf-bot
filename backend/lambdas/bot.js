@@ -80,6 +80,8 @@ function parseBody(body) {
   return parsed;
 }
 
+let userBookMap = {};
+
 module.exports.handler = async (event) => {
   const body = JSON.parse(event.body);
   const parsedBody = parseBody(body);
@@ -113,6 +115,21 @@ module.exports.handler = async (event) => {
       if (!parsedBody.bookID) {
         await baseCommandHandler.emptyStart(parsedBody);
       } else {
+        const userBookKey = `${parsedBody.chatID}_${parsedBody.bookID}`;
+
+        if (userBookMap[userBookKey]) {
+          await baseCommandHandler.repeatedCommand(parsedBody);
+
+          log.warn('bot-interactions',
+            'Warning: %s, UserBookKey: %s, BookID: %s, Username: %s, ChatID: %s',
+            messages.WARN_DOUBLE_REQUEST, userBookKey, parsedBody.bookID,
+            parsedBody.username, parsedBody.chatID);
+
+          return;
+        }
+
+        userBookMap[userBookKey] = true;
+
         await baseCommandHandler.borrowBook(parsedBody);
       }
     } else if (parsedBody.command === commands.RETURN) {

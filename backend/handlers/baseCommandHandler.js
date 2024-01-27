@@ -207,3 +207,10 @@ module.exports.support = async (parsedBody) => {
   const supportMessage = `${userMessages.DONATE}${config.TINKOFF_LINK}\n${config.PAYPAL_LINK}`;
   await telegramUtils.sendFormattedMessage(parsedBody.chatID, supportMessage);
 }
+
+
+module.exports.repeatedCommand = async (parsedBody) => {
+  await telegramUtils.deleteMessage(parsedBody);
+  // await telegramUtils.sendMessage(parsedBody.chatID,
+  //   userMessages.REPEATED_COMMAND);
+}
