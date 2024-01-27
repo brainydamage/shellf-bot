@@ -12,6 +12,8 @@ module.exports = {
   FAILED_GET_BOOK_DATA: 'Failed to get book data while borrowing',
   FAILED_RETURN_BOOK: 'Failed to return book',
   FAILED_PROLONG_BOOK: 'Failed to prolong book',
+
+  WARN_DOUBLE_REQUEST: 'User requests the same book: double click situation',
   // WARN_PROLONG_BOOK: 'Row with book to PROLONG is not found, probably
   // "double click" situation', WARN_RETURN_BOOK: 'Row with book to RETURN is
   // not found, probably "double click" situation',

@@ -41,6 +41,15 @@ module.exports.borrowBook = async (parsedBody) => {
 
   await telegramUtils.deleteMessage(parsedBody);
 
+  const {
+    message_id, chat: {id: chat_id}
+  } = await telegramUtils.sendMessage(parsedBody.chatID,
+    userMessages.BOOK_LOADER);
+  const loaderMsg = {
+    'messageID': message_id,
+    'chatID': chat_id,
+  };
+
   try {
     let message = `${userMessages.BOOK_BORROWED}*${deadlineDate}*`;
     let rowNumber;
@@ -74,7 +83,9 @@ module.exports.borrowBook = async (parsedBody) => {
     }
 
     message += `${userMessages.BOOK_BORROWED_ENDING}`;
-    await telegramUtils.sendFormattedMessage(message, parsedBody);
+
+    await telegramUtils.deleteMessage(loaderMsg);
+    await telegramUtils.sendFormattedMessage(parsedBody.chatID, message);
 
     log.info('base-command-handler',
       'Success: "%s", Command: %s, BookID: %s, BookInfo: %s, Shelf: %s, Username: %s, ChatID: %s',
@@ -106,7 +117,7 @@ module.exports.borrowBook = async (parsedBody) => {
 
     console.error(error);
 
-    await telegramUtils.sendAdminMessage(error.message, parsedBody);
+    await telegramUtils.sendAdminMessage(parsedBody, error.message);
   }
 };
 
@@ -156,8 +167,8 @@ module.exports.returnBook = async (parsedBody) => {
     if (arrayOfBooks.length > 0) {
       await telegramUtils.showBooksToReturn(parsedBody.chatID, arrayOfBooks);
     } else {
-      await telegramUtils.sendFormattedMessage(userMessages.NO_BOOK_TO_RETURN,
-        parsedBody);
+      await telegramUtils.sendFormattedMessage(parsedBody.chatID,
+        userMessages.NO_BOOK_TO_RETURN);
     }
 
   } catch (error) {
@@ -168,7 +179,8 @@ module.exports.returnBook = async (parsedBody) => {
 
     console.error(error);
 
-    await telegramUtils.sendFormattedMessage(userMessages.SUPPORT, parsedBody);
+    await telegramUtils.sendFormattedMessage(parsedBody.chatID,
+      userMessages.SUPPORT);
   }
 }
 
@@ -193,5 +205,5 @@ module.exports.support = async (parsedBody) => {
   await telegramUtils.deleteMessage(parsedBody);
 
   const supportMessage = `${userMessages.DONATE}${config.TINKOFF_LINK}\n${config.PAYPAL_LINK}`;
-  await telegramUtils.sendFormattedMessage(supportMessage, parsedBody);
+  await telegramUtils.sendFormattedMessage(parsedBody.chatID, supportMessage);
 }

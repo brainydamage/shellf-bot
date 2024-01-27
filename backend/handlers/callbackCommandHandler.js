@@ -93,8 +93,8 @@ module.exports.returnBook = async (parsedBody) => {
 
       const range = `${parsedBody.rowNumber}:${parsedBody.rowNumber}`;
       await googleSheetsUtils.updateRow(range, dataForRow);
-      await telegramUtils.sendFormattedMessage(userMessages.BOOK_RETURNED,
-        parsedBody);
+      await telegramUtils.sendFormattedMessage(parsedBody.chatID,
+        userMessages.BOOK_RETURNED);
 
       log.info('callback-command-handler',
         'Success: "%s", Callback: %s, BookID: %s, BookInfo: %s, DaysBorrowed: %s, Username: %s, ChatID: %s, Shelf: %s',
@@ -113,7 +113,8 @@ module.exports.returnBook = async (parsedBody) => {
 
     console.error(error);
 
-    await telegramUtils.sendFormattedMessage(userMessages.SUPPORT, parsedBody);
+    await telegramUtils.sendFormattedMessage(parsedBody.chatID,
+      userMessages.SUPPORT);
   }
 }
 
@@ -146,7 +147,7 @@ module.exports.prolongBook = async (parsedBody) => {
       const shelf = bookRow[config.SHELF_COLUMN_LOG];
 
       let message = `${userMessages.BOOK_BORROWED}*${deadlineDate}* на полку *${shelf}*:\n\n${bookInfo}${userMessages.BOOK_BORROWED_ENDING}`;
-      await telegramUtils.sendFormattedMessage(message, parsedBody);
+      await telegramUtils.sendFormattedMessage(parsedBody.chatID, message);
 
       //TODO add some fields to the log!!! see returnBook above
       log.info('callback-command-handler',
@@ -166,7 +167,8 @@ module.exports.prolongBook = async (parsedBody) => {
 
     console.error(error);
 
-    await telegramUtils.sendFormattedMessage(userMessages.SUPPORT, parsedBody);
+    await telegramUtils.sendFormattedMessage(parsedBody.chatID,
+      userMessages.SUPPORT);
   }
 }
 

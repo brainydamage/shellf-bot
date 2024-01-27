@@ -23,27 +23,24 @@ async function deleteMessage(parsedBody) {
 
 async function sendMessage(chatId, message) {
   try {
-    await bot.telegram.sendMessage(chatId, message);
+    return await bot.telegram.sendMessage(chatId, message);
   } catch (error) {
     // console.error(error);
     // throw new Error(messages.FAILED_SEND_TG);
   }
 }
 
-async function sendFormattedMessage(message, parsedBody) {
+async function sendFormattedMessage(chatID, message) {
   try {
-    await bot.telegram.sendMessage(parsedBody.chatID, message, {
+    return await bot.telegram.sendMessage(chatID, message, {
       parse_mode: "Markdown", disable_web_page_preview: true
     });
   } catch (error) {
-    // console.error(error);
-
     throw new Error(messages.FAILED_SEND_TG);
-    // await sendAdminMessage(error.message);
   }
 }
 
-async function sendAdminMessage(errorMessage, parsedBody) {
+async function sendAdminMessage(parsedBody, errorMessage) {
   const commandName = parsedBody.command || parsedBody.callback;
   const adminChatID = config.ADMIN_CHAT_ID;
   const formattedUsername = parsedBody.username ?
@@ -51,7 +48,7 @@ async function sendAdminMessage(errorMessage, parsedBody) {
   const adminMessage = `${userMessages.ADMIN_ERROR}${formattedUsername}, chatID: ${parsedBody.chatID}, command: ${commandName}, errorMessage: ${errorMessage}`;
 
   try {
-    await bot.telegram.sendMessage(adminChatID, adminMessage);
+    return await bot.telegram.sendMessage(adminChatID, adminMessage);
   } catch (error) {
     log.error('telegram-utils',
       `Reason: "%s", Username: %s, ChatID: %s, ErrorMessage: %s`,
