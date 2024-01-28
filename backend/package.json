@@ -4,7 +4,8 @@
   "dependencies": {
     "@aws-sdk/client-ssm": "^3.449.0",
     "@types/npmlog": "^7.0.0",
-    "googleapis": "^128.0.0",
+    "@googleapis/sheets": "^5.0.5",
+    "google-auth-library": "^9.5.0",
     "npmlog": "^7.0.1",
     "telegraf": "^4.15.0"
   }
