@@ -34,6 +34,8 @@ functions:
       - httpApi: POST /rentBook
     environment:
       TELEGRAM_TOKEN: ${env:TELEGRAM_TOKEN_SHELLF}
+      CLIENT_EMAIL: ${env:SHELLF_CLIENT_EMAIL}
+      PRIVATE_KEY: ${env:SHELLF_PRIVATE_KEY}
       NODE_ENV: 'production'
   backend_handler:
     handler: lambdas/backend.handler

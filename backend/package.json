@@ -2,7 +2,6 @@
   "name": "shellf-bot",
   "version": "1.0.0",
   "dependencies": {
-    "@aws-sdk/client-ssm": "^3.449.0",
     "@types/npmlog": "^7.0.0",
     "@googleapis/sheets": "^5.0.5",
     "google-auth-library": "^9.5.0",

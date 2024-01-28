@@ -1,24 +1,9 @@
 const {sheets} = require("@googleapis/sheets");
 const {JWT} = require('google-auth-library');
-const {SSMClient, GetParameterCommand} = require("@aws-sdk/client-ssm");
 const config = require("../constants/config");
 const messages = require("../constants/messages");
 
-const ssmClient = new SSMClient({region: config.REGION});
 let sheetsClient = null;
-
-async function getParameter(name, withDecryption = false) {
-  try {
-    const command = new GetParameterCommand({
-      Name: name, WithDecryption: withDecryption
-    });
-
-    const response = await ssmClient.send(command);
-    return response.Parameter.Value;
-  } catch (error) {
-    throw new Error(messages.FAILED_GET_SSM);
-  }
-}
 
 async function getGoogleSheetsClient() {
   if (sheetsClient) {
@@ -26,9 +11,8 @@ async function getGoogleSheetsClient() {
   }
 
   try {
-    const clientEmail = await getParameter(config.CLIENT_EMAIL);
-    const privateKey = (await getParameter(config.CLIENT_PRIVATE_KEY,
-      true)).replace(/\\n/g, '\n');
+    const clientEmail = process.env.CLIENT_EMAIL;
+    const privateKey = process.env.PRIVATE_KEY.replace(/\\n/g, '\n');
 
     const client = new JWT({
       email: clientEmail,
