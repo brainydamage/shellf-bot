@@ -1,4 +1,5 @@
-const {google} = require("googleapis");
+const {sheets} = require("@googleapis/sheets");
+const {JWT} = require('google-auth-library');
 const {SSMClient, GetParameterCommand} = require("@aws-sdk/client-ssm");
 const config = require("../constants/config");
 const messages = require("../constants/messages");
@@ -29,10 +30,13 @@ async function getGoogleSheetsClient() {
     const privateKey = (await getParameter(config.CLIENT_PRIVATE_KEY,
       true)).replace(/\\n/g, '\n');
 
-    const client = new google.auth.JWT(clientEmail, null, privateKey,
-      [config.SCOPE]);
+    const client = new JWT({
+      email: clientEmail,
+      key: privateKey,
+      scopes: [config.SCOPE],
+    });
 
-    sheetsClient = google.sheets({version: 'v4', auth: client});
+    sheetsClient = sheets({version: 'v4', auth: client});
     return sheetsClient;
   } catch (error) {
     // console.error(error);
