@@ -10,10 +10,7 @@ provider:
   name: aws
   runtime: nodejs18.x
   memorySize: 256
-  #  timeout: 15 # in seconds
   region: eu-central-1
-  #  tracing:
-  #    lambda: true
   httpApi:
     cors: true
 
@@ -36,7 +33,6 @@ functions:
       TELEGRAM_TOKEN: ${env:TELEGRAM_TOKEN_SHELLF}
       CLIENT_EMAIL: ${env:SHELLF_CLIENT_EMAIL}
       PRIVATE_KEY: ${env:SHELLF_PRIVATE_KEY}
-      NODE_ENV: 'production'
   backend_handler:
     handler: lambdas/backend.handler
     timeout: 5
@@ -45,13 +41,14 @@ functions:
           method: GET
           path: /book/{bookID}
     environment:
-      NODE_ENV: 'production'
+      CLIENT_EMAIL: ${env:SHELLF_CLIENT_EMAIL}
+      PRIVATE_KEY: ${env:SHELLF_PRIVATE_KEY}
   reminder_handler:
     handler: lambdas/reminder.handler
     timeout: 5
     events:
-      - schedule: cron(0 13 * * ? *)
-    #      - schedule: rate(2 minutes)
+      - schedule: cron(15 13 * * ? *)
     environment:
       TELEGRAM_TOKEN: ${env:TELEGRAM_TOKEN_SHELLF}
-      NODE_ENV: 'production'
+      CLIENT_EMAIL: ${env:SHELLF_CLIENT_EMAIL}
+      PRIVATE_KEY: ${env:SHELLF_PRIVATE_KEY}
