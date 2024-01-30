@@ -46,7 +46,8 @@ module.exports.handler = async (event) => {
     }
 
   } catch (error) {
-    console.error(error);
+    log.error('backend', `Reason: "%s", BookID: %s', ErrorMessage: %s`,
+      messages.FAILED_SCAN_BOOK, requestedBookID, error.message);
 
     return {
       statusCode: 500, body: JSON.stringify({message: error.message}),

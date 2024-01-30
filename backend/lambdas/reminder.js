@@ -35,7 +35,23 @@ function parseDate(dateString) {
   return new Date(year, month - 1, day);
 }
 
+async function add3DaysAndFormat(timestamp) {
+  const date = new Date(timestamp * 1000);
+
+  date.setDate(date.getDate() + 3); // Add 3 days
+
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const year = date.getFullYear(); // Get year
+
+  return `${day}.${month}.${year}`;
+}
+
 module.exports.handler = async (event) => {
+  const returnDate = await add3DaysAndFormat(Math.floor(Date.now() / 1000));
+  log.info('reminder',
+    'Return date: %s', returnDate);
+
   const borrowedColumn = config.DATE_COLUMN_LOG;
   const deadlineColumn = config.DEADLINE_COLUMN_LOG;
   const returnedColumn = config.RETURN_COLUMN_LOG;
@@ -131,7 +147,12 @@ module.exports.handler = async (event) => {
         overdueBook.shelf, overdueBook.overdueDays, overdueBook.username,
         overdueBook.chatID);
 
-      // await telegramUtils.remindOverdue(overdueBook.chatID, overdueBook);
+      if (overdueBook.overdueDays === 1 || overdueBook.overdueDays % 7 === 0) {
+        // Logic to send overdue notification
+        console.log(
+          `${overdueBook.username} (${overdueBook.chatID}) is overdue for book ${overdueBook.bookID} for ${overdueBook.overdueDays} days`);
+        // await telegramUtils.remindOverdue(overdueBook.chatID, overdueBook);
+      }
     }
 
     // Logic to track lost books
@@ -144,7 +165,12 @@ module.exports.handler = async (event) => {
         messages.SENDING_LOST, lostBook.bookID, bookInfo, lostBook.shelf,
         lostBook.lostDays, lostBook.username, lostBook.chatID);
 
-      // await telegramUtils.remindLost(overdueBook.chatID, lostBook);
+      if (lostBook.lostDays === 1 || lostBook.lostDays % 7 === 0) {
+        // Logic to send overdue notification
+        console.log(
+          `${lostBook.username} (${lostBook.chatID}) lost book ${lostBook.bookID} for ${lostBook.lostDays} days`);
+        // await telegramUtils.remindLost(overdueBook.chatID, lostBook);
+      }
     }
 
   } catch (error) {
