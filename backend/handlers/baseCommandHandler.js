@@ -23,11 +23,19 @@ function timestampToHumanReadable(timestamp) {
 function addOneMonthAndFormat(timestamp) {
   const date = new Date(timestamp * 1000);
 
+  const originalDay = date.getDate();
   date.setMonth(date.getMonth() + 1); // Add one month
 
+  // Check for month rollover (e.g., Jan 31 to Feb 28/29)
+  if (date.getDate() !== originalDay) {
+    date.setDate(0); // Set to the last day of the previous month
+  }
+
   const day = date.getDate().toString().padStart(2, '0');
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  const year = date.getFullYear(); // Get year
+  const month = (date.getMonth() + 1).toString().padStart(2, '0'); // getMonth()
+                                                                   // is
+                                                                   // 0-indexed
+  const year = date.getFullYear();
 
   return `${day}.${month}.${year}`;
 }

@@ -20,14 +20,29 @@ async function timestampToHumanReadable(timestamp) {
   return date.toLocaleString('ru-RU', options);
 }
 
-async function add10DaysAndFormat(timestamp) {
+async function getLaterDate(date1Timestamp, date2String) {
+  const timezoneOffset = 3600 * 1000; // 1 hour offset for GMT+1
+  const date1Date = new Date((date1Timestamp * 1000) + timezoneOffset);
+
+  const [day, month, year] = date2String.split('.').map(Number);
+  const date2Date = new Date(year, month - 1, day);
+
+  // Compare and return the later date in date1Timestamp format
+  if (date2Date > date1Date) {
+    return Math.floor(date2Date.getTime() / 1000);
+  } else {
+    return date1Timestamp;
+  }
+}
+
+async function add7DaysAndFormat(timestamp) {
   const date = new Date(timestamp * 1000);
 
-  date.setDate(date.getDate() + 10); // Add 10 days
+  date.setDate(date.getDate() + 7); // Add 7 days
 
   const day = date.getDate().toString().padStart(2, '0');
   const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  const year = date.getFullYear(); // Get year
+  const year = date.getFullYear();
 
   return `${day}.${month}.${year}`;
 }
@@ -62,12 +77,31 @@ function setProlongAndDeadlineDatesForRowArray(inputArray, prolongDate,
   return transformedArray;
 }
 
+async function getBookRowWithNumber(parsedBody) {
+  const rows = await googleSheetsUtils.getRows(config.BOOKS_LOG);
+
+  for (let i = 1; i < rows.length; i++) {
+    const row = rows[i];
+
+    const chatIDColumn = config.CHATID_COLUMN_LOG;
+    const bookIDColumn = config.BOOKID_COLUMN_LOG;
+
+    const sameChatID = row[chatIDColumn] === parsedBody.chatID.toString();
+    const sameBookID = row[bookIDColumn] === parsedBody.bookID.toString();
+
+    if (sameChatID && sameBookID) {
+      return {bookRow: row, rowNumber: i + 1};
+    }
+  }
+  return {bookRow: null, rowNumber: null};
+}
+
 module.exports.returnBook = async (parsedBody) => {
   await telegramUtils.deleteMessage(parsedBody);
 
   try {
-    const bookRow = await googleSheetsUtils.getRow(config.BOOKS_LOG,
-      parsedBody.rowNumber);
+    const result = await getBookRowWithNumber(parsedBody);
+    const bookRow = result.bookRow;
 
     if (bookRow && (bookRow.length < config.LOG_COLUMNS_NUMBER ||
       bookRow[config.RETURN_COLUMN_LOG] === '')) {
@@ -91,7 +125,7 @@ module.exports.returnBook = async (parsedBody) => {
       const returnDate = await timestampToHumanReadable(Date.now());
       const dataForRow = setReturnDateForRowArray(bookRow, returnDate);
 
-      const range = `${parsedBody.rowNumber}:${parsedBody.rowNumber}`;
+      const range = `${result.rowNumber}:${result.rowNumber}`;
       await googleSheetsUtils.updateRow(range, dataForRow);
       await telegramUtils.sendFormattedMessage(parsedBody.chatID,
         userMessages.BOOK_RETURNED);
@@ -122,8 +156,8 @@ module.exports.prolongBook = async (parsedBody) => {
   await telegramUtils.deleteMessage(parsedBody);
 
   try {
-    const bookRow = await googleSheetsUtils.getRow(config.BOOKS_LOG,
-      parsedBody.rowNumber);
+    const result = await getBookRowWithNumber(parsedBody);
+    const bookRow = result.bookRow;
 
     //TODO is that actual with the new ID column (last one)?
     if (bookRow && (bookRow.length < config.LOG_COLUMNS_NUMBER - 1 ||
@@ -131,13 +165,19 @@ module.exports.prolongBook = async (parsedBody) => {
       (bookRow.length < config.LOG_COLUMNS_NUMBER ||
         bookRow[config.RETURN_COLUMN_LOG] === '')) {
 
+      //1706662735
       const timestamp = parsedBody.date;
-      const deadlineDate = await add10DaysAndFormat(timestamp);
+      //'01.03.2024'
+      const initialDeadline = bookRow[config.DEADLINE_COLUMN_LOG];
+
+      const laterDateTimestamp = await getLaterDate(timestamp, initialDeadline);
+
+      const newDeadlineDate = await add7DaysAndFormat(laterDateTimestamp);
       const prolongDate = await timestampToHumanReadable(Date.now());
 
-      const range = `${parsedBody.rowNumber}:${parsedBody.rowNumber}`;
+      const range = `${result.rowNumber}:${result.rowNumber}`;
       const dataForRow = setProlongAndDeadlineDatesForRowArray(bookRow,
-        prolongDate, deadlineDate);
+        prolongDate, newDeadlineDate);
       await googleSheetsUtils.updateRow(range, dataForRow);
 
       const bookTitle = bookRow[config.TITLE_COLUMN_LOG];
@@ -146,12 +186,11 @@ module.exports.prolongBook = async (parsedBody) => {
 
       const shelf = bookRow[config.SHELF_COLUMN_LOG];
 
-      let message = `${userMessages.BOOK_BORROWED}*${deadlineDate}* на полку *${shelf}*:\n\n${bookInfo}${userMessages.BOOK_BORROWED_ENDING}`;
+      let message = `${userMessages.BOOK_BORROWED}*${newDeadlineDate}* на полку *${shelf}*:\n\n${bookInfo}${userMessages.BOOK_BORROWED_ENDING}`;
       await telegramUtils.sendFormattedMessage(parsedBody.chatID, message);
 
-      //TODO add some fields to the log!!! see returnBook above
       log.info('callback-command-handler',
-        'Success: "%s", Callback: %s, BookID: %s, BookInfo: %s, Username: %s, ChatID: %s, Shelf: %s, ',
+        'Success: "%s", Callback: %s, BookID: %s, BookInfo: %s, Username: %s, ChatID: %s, Shelf: %s',
         messages.BOOK_PROLONGED, parsedBody.callback, parsedBody.bookID,
         bookInfo, parsedBody.username, parsedBody.chatID, shelf);
 

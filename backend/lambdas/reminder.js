@@ -76,6 +76,14 @@ module.exports.handler = async (event) => {
         const deadline = row[deadlineColumn];
         const returned = row[returnedColumn];
 
+        //code for testing prolongation!!!
+        // if (row[chatIDColumn].toString() ===
+        // config.ADMIN_CHAT_ID.toString()) { reminders.push({ chatID:
+        // row[chatIDColumn], username: row[usernameColumn], bookID:
+        // row[bookIDColumn], title: row[titleColumn], author:
+        // row[authorColumn], shelf: row[shelfColumn], deadline: deadline,
+        // prolonged: row[prolongedColumn], rowNumber: i + 1, }); }
+
         if (!returned) {
           if (isDeadlineIn(deadline, config.REMIND_DAYS)) {
             reminders.push({
