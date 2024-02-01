@@ -78,8 +78,7 @@ async function remindToReturn(chatId, reminder) {
     const prolongKeyboard = await keyboardUtils.getProlongKeyboard(
       reminder.bookID, reminder.rowNumber);
     keyboardExtra = {
-      parse_mode: "Markdown",
-      reply_markup: {
+      parse_mode: "Markdown", reply_markup: {
         inline_keyboard: prolongKeyboard,
       },
     }
@@ -107,11 +106,31 @@ async function remindToReturn(chatId, reminder) {
   }
 }
 
+async function remindOverdue(chatId, reminder) {
+  const bookInfo = reminder.author ? `${reminder.title}, ${reminder.author}` :
+    reminder.title;
+  const message = `${userMessages.REMINDER_OVERDUE_1}*${reminder.deadline}*${userMessages.REMINDER_OVERDUE_2}\n\n*${bookInfo}*\n\n${userMessages.REMINDER_OVERDUE_3}*${reminder.shelf}*${userMessages.REMINDER_OVERDUE_4}`;
+
+  try {
+    await bot.telegram.sendMessage(chatId, message, {
+      parse_mode: "Markdown",
+    });
+  } catch (error) {
+    log.error('telegram-utils',
+      `Reason: "%s", Username: %s, ChatID: %s, ErrorMessage: %s`,
+      messages.FAILED_SEND_TG_OVERDUE_LOST, reminder.username, reminder.chatID,
+      error.message);
+
+    // throw new Error(messages.FAILED_SEND_TG_REMINDER);
+  }
+}
+
 module.exports = {
   deleteMessage,
   sendMessage,
   sendFormattedMessage,
   sendAdminMessage,
   showBooksToReturn,
-  remindToReturn
+  remindToReturn,
+  remindOverdue,
 };

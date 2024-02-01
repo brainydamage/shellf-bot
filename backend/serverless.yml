@@ -47,7 +47,7 @@ functions:
     handler: lambdas/reminder.handler
     timeout: 5
     events:
-      - schedule: cron(15 13 * * ? *)
+      - schedule: cron(30 13 * * ? *)
     environment:
       TELEGRAM_TOKEN: ${env:TELEGRAM_TOKEN_SHELLF}
       CLIENT_EMAIL: ${env:SHELLF_CLIENT_EMAIL}

@@ -30,6 +30,7 @@ module.exports = {
   FAILED_SEND_TG_ADMIN: 'Failed to send telegram message to admin',
   FAILED_SEND_TG_KEYBOARD: 'Failed to send telegram message: list of books',
   FAILED_SEND_TG_REMINDER: 'Failed to send telegram message: reminder',
+  FAILED_SEND_TG_OVERDUE_LOST: 'Failed to send telegram message: overdue or lost',
 
   //Google Sheets
   FAILED_GET_SSM: 'Failed to get parameters from SSM',
@@ -40,7 +41,9 @@ module.exports = {
 
   //Reminder
   SENDING_REMINDER: 'Sending reminder',
-  SENDING_OVERDUE: 'Tracking overdue book',
-  SENDING_LOST: 'Tracking lost book',
+  SENDING_OVERDUE: 'Sending reminder: overdue',
+  SENDING_LOST: 'Sending reminder: lost',
+  TRACKING_OVERDUE: 'Tracking overdue book',
+  TRACKING_LOST: 'Tracking lost book',
   FAILED_REMINDER: 'Failed to handle reminder',
 };
