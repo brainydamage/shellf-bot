@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "optimal-moon-235715",
+  "private_key_id": "30bc3d52430fafb94d666aafc49c7557fca82fd2",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDFlbGs/vlKblAX\n/t1uljqryFxyQxPS9PTMal8FY7FvXGnhjcCJZ4H5YjRpIe6rh6DC6U/FnDJjp9ef\n/KV3ubXBfs0Wy7RZKCKEeMyLRxTqxbGLfY4IuL6s3OGQVqEQ3SlIRKhyEfao4JDD\n4AmVQZ394ikgC5iq3bGxLuRopJNLcj1KJQuZpmmHEJKxagwpZtN26rEHAiDUrrAg\nDjyZ7jZJ2IBzqpK8oul5fAVjdWiKXzUcyOLZZwBEkc0Wlz7aVPb+Zpc3GX2R5y22\nQYA28XEQ2dbgRIXBBYxpFWjLhWvev/tLEax2S0J3SJfM728SYEv/O/AcNbopKmbv\nrUHQs09nAgMBAAECggEAAjNv3FBVoNKLfWHHl4Mo1p/RWATPGxCNNJWdK+7oYmtq\nqmpak8aEXhly69nUM8B4QCbwmHbKdQH9mI62TNSd4j4jD+s7qY9R3W2jJ8JVcS7k\nTzj4ecYG85wMRPlclvG8yUZ7kSGDM0XoRTrudyIIONl6ozedAnQjRSIg7gGU/e1E\ndd968RziruVbv8ciyYQzP/KBLVXcNHtj+X02nGMbg7D2gOOevhVIwHafAGLrNw2s\nFQr3B0as8vw2LL/trzfBRbeH8a/Vp2UkohdOp4LzCDd/XuNIGrtllmeLVYANaJ9u\nvR7KMPX8X4F0vdMjqYiRIG7i97sYYntwtYCZMpYrEQKBgQD8FcEhlbyC097suGiv\niNDzjUb1ejsFwilU5A9+QlEuiXcbETTBOfIkoHtLgADAEo7b/YOB4hHIuQGf1OOg\nP06dEmk8Cqj9D+8saDL2Jj/HYIDeJes1hsKEPVjKnoY7ocgP0VZRjBDIPBj3JBBJ\nL2B3Q8oPVYHltYeyd/+Cb7l0twKBgQDIp0GanFm+sHKjUDTG8DYAawgQd/3xsWgU\nzPgXgciagSzUEteLkokEKv51hfJIfGAOyYrz+F5k1hR9gBXI5LJLfVHsJXUd15OJ\nbA0Kledkh5qSb7jkjEXH1jgEXNkbm2at557llSDYJlW30PkhRtB/qEE0zddrZfAL\nUOCBqQMq0QKBgA3ujdvzUJXSa9GdZ3u8DgBH4JIUjUqGLo6YhBqwQ5hU1JZUXxwG\nvdE0ZVwI2QHEhMy3uBrniaAUSXix5Vqn5QpdSB+fXzONO+SyZY6hEolMVhLw+Yzd\nw8ZXNZ8NH9IP4OSu5xxep1bJq3+NKLFCwwwUXQh361PssnE0nJRy5EcFAoGATzcA\nxlotcAPW7jSO8W8J0rZuk5nbjlx8e6HD2/vnx19x5DOgFsD+CMA0fw8nbIh1n8Df\nc5u9IFAH/NfhQdNPtE/AVNsg1mwyGdGngGNX269RTbh/pPLf5ZnjuY0yRRzft442\ng+qQ8eSIeK4ufH2peIxjWcZd4k93KfB/AZFI59ECgYBlTreHvDb8EqSvapRy1tcq\nzdOkO5yOeGwd8leJWch3bu63j5Mmvos/58ZVPdNGluidW0OOX6i6dZQlnYqBxvxx\n8upkS5Vgorx4zgk3y6v4Myw4GvrsNP8giI8d20s2hdv+XnRnHRQFXE7xzDKgKeee\n2H4tmCLOAud3esbxk61Plw==\n-----END PRIVATE KEY-----\n",
+  "client_email": "shellf-fe@optimal-moon-235715.iam.gserviceaccount.com",
+  "client_id": "104800364697234608179",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/shellf-fe%40optimal-moon-235715.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
