@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>shell(f)</title>
+    <link href="styles.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="favicon.ico" rel="icon" type="image/x-icon">
+</head>
+
+<body>
+<div id="content-wrapper">
+
+    <div class="header-content">
+        <img alt="shell(f) logo" id="library-logo" src="logo.jpg">
+        <div class="social-icons">
+            <a class="social-icon" href="https://www.instagram.com/shell.f_" target="_blank">
+                <i class="fab fa-instagram"></i>
+            </a>
+            <a class="social-icon" href="https://t.me/shelllllf" target="_blank">
+                <i class="fab fa-telegram-plane"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="books-content">
+        <input id="search-input" oninput="searchBooks()" placeholder="Найти книгу..." type="text">
+
+        <table id="books-table">
+            <thead>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <th>название</th>
+                <th>автор:ка</th>
+                <th>полка</th>
+            </tr>
+            </thead>
+            <tbody id="books-list">
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Райский сад первой любви</td>
+                <td>Линь Ихань</td>
+                <td>Flat</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Инферно (роман поэта)</td>
+                <td>Айлин Майлз</td>
+                <td>Flat</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Автобиография красного</td>
+                <td>Энн Карсон</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Я монстр, что говорит с вами</td>
+                <td>Поль Б. Пресьядо</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Хронология воды</td>
+                <td>Лидия Юкнавич</td>
+                <td>Flat</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Событие</td>
+                <td>Анни Эрно</td>
+                <td>Flat</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Свое место</td>
+                <td>Анни Эрно</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Сестра-отверженная</td>
+                <td>Одри Лорд</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>I Love Dick</td>
+                <td>Крис Краус</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Ползут, чтоб вновь родиться в Вифлееме</td>
+                <td>Джоан Дидион</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Тот, кто полюбит все твои трещины</td>
+                <td>Рафаэль Боб-Ваксберг</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>How much queer work!</td>
+                <td></td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Факт. Как я училась полиамории, снималась в порно и завела раба</td>
+                <td>Милана Логунова</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Закрытые. Жизнь гомосексуалов в Советском Союзе</td>
+                <td>Рустам Александер</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Феминистский город</td>
+                <td>Лесли Керн</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Империя знаков</td>
+                <td>Ролан Барт</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Kudos</td>
+                <td>Рейчел Каск</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Деколониальность: настоящее и будущее. Сборник статей</td>
+                <td></td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Поговорим о панических атаках</td>
+                <td>Дэвид Карбонелл</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Поговорим о депрессии</td>
+                <td>Дэвид Карп</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Как жить, когда «всё на тебе»</td>
+                <td>Саманта Вильяр</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>War in Serbia (1991-2001): it did happen</td>
+                <td></td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Роза</td>
+                <td>Оксана Васякина</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Как слышно</td>
+                <td>Артем Роганов</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Считалка</td>
+                <td>Тата Мелашвили</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Детство</td>
+                <td>Тове Дитлевсен</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Юность</td>
+                <td>Тове Дитлевсен</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Зависимость</td>
+                <td></td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Одинокий город</td>
+                <td>Оливия Лэнг</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Сообщники. Cборник рассказов</td>
+                <td></td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Имени такого-то</td>
+                <td>Линор Горалик</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Отделение связи</td>
+                <td>Полина Барскова</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Uncommon type</td>
+                <td>Tom Hanks</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Риф</td>
+                <td>Алексей Поляринов</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Непонятное искусство</td>
+                <td>Уилл Гомперц</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Клуб самоубийц</td>
+                <td>Роберт Люис Стивенсон</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>И дольше века длится день</td>
+                <td>Чингиз Айтматов</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Рай</td>
+                <td>Абдулразак Гурна</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Золотинка</td>
+                <td>Евгения Некрасова</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>История одного немца</td>
+                <td>Себастьян Хафнер</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Балканская трилогия: том I, Величайшее благо</td>
+                <td>Оливия Мэннинг</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Балканская трилогия: том II, Разграбленный город</td>
+                <td>Оливия Мэннинг</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>The Origin of Others</td>
+                <td>Toni Morrison</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Anxious people</td>
+                <td>Fredrik Backman</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>К себе нежно</td>
+                <td>Ольга Примаченко</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Апоптоз</td>
+                <td>Наташа Гринь</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Лето в пионерском галстуке</td>
+                <td>Катерина Сильванова, Елена Малисова</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Лето в пионерском галстуке</td>
+                <td>Катерина Сильванова, Елена Малисова</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Лето в пионерском галстуке</td>
+                <td>Катерина Сильванова, Елена Малисова</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>О чем молчит ласточка</td>
+                <td>Катерина Сильванова, Елена Малисова</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>The Light We Carry</td>
+                <td>Michelle Obama</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>The Stationery Shop</td>
+                <td>Marjan Kamali</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Catch the Rabbit</td>
+                <td>Lana Bastašić</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Квир-пространства в России</td>
+                <td></td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>The Summer House</td>
+                <td>James Patterson</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Любовь во время чумы</td>
+                <td>Габриэль Гарсиа Маркес</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Speak of the Devil</td>
+                <td>Rose Wilding</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Дорамароман</td>
+                <td>Михаил Захаров</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Наивно. Супер</td>
+                <td>Эрленд Лу</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Когда мы перестали понимать мир</td>
+                <td>Бенхамин Лабатут</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Гудбай, Берлин</td>
+                <td>Вольфганг Херрндорф</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Ужель та самая Татьяна?</td>
+                <td>Клементина Бове</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Бег</td>
+                <td>Михаил Булгаков</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Андрей Сахаров. Человек, который не боялся</td>
+                <td>Ксения Новохатько</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Мюонное нейтрино, пролетевшее сквозь наши сердца</td>
+                <td>Анастасия Евстюхина</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Я рожден(а) для этого</td>
+                <td>Элис Осман</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Отравленные слова</td>
+                <td>Майте Карранса</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>21 Lessons for the 21st Century</td>
+                <td>Yuval Noah Harari</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Talking to Strangers</td>
+                <td>Malcolm Gladwell</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Девушка из Дании</td>
+                <td>Дэвид Эберсхофф</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Хорея</td>
+                <td>Марина Кочан</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>So Sad Today</td>
+                <td>Melissa Broder</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>The Best of Edgar Poe</td>
+                <td>Edgar Allan Poe</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Extremely Loud & Incredibly Close</td>
+                <td>Jonathan Safran Foer</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Anne of Green Gables</td>
+                <td>Lucy Maud Montgomery</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>О фотографии</td>
+                <td>Сьюзен Сонтаг</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Парадокс любви</td>
+                <td>Паскаль Брюкер</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Кинг-конг-теория</td>
+                <td>Виржини Депант</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Просто дети</td>
+                <td>Патти Смит</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Жена Эйнштейна</td>
+                <td>Лив Стрёмквист</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Астрид Лингрен: этот день и есть жизнь</td>
+                <td>Йенс Андерсен</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Авторицы и поэтки. Женская критика: 1830-1870</td>
+                <td></td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Отель «У погибшего альпиниста»</td>
+                <td>Стругацкие</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Плод познания</td>
+                <td>Лив Стрёмквист</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Розы без шипов</td>
+                <td>Мария Нестеренко</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Сборник квир-поэзии. Под одной обложкой</td>
+                <td></td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Абсурдные приче</td>
+                <td>Даниил Хармс</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Все твердое растворяется в воздухе. Опыт модерности</td>
+                <td>Маршалл Берман</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Год порно</td>
+                <td>Илья Мамаев-Найлз</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Под стеклянным колпаком</td>
+                <td>Сильвия Плат</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Не отпускай меня</td>
+                <td>Кадзуо Исигуро</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Токсичные коллеги</td>
+                <td>Тесса Уст</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Тайная история</td>
+                <td>Донна Тарт</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Насморк</td>
+                <td>Станислав Лем</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Глас Господа</td>
+                <td>Станислав Лем</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Все лгут</td>
+                <td>Сет Стивенс-Давидовиц</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Лето на Парк-авеню</td>
+                <td>Рене Розен</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Таинственный сад</td>
+                <td>Фрэнсис Бернетт</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Аэропорт</td>
+                <td>Артур Хейли</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Чистый цвет</td>
+                <td>Шила Хети</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Hari Poter i Kamen mudrosti</td>
+                <td>Džoan K. Rouling</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Izgubljena duša</td>
+                <td>Olga Tokarčuk</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Двери восприятия, Рай и ад</td>
+                <td>Олдос Хаксли</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Ужасы жизни</td>
+                <td>Маша Гаврилова</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Сам секс</td>
+                <td>Саша Казанцева</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Сам секс</td>
+                <td>Саша Казанцева</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Поговорим о бессонице</td>
+                <td>Тильман Мюллер, Беата Патерок</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Поговорим об утрате</td>
+                <td>Меган Девайн</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Обыкновенная страсть. Стыд</td>
+                <td>Анни Эрно</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Ариадна Эфрон: рассказанная жизнь</td>
+                <td>Елена Коркина</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Trigger Warning</td>
+                <td>Neil Gaiman</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>On Photograpy</td>
+                <td>Susan Sontag</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Reborn</td>
+                <td>Susan Sontag</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Push</td>
+                <td>Ashley Audrain</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Живые картины</td>
+                <td>Полина Барскова</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Натуралист</td>
+                <td>Полина Барскова</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Седьмая щелочь</td>
+                <td>Полина Барскова</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Отделение связи</td>
+                <td>Полина Барскова</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Инферно (роман поэта)</td>
+                <td>Айлин Майлз</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Верю каждому зверю</td>
+                <td>Настасья Мартен</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Финские ночи</td>
+                <td>Станислав Снытко</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Женщина</td>
+                <td>Анни Эрно</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Во власти</td>
+                <td>Анни Эрно</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Человек-комбини</td>
+                <td>Саяка Мурата</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Лишь</td>
+                <td>Эндрю Шон Грир</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Сметая запреты. Очерки русской сексуальной культуры XI-XX веков</td>
+                <td>Н. Пушкарева, А. Белова, Н. Мицюк</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Как жить, когда «всё на тебе»</td>
+                <td>Саманта Вильяр</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>My Year of Rest and Relaxation</td>
+                <td>Ottessa Moshfegh</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>The Blue Flower</td>
+                <td>Penelope Fitzgerald</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Единственный ребенок в семье</td>
+                <td>Джилл Питкетли, Дэвид Эмерсон</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Как жить, когда близкий перестал тебя узнавать</td>
+                <td>Патти Дэвис</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Как я превращалась (детская книга)</td>
+                <td>Ольга Седакова</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Мать</td>
+                <td>Максим Горький</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Поговорим о диагнозе "рак груди"</td>
+                <td>Кэролайн Кларк</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Поговорим о дислексии</td>
+                <td>Лус Рельо</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Поговорим о дыхании</td>
+                <td>Джессика Браун</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Поговорим о кельтской мудрости</td>
+                <td>Джон О Донохью</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Скоро конец света</td>
+                <td>Микита Франко</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Хватит врать</td>
+                <td>Филипп Бессон</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Свидетельства активист_ок из России</td>
+                <td></td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Заповедник</td>
+                <td>Сергей Довлатов</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Поговорим о диагнозе "рак груди"</td>
+                <td>Кэролайн Кларк</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Быть здесь –– уже чудо</td>
+                <td>Мари Дарьесек</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>В клетке. Вирус. Напролом</td>
+                <td>Джон Скальцы</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Краткая история феминизма в евро-американском контексте</td>
+                <td>Пату / Антье Шрупп</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Жизнь в пограничном слое</td>
+                <td>Робин Уолл Киммерер</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>The Trouble with Happiness</td>
+                <td>Tove Ditlevsen</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Миф о красоте</td>
+                <td>Наоми Вульф</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Степь</td>
+                <td>Оксана Васякина</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Be kinky!</td>
+                <td>Андреа Фарольфи</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Каталог утраченных вещей</td>
+                <td>Юдит Шалански</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Поговорим о деменции</td>
+                <td>Лора Уэймен</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Балконы</td>
+                <td>Алина Моисеева</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Дислексия</td>
+                <td>Светлана Олонцева</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Požuri i izmisli grad</td>
+                <td>Lejla Kalamujić</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Чисто шведские убийства. Отпуск в раю</td>
+                <td>Андерс Де Ла Мотт, Монс Нильссон</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Чисто шведские убийства. Опасная находка</td>
+                <td>Андерс Де Ла Мотт, Монс Нильссон</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>На вилле</td>
+                <td>Сомерсет Моэм</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Outline</td>
+                <td>Rachek Cusk</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Дворец сновидений</td>
+                <td>Исмаиль Кадарэ</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Mansfield Park</td>
+                <td>Jane Austen</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>The Vanishing Half</td>
+                <td>Brit Bennet</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Полярный круг</td>
+                <td>Лиза Марклунд</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Моральная слепота</td>
+                <td>Зигмунт Бауман, Леонидас Донскис</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Любовь в эпоху ненависти. Хроника одного чувства. 1929-1939</td>
+                <td>Флориан Иллиес</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>В Париже. Из писем домой</td>
+                <td>Александр Родченко</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Степь</td>
+                <td>Оксана Васякина</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Посторонний</td>
+                <td>Альбер Камю</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Как работает Google</td>
+                <td>Эрик Шмидт, Джонатан Розенберг</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>До самого рая</td>
+                <td>Ханья Янагихара</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Теория бесконечных обезьян</td>
+                <td>Екатерина Звонцова</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Краткая история головы: инструкция по применению</td>
+                <td>Рэймонд Таллис</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>О дружбе. Эволюция, биология и суперсила главных в жизни связей</td>
+                <td>Лидия Денворт</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Тот город</td>
+                <td>Ольга Кромер</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Валсарб</td>
+                <td></td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Снежная слепота</td>
+                <td>Рагнар Йонассон</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Мисс Исландия</td>
+                <td>Аудур Ава Олафсдоттир</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Двойной контроль</td>
+                <td>Эдвард Сент-Обин</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Хребты безумия</td>
+                <td>Говард Лавкрафт</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Условно пригодные</td>
+                <td>Питер Хёг</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Средневековая Европа. От падения Рима до Реформации</td>
+                <td>Крис Уикхем</td>
+                <td>Nekrasova</td>
+            </tr>
+            <tr data-href="https://t.me/shellf_bot?start=1">
+                <td>Черный обелиск</td>
+                <td>Эрих Мария Ремарк</td>
+                <td>Nekrasova</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+<!--<script src="bookList.js"></script>-->
+</body>
+</html>

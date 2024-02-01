@@ -1,0 +1,97 @@
+/* styles.css */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+#content-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Distributes space evenly */
+    align-items: center;
+    height: 90vh; /* Full viewport height */
+}
+
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    background-color: #f3eee8;
+}
+
+header {
+    background-color: #f3eee8;
+    padding: 10px 0;
+
+    display: flex;
+    justify-content: center;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+}
+
+.social-icons {
+    display: flex;
+    flex-direction: column;
+    /*align-items: flex-start; !* Align icons to the start of the column *!*/
+}
+
+.social-icon {
+    color: #2d2c54; /* Icon color */
+    margin: 5px 0; /* Space between icons */
+    font-size: 24px; /* Icon size */
+}
+
+.social-icon:hover {
+    color: #e7babd; /* Icon hover color */
+}
+
+#library-logo {
+    width: 200px;
+    height: auto;
+}
+
+.books-content {
+    width: 80%; /* Adjust if needed */
+    max-width: 100%; /* Ensures the container does not exceed the viewport width */
+    overflow-x: auto; /* Allows horizontal scrolling on overflow */
+    margin: 20px; /* Adjust margins as needed */
+}
+
+#books-table {
+    width: 80%;
+    border-collapse: collapse;
+    /* No need to set min-width unless you want a specific minimum width */
+}
+
+#search-input {
+    width: 90%;
+    padding: 10px;
+    margin: 20px 0;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    text-align: left;
+    padding: 8px;
+}
+
+th {
+    background-color: #2d2c54;
+    color: white;
+}
+
+td {
+    border-bottom: 1px solid #ddd;
+}
