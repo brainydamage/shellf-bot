@@ -53,7 +53,7 @@ async function getBooks() {
   for (const row of rows.slice(1)) {
     if (row[config.BOOKID_COLUMN_DB]) {
       books.push({
-        id: row[config.BOOKID_COLUMN_DB],
+        id: parseInt(row[config.BOOKID_COLUMN_DB]),
         title: row[config.TITLE_COLUMN_DB],
         author: row[config.AUTHOR_COLUMN_DB],
         shelf: row[config.SHELF_COLUMN_DB],
