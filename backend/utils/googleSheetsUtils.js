@@ -46,6 +46,25 @@ async function getBookData(requestedBookID) {
   return book;
 }
 
+async function getBooks() {
+  const rows = await getRows(config.BOOKS_DB);
+
+  let books = [];
+  for (const row of rows.slice(1)) {
+    if (row[config.BOOKID_COLUMN_DB]) {
+      books.push({
+        id: row[config.BOOKID_COLUMN_DB],
+        title: row[config.TITLE_COLUMN_DB],
+        author: row[config.AUTHOR_COLUMN_DB],
+        shelf: row[config.SHELF_COLUMN_DB],
+        free: row[config.STATUS_COLUMN_DB] === '',
+      })
+    }
+  }
+
+  return books;
+}
+
 function getColumnLetter(columnNumber) {
   let letter = '';
   let base = 26;
@@ -145,5 +164,5 @@ async function updateRow(range, data) {
 }
 
 module.exports = {
-  getBookData, getRow, getRows, appendRow, updateRow
+  getBookData, getBooks, getRow, getRows, appendRow, updateRow
 };

@@ -1,13 +1,16 @@
 module.exports = {
   //Success
   BOOK_REQUESTED: 'Book requested',
+  BOOK_LIST_REQUESTED: 'All books requested',
   BOOK_FOUND: 'Book found',
+  BOOK_LIST_RECEIVED: 'Book list received',
   BOOK_BORROWED: 'Book borrowed',
   BOOK_RETURNED: 'Book returned',
   BOOK_PROLONGED: 'Book prolonged',
 
   //Fail
   FAILED_SCAN_BOOK: 'Failed to scan book',
+  FAILED_GET_BOOKS_LIST: 'Failed to get books list',
   FAILED_BORROW_BOOK: 'Failed to borrow book',
   FAILED_APPEND_ROW: 'Failed to append a row while borrowing',
   FAILED_GET_BOOK_DATA: 'Failed to get book data while borrowing',
@@ -24,6 +27,7 @@ module.exports = {
   INVALID_PAYLOAD: 'Invalid or strange payload',
   NOT_VALID_BOOK_ID: 'Not valid book id',
   BOOK_NOT_FOUND: 'Book not found',
+  BOOK_LIST_EMPTY: 'No book found',
 
   //TG
   FAILED_SEND_TG: 'Failed to send telegram message to user',
