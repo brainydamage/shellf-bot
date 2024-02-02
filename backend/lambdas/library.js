@@ -3,7 +3,7 @@ const messages = require('../constants/messages');
 const googleSheetsUtils = require('../utils/googleSheetsUtils');
 const log = require('../utils/customLogger');
 
-module.exports.handler = async () => {
+module.exports.getter = async () => {
   log.info('library', 'Message: "%s"', messages.BOOK_LIST_REQUESTED);
 
   try {

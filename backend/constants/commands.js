@@ -6,5 +6,5 @@ module.exports = {
   RETURN_CALLBACK: '_return',
   PROLONG_CALLBACK: '_prolong',
   CANCEL: '_cancel',
-  HOW_TO_RETURN: '_how_to_return'
+  HOW_TO_RETURN: '_how_to_return',
 };
