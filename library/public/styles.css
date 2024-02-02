@@ -9,7 +9,7 @@
 #content-wrapper {
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* Distributes space evenly */
+    justify-content: flex-start; /* Aligns children to the top */
     align-items: center;
     height: 90vh; /* Full viewport height */
 }
@@ -56,6 +56,27 @@ header {
     height: auto;
 }
 
+.search-container {
+    align-self: flex-start; /* Aligns this container to the start of the flex container, overriding center alignment */
+    width: 100%; /* Ensures the div takes full width */
+    display: flex; /* Makes it a flex container */
+    justify-content: flex-start; /* Aligns children (the input) to the left */
+    padding-left: 20px; /* Adjust this value to match your design needs */
+}
+
+#search-input {
+    width: 50%;
+    padding: 20px;
+    margin: 20px 0 20px 0;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    font-size: 16px; /* Or any other size */
+}
+
+input::placeholder {
+    color: #a9a9a9; /* You can also change the color if needed */
+}
+
 .books-content {
     width: 80%; /* Adjust if needed */
     max-width: 100%; /* Ensures the container does not exceed the viewport width */
@@ -64,17 +85,21 @@ header {
 }
 
 #books-table {
-    width: 80%;
+    width: 100%;
     border-collapse: collapse;
     /* No need to set min-width unless you want a specific minimum width */
 }
 
-#search-input {
-    width: 90%;
-    padding: 10px;
-    margin: 20px 0;
-    border-radius: 10px;
-    border: 1px solid #ddd;
+.row-tap-feedback {
+    background-color: #e0e0e0; /* Light grey, or any color of your choice */
+}
+
+.book-title {
+    font-size: 1em; /* This sets the font size to 80% of the containing element's font size */
+}
+
+.book-author {
+    font-size: 0.8em; /* This sets the font size to 80% of the containing element's font size */
 }
 
 table {
@@ -85,6 +110,7 @@ table {
 th, td {
     text-align: left;
     padding: 8px;
+    font-size: 1em;
 }
 
 th {
@@ -92,6 +118,31 @@ th {
     color: white;
 }
 
-td {
+tr {
     border-bottom: 1px solid #ddd;
 }
+
+.redirect-button {
+    display: block; /* Initially hidden */
+    margin-left: 0;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #ebd2cf; /* Example color */
+    color: #2d2c58;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.3s ease-in;
+    font-size: 0.9em;;
+}
+
+/* Remove the bottom border of the clicked row */
+.clicked-row {
+    border-bottom: none !important; /* Use !important to override any existing border styles */
+}
+
+/* Remove the top border of the button row */
+.redirect-button-row td {
+    border-top: none !important; /* Assuming your buttonCell might inherit border styles */
+}
+
