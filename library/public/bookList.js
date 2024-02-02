@@ -1,3 +1,21 @@
+window.onload = function () {
+  const gwUrl = 'https://y1jyo2lk58.execute-api.eu-central-1.amazonaws.com';
+
+  fetch(`${gwUrl}/books`)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('An error occurred: ' + response.status);
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log(data);
+    })
+    .catch((error) => {
+      console.error(error)
+    });
+};
+
 function searchBooks() {
   const input = document.getElementById('search-input');
   const filter = input.value.toUpperCase();
