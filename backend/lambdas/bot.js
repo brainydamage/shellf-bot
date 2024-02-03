@@ -12,6 +12,7 @@ function parseBody(body) {
     chatID: null,
     username: 'no_username',
     command: null,
+    subscribe: false,
     callback: null,
     rowNumber: null,
     bookID: null,
@@ -25,14 +26,18 @@ function parseBody(body) {
     parsed.command = body.message.text.split(' ')[0];
 
     const command = body.message.text;
-
-    // Extract bookID from /start command
     if (command.startsWith(commands.START)) {
       const parts = command.split(' ');
       if (parts.length === 2) {
-        const potentialBookID = parts[1];
-        if (/^\d+$/.test(potentialBookID)) {
-          parsed.bookID = parseInt(potentialBookID, 10);
+        let parameter = parts[1];
+
+        if (parameter.startsWith(commands.SUBSCRIBE)) {
+          parsed.subscribe = true;
+          parameter = parameter.split('_')[1];
+        }
+
+        if (/^\d+$/.test(parameter)) {
+          parsed.bookID = parseInt(parameter, 10);
         }
       }
     }
@@ -114,21 +119,38 @@ module.exports.handler = async (event) => {
     if (parsedBody.command.startsWith(commands.START)) {
       if (!parsedBody.bookID) {
         await baseCommandHandler.emptyStart(parsedBody);
-      } else {
-        const userBookKey = `${parsedBody.chatID}_${parsedBody.bookID}`;
+      } else if (parsedBody.subscribe) {
+        const userSubsBookKey = `${parsedBody.chatID}_subscribe_${parsedBody.bookID}`;
 
-        if (userBookMap[userBookKey]) {
+        if (userBookMap[userSubsBookKey]) {
           await baseCommandHandler.repeatedCommand(parsedBody);
 
           log.warn('bot-interactions',
-            'Warning: %s, UserBookKey: %s, BookID: %s, Username: %s, ChatID: %s',
-            messages.WARN_DOUBLE_REQUEST, userBookKey, parsedBody.bookID,
+            'Warning: %s, UserSubsBookKey: %s, BookID: %s, Username: %s, ChatID: %s',
+            messages.WARN_DOUBLE_REQUEST, userSubsBookKey, parsedBody.bookID,
             parsedBody.username, parsedBody.chatID);
 
           return;
         }
 
-        userBookMap[userBookKey] = true;
+        userBookMap[userSubsBookKey] = true;
+
+        await baseCommandHandler.subscribeBook(parsedBody);
+      } else {
+        const userBorrowBookKey = `${parsedBody.chatID}_${parsedBody.bookID}`;
+
+        if (userBookMap[userBorrowBookKey]) {
+          await baseCommandHandler.repeatedCommand(parsedBody);
+
+          log.warn('bot-interactions',
+            'Warning: %s, userBorrowBookKey: %s, BookID: %s, Username: %s, ChatID: %s',
+            messages.WARN_DOUBLE_REQUEST, userBorrowBookKey, parsedBody.bookID,
+            parsedBody.username, parsedBody.chatID);
+
+          return;
+        }
+
+        userBookMap[userBorrowBookKey] = true;
 
         await baseCommandHandler.borrowBook(parsedBody);
       }
