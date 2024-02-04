@@ -106,10 +106,8 @@ module.exports.subscribeBook = async (parsedBody) => {
   }
 };
 
-module.exports.unsubscribeUserFromBorrowedBook = async (parsedBody) => {
+module.exports.unsubscribeUserFromBorrowedBook = async (rows, parsedBody) => {
   try {
-    const rows = await googleSheetsUtils.getRows(config.BOOKS_SUBS);
-
     let bookToUnsubscribe;
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];

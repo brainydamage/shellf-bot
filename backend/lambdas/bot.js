@@ -4,7 +4,6 @@ const commands = require('../constants/commands');
 const config = require('../constants/config');
 const baseCommandHandler = require('../handlers/baseCommandHandler');
 const callbackCommandHandler = require('../handlers/callbackCommandHandler');
-const subscriberHandler = require('../handlers/subscriberHandler');
 const log = require('../utils/customLogger');
 const {LambdaClient, InvokeCommand} = require("@aws-sdk/client-lambda");
 
@@ -192,6 +191,7 @@ module.exports.handler = async (event) => {
 
     if (parsedBody.callback === commands.RETURN_CALLBACK) {
       await callbackCommandHandler.returnBook(parsedBody);
+      await invokeSubscriber(parsedBody);
     } else if (parsedBody.callback === commands.UNSUBSCRIBE_CALLBACK) {
       await callbackCommandHandler.unsubscribeBook(parsedBody);
     } else if (parsedBody.callback === commands.PROLONG_CALLBACK) {
