@@ -9,6 +9,7 @@ module.exports = {
   BOOK_PROLONGED: 'Book prolonged',
   BOOK_SUBSCRIBED: 'Book subscribed',
   BOOK_UNSUBSCRIBED: 'Book unsubscribed',
+  BOOK_UNSUBSCRIBED_HIDDEN: 'Book unsubscribed while borrowing',
 
   //Fail
   FAILED_SCAN_BOOK: 'Failed to scan book',

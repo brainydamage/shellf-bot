@@ -193,7 +193,7 @@ module.exports.handler = async (event) => {
     if (parsedBody.callback === commands.RETURN_CALLBACK) {
       await callbackCommandHandler.returnBook(parsedBody);
     } else if (parsedBody.callback === commands.UNSUBSCRIBE_CALLBACK) {
-      await subscriberHandler.unsubscribeBook(parsedBody);
+      await callbackCommandHandler.unsubscribeBook(parsedBody);
     } else if (parsedBody.callback === commands.PROLONG_CALLBACK) {
       await callbackCommandHandler.prolongBook(parsedBody);
     } else if (parsedBody.callback === commands.CANCEL) {

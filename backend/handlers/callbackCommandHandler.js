@@ -19,6 +19,19 @@ function setReturnDateForRowArray(inputArray, returnDate) {
   return transformedArray;
 }
 
+function setUnsubsDateForRowArray(inputArray, unsubsDate) {
+  const transformedArrayLength = inputArray.length <=
+  config.SUBS_COLUMNS_NUMBER ? config.SUBS_COLUMNS_NUMBER : inputArray.length;
+
+  // Create a new array with a fixed length, filled with null
+  const transformedArray = new Array(transformedArrayLength).fill(null);
+
+  // Set the unsubscribe column of the transformed array to returnDate
+  transformedArray[config.UNSUBSCRIBE_COLUMN_SUBS] = unsubsDate;
+
+  return transformedArray;
+}
+
 function setProlongAndDeadlineDatesForRowArray(inputArray, prolongDate,
                                                deadlineDate) {
   const transformedArrayLength = inputArray.length <=
@@ -36,14 +49,21 @@ function setProlongAndDeadlineDatesForRowArray(inputArray, prolongDate,
   return transformedArray;
 }
 
-async function getBookRowWithNumber(parsedBody) {
-  const rows = await googleSheetsUtils.getRows(config.BOOKS_LOG);
+async function getBookRowWithNumber(parsedBody, sheetName) {
+  const rows = await googleSheetsUtils.getRows(sheetName);
 
   for (let i = 1; i < rows.length; i++) {
     const row = rows[i];
 
-    const chatIDColumn = config.CHATID_COLUMN_LOG;
-    const bookIDColumn = config.BOOKID_COLUMN_LOG;
+    let chatIDColumn, bookIDColumn;
+
+    if (sheetName === config.BOOKS_LOG) {
+      chatIDColumn = config.CHATID_COLUMN_LOG;
+      bookIDColumn = config.BOOKID_COLUMN_LOG;
+    } else if (sheetName === config.BOOKS_SUBS) {
+      chatIDColumn = config.CHATID_COLUMN_SUBS;
+      bookIDColumn = config.BOOKID_COLUMN_SUBS;
+    }
 
     const sameChatID = row[chatIDColumn] === parsedBody.chatID.toString();
     const sameBookID = row[bookIDColumn] === parsedBody.bookID.toString();
@@ -59,7 +79,7 @@ module.exports.returnBook = async (parsedBody) => {
   await telegramUtils.deleteMessage(parsedBody);
 
   try {
-    const result = await getBookRowWithNumber(parsedBody);
+    const result = await getBookRowWithNumber(parsedBody, config.BOOKS_LOG);
     const bookRow = result.bookRow;
 
     if (bookRow && (bookRow.length < config.LOG_COLUMNS_NUMBER ||
@@ -116,10 +136,9 @@ module.exports.prolongBook = async (parsedBody) => {
   await telegramUtils.deleteMessage(parsedBody);
 
   try {
-    const result = await getBookRowWithNumber(parsedBody);
+    const result = await getBookRowWithNumber(parsedBody, config.BOOKS_LOG);
     const bookRow = result.bookRow;
 
-    //TODO is that actual with the new ID column (last one)?
     if (bookRow && (bookRow.length < config.LOG_COLUMNS_NUMBER - 1 ||
         bookRow[config.PROLONG_COLUMN_LOG] === '') &&
       (bookRow.length < config.LOG_COLUMNS_NUMBER ||
@@ -165,6 +184,52 @@ module.exports.prolongBook = async (parsedBody) => {
     log.error('callback-command-handler',
       `Reason: "%s", Username: %s, BookID: %s, ChatID: %s, ErrorMessage: %s`,
       messages.FAILED_PROLONG_BOOK, parsedBody.username, parsedBody.bookID,
+      parsedBody.chatID, error.message);
+
+    console.error(error);
+
+    await telegramUtils.sendFormattedMessage(parsedBody.chatID,
+      userMessages.SUPPORT);
+  }
+}
+
+module.exports.unsubscribeBook = async (parsedBody) => {
+  await telegramUtils.deleteMessage(parsedBody);
+
+  try {
+    const result = await getBookRowWithNumber(parsedBody, config.BOOKS_SUBS);
+    const bookRow = result.bookRow;
+
+    if (bookRow && (bookRow.length < config.SUBS_COLUMNS_NUMBER ||
+      bookRow[config.UNSUBSCRIBE_COLUMN_SUBS] === '')) {
+      const bookTitle = bookRow[config.TITLE_COLUMN_SUBS];
+      const bookAuthor = bookRow[config.AUTHOR_COLUMN_SUBS];
+      const bookInfo = bookAuthor ? `${bookTitle}, ${bookAuthor}` : bookTitle;
+      const shelf = bookRow[config.SHELF_COLUMN_SUBS];
+
+      const unsubsDate = dateTimeUtils.timestampToHumanReadable(
+        Date.now() / 1000);
+      const dataForRow = setUnsubsDateForRowArray(bookRow, unsubsDate);
+
+      const range = `${config.BOOKS_SUBS}!${result.rowNumber}:${result.rowNumber}`;
+      await googleSheetsUtils.updateRow(range, dataForRow);
+
+      const message = `${userMessages.BOOK_UNSUBSCRIBED}\n\n${bookInfo}`;
+      await telegramUtils.sendFormattedMessage(parsedBody.chatID, message);
+
+      log.info('callback-command-handler',
+        'Success: "%s", Callback: %s, BookID: %s, BookInfo: %s, Username: %s, ChatID: %s, Shelf: %s',
+        messages.BOOK_UNSUBSCRIBED, parsedBody.callback, parsedBody.bookID,
+        bookInfo, parsedBody.username, parsedBody.chatID, shelf);
+
+    } else {
+      // Handle case where row was not found or double-click
+      // console.warn(`${messages.WARN_RETURN_BOOK}`);
+    }
+  } catch (error) {
+    log.error('callback-command-handler',
+      `Reason: "%s", Username: %s, BookID: %s, ChatID: %s, ErrorMessage: %s`,
+      messages.FAILED_UNSUBSCRIBE_BOOK, parsedBody.username, parsedBody.bookID,
       parsedBody.chatID, error.message);
 
     console.error(error);

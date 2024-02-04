@@ -6,25 +6,6 @@ const messages = require("../constants/messages");
 const userMessages = require("../constants/userMessages");
 const log = require('../utils/customLogger');
 
-async function getBookRowWithNumber(parsedBody) {
-  const rows = await googleSheetsUtils.getRows(config.BOOKS_SUBS);
-
-  for (let i = 1; i < rows.length; i++) {
-    const row = rows[i];
-
-    const chatIDColumn = config.CHATID_COLUMN_SUBS;
-    const bookIDColumn = config.BOOKID_COLUMN_SUBS;
-
-    const sameChatID = row[chatIDColumn] === parsedBody.chatID.toString();
-    const sameBookID = row[bookIDColumn] === parsedBody.bookID.toString();
-
-    if (sameChatID && sameBookID) {
-      return {bookRow: row, rowNumber: i + 1};
-    }
-  }
-  return {bookRow: null, rowNumber: null};
-}
-
 function setUnsubsDateForRowArray(inputArray, unsubsDate) {
   const transformedArrayLength = inputArray.length <=
   config.SUBS_COLUMNS_NUMBER ? config.SUBS_COLUMNS_NUMBER : inputArray.length;
@@ -125,45 +106,55 @@ module.exports.subscribeBook = async (parsedBody) => {
   }
 };
 
-module.exports.unsubscribeBook = async (parsedBody) => {
-  await telegramUtils.deleteMessage(parsedBody);
-
+module.exports.unsubscribeUserFromBorrowedBook = async (parsedBody) => {
   try {
-    const result = await getBookRowWithNumber(parsedBody);
-    const bookRow = result.bookRow;
+    const rows = await googleSheetsUtils.getRows(config.BOOKS_SUBS);
 
-    if (bookRow && (bookRow.length < config.SUBS_COLUMNS_NUMBER ||
-      bookRow[config.UNSUBSCRIBE_COLUMN_SUBS] === '')) {
-      const bookTitle = bookRow[config.TITLE_COLUMN_SUBS];
-      const bookAuthor = bookRow[config.AUTHOR_COLUMN_SUBS];
-      const bookInfo = bookAuthor ? `${bookTitle}, ${bookAuthor}` : bookTitle;
-      const shelf = bookRow[config.SHELF_COLUMN_SUBS];
+    let bookToUnsubscribe;
+    for (let i = 1; i < rows.length; i++) {
+      const row = rows[i];
 
+      const chatIDColumn = config.CHATID_COLUMN_SUBS;
+      const bookIDColumn = config.BOOKID_COLUMN_SUBS;
+      const unsubscribeDateColumn = config.UNSUBSCRIBE_COLUMN_SUBS;
+
+      const sameChatID = row[chatIDColumn] === parsedBody.chatID.toString();
+      const sameBookID = row[bookIDColumn] === parsedBody.bookID.toString();
+      const isBookNotUnsubscribed = row[unsubscribeDateColumn] === '' ||
+        row.length < config.SUBS_COLUMNS_NUMBER;
+
+      if (sameChatID && sameBookID && isBookNotUnsubscribed) {
+        bookToUnsubscribe = {
+          bookRow: row, rowNumber: i + 1,
+        };
+      }
+    }
+
+    if (bookToUnsubscribe) {
       const unsubsDate = dateTimeUtils.timestampToHumanReadable(
         Date.now() / 1000);
-      const dataForRow = setUnsubsDateForRowArray(bookRow, unsubsDate);
+      const dataForRow = setUnsubsDateForRowArray(bookToUnsubscribe.bookRow,
+        unsubsDate);
 
-      const range = `${config.BOOKS_SUBS}!${result.rowNumber}:${result.rowNumber}`;
+      const bookTitle = bookToUnsubscribe.bookRow[config.TITLE_COLUMN_SUBS];
+      const bookAuthor = bookToUnsubscribe.bookRow[config.AUTHOR_COLUMN_SUBS];
+      const bookInfo = bookAuthor ? `${bookTitle}, ${bookAuthor}` : bookTitle;
+      const shelf = bookToUnsubscribe.bookRow[config.SHELF_COLUMN_SUBS];
+
+      const range = `${config.BOOKS_SUBS}!${bookToUnsubscribe.rowNumber}:${bookToUnsubscribe.rowNumber}`;
       await googleSheetsUtils.updateRow(range, dataForRow);
 
-      const message = `${userMessages.BOOK_UNSUBSCRIBED}\n\n${bookInfo}`;
-      await telegramUtils.sendFormattedMessage(parsedBody.chatID, message);
-
       log.info('subscriber-handler',
-        'Success: "%s", Command: %s, Callback: %s, BookID: %s, BookInfo: %s, Username: %s, ChatID: %s, Shelf: %s',
-        messages.BOOK_UNSUBSCRIBED, parsedBody.command, parsedBody.callback,
-        parsedBody.bookID, bookInfo, parsedBody.username, parsedBody.chatID,
-        shelf);
-
-    } else {
-      // Handle case where row was not found or double-click
-      // console.warn(`${messages.WARN_RETURN_BOOK}`);
+        'Success: "%s", Command: %s, BookID: %s, BookInfo: %s, Username: %s, ChatID: %s, Shelf: %s',
+        messages.BOOK_UNSUBSCRIBED_HIDDEN, parsedBody.command,
+        parsedBody.bookID,
+        bookInfo, parsedBody.username, parsedBody.chatID, shelf);
     }
   } catch (error) {
     log.error('subscriber-handler',
-      `Reason: "%s", Username: %s, BookID: %s, ChatID: %s, ErrorMessage: %s`,
-      messages.FAILED_UNSUBSCRIBE_BOOK, parsedBody.username, parsedBody.bookID,
-      parsedBody.chatID, error.message);
+      `Reason: "%s", Username: %s, ChatID: %s, ErrorMessage: %s`,
+      messages.FAILED_UNSUBSCRIBE_BOOK, parsedBody.username, parsedBody.chatID,
+      error.message);
 
     console.error(error);
 
