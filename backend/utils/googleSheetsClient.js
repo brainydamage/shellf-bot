@@ -15,9 +15,7 @@ async function getGoogleSheetsClient() {
     const privateKey = process.env.PRIVATE_KEY.replace(/\\n/g, '\n');
 
     const client = new JWT({
-      email: clientEmail,
-      key: privateKey,
-      scopes: [config.SCOPE],
+      email: clientEmail, key: privateKey, scopes: [config.SCOPE],
     });
 
     sheetsClient = sheets({version: 'v4', auth: client});

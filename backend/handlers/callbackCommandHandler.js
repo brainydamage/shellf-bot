@@ -1,51 +1,10 @@
 const googleSheetsUtils = require("../utils/googleSheetsUtils");
 const config = require("../constants/config");
 const telegramUtils = require("../utils/telegramUtils");
+const dateTimeUtils = require("../utils/dateTimeUtils");
 const messages = require("../constants/messages");
 const userMessages = require("../constants/userMessages");
 const log = require('../utils/customLogger');
-
-async function timestampToHumanReadable(timestamp) {
-  const date = new Date(timestamp);
-
-  const options = {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZone: 'Europe/Belgrade'
-  };
-
-  return date.toLocaleString('ru-RU', options);
-}
-
-async function getLaterDate(date1Timestamp, date2String) {
-  const timezoneOffset = 3600 * 1000; // 1 hour offset for GMT+1
-  const date1Date = new Date((date1Timestamp * 1000) + timezoneOffset);
-
-  const [day, month, year] = date2String.split('.').map(Number);
-  const date2Date = new Date(year, month - 1, day);
-
-  // Compare and return the later date in date1Timestamp format
-  if (date2Date > date1Date) {
-    return Math.floor(date2Date.getTime() / 1000);
-  } else {
-    return date1Timestamp;
-  }
-}
-
-async function add7DaysAndFormat(timestamp) {
-  const date = new Date(timestamp * 1000);
-
-  date.setDate(date.getDate() + 7); // Add 7 days
-
-  const day = date.getDate().toString().padStart(2, '0');
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  const year = date.getFullYear();
-
-  return `${day}.${month}.${year}`;
-}
 
 function setReturnDateForRowArray(inputArray, returnDate) {
   const transformedArrayLength = inputArray.length <=
@@ -122,7 +81,8 @@ module.exports.returnBook = async (parsedBody) => {
       const timeDiff = currentDate.getTime() - dateBorrowed.getTime();
       const daysBorrowed = Math.ceil(timeDiff / (1000 * 3600 * 24));
 
-      const returnDate = await timestampToHumanReadable(Date.now());
+      const returnDate = dateTimeUtils.timestampToHumanReadable(
+        Date.now() / 1000);
       const dataForRow = setReturnDateForRowArray(bookRow, returnDate);
 
       const range = `${result.rowNumber}:${result.rowNumber}`;
@@ -170,10 +130,13 @@ module.exports.prolongBook = async (parsedBody) => {
       //'01.03.2024'
       const initialDeadline = bookRow[config.DEADLINE_COLUMN_LOG];
 
-      const laterDateTimestamp = await getLaterDate(timestamp, initialDeadline);
+      const laterDateTimestamp = dateTimeUtils.getLaterDate(timestamp,
+        initialDeadline);
 
-      const newDeadlineDate = await add7DaysAndFormat(laterDateTimestamp);
-      const prolongDate = await timestampToHumanReadable(Date.now());
+      const newDeadlineDate = dateTimeUtils.addNDaysAndFormat(
+        laterDateTimestamp, 7);
+      const prolongDate = dateTimeUtils.timestampToHumanReadable(
+        Date.now() / 1000);
 
       const range = `${result.rowNumber}:${result.rowNumber}`;
       const dataForRow = setProlongAndDeadlineDatesForRowArray(bookRow,

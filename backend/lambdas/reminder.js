@@ -1,5 +1,6 @@
 'use strict';
 const telegramUtils = require('../utils/telegramUtils');
+const dateTimeUtils = require('../utils/dateTimeUtils');
 const config = require('../constants/config');
 const messages = require('../constants/messages');
 const googleSheetsUtils = require("../utils/googleSheetsUtils");
@@ -16,48 +17,6 @@ const shelfColumn = config.SHELF_COLUMN_LOG;
 const chatIDColumn = config.CHATID_COLUMN_LOG;
 const usernameColumn = config.USERNAME_COLUMN_LOG;
 
-function isDeadlineIn(deadline, days) {
-  const deadlineDate = parseDate(deadline);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const threeDaysInMilliseconds = days * 24 * 60 * 60 * 1000;
-  const timeDiff = deadlineDate.getTime() - today.getTime();
-
-  return timeDiff === threeDaysInMilliseconds;
-}
-
-async function countDaysOnHands(borrowed) {
-  const borrowedDate = parseDate(borrowed);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const timeDiff = today.getTime() - borrowedDate.getTime();
-
-  return timeDiff / 24 / 60 / 60 / 1000;
-}
-
-function parseDate(dateString) {
-  //19.12.2023, 18:47
-  //19.01.2024
-  const dateParts = dateString.split(', ');
-  const [day, month, year] = dateParts[0].split('.').map(Number);
-
-  return new Date(year, month - 1, day);
-}
-
-async function add3DaysAndFormat(timestamp) {
-  const date = new Date(timestamp * 1000);
-
-  date.setDate(date.getDate() + 3); // Add 3 days
-
-  const day = date.getDate().toString().padStart(2, '0');
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  const year = date.getFullYear(); // Get year
-
-  return `${day}.${month}.${year}`;
-}
-
 async function processReminders(rows) {
   let reminders = [];
 
@@ -66,7 +25,7 @@ async function processReminders(rows) {
     const deadline = row[deadlineColumn];
     const returned = row[returnedColumn];
 
-    if (!returned && isDeadlineIn(deadline, config.REMIND_DAYS)) {
+    if (!returned && dateTimeUtils.isDeadlineIn(deadline, config.REMIND_DAYS)) {
       reminders.push({
         chatID: row[chatIDColumn],
         username: row[usernameColumn],
@@ -96,7 +55,7 @@ async function processOverdueBooks(rows) {
     const borrowed = row[borrowedColumn];
     const deadline = row[deadlineColumn];
     const returned = row[returnedColumn];
-    const daysOnHands = await countDaysOnHands(borrowed);
+    const daysOnHands = dateTimeUtils.countDaysOnHands(borrowed);
 
     if (!returned && daysOnHands > config.OVERDUE_DAYS) {
       overdueBooks.push({
@@ -163,7 +122,8 @@ function logOverdueBookReminder(overdueBook, bookInfo) {
 }
 
 module.exports.handler = async (event) => {
-  const returnDate = await add3DaysAndFormat(Math.floor(Date.now() / 1000));
+  const returnDate = dateTimeUtils.addNDaysAndFormat(
+    Math.floor(Date.now() / 1000), 3);
   log.info('reminder', 'Return date: %s', returnDate);
 
   try {
