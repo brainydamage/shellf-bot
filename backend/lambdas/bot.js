@@ -1,9 +1,15 @@
 'use strict';
 const messages = require('../constants/messages');
 const commands = require('../constants/commands');
+const config = require('../constants/config');
 const baseCommandHandler = require('../handlers/baseCommandHandler');
 const callbackCommandHandler = require('../handlers/callbackCommandHandler');
 const log = require('../utils/customLogger');
+const {LambdaClient, InvokeCommand} = require("@aws-sdk/client-lambda");
+
+const lambdaClient = new LambdaClient({region: config.REGION});
+
+let userBookMap = {};
 
 function parseBody(body) {
   let parsed = {
@@ -13,6 +19,7 @@ function parseBody(body) {
     username: 'no_username',
     command: null,
     subscribe: false,
+    unsubscribe: false,
     callback: null,
     rowNumber: null,
     bookID: null,
@@ -85,7 +92,23 @@ function parseBody(body) {
   return parsed;
 }
 
-let userBookMap = {};
+async function invokeSubscriber(payload) {
+  const params = {
+    FunctionName: config.SUBSCRIBER_LAMBDA,
+    InvocationType: 'Event',
+    Payload: JSON.stringify(payload),
+  };
+
+  const command = new InvokeCommand(params);
+
+  try {
+    const response = await lambdaClient.send(command);
+
+    console.log('Subscriber invoked successfully: HTTP', response.StatusCode);
+  } catch (error) {
+    console.error('Error invoking Subscriber:', error);
+  }
+}
 
 module.exports.handler = async (event) => {
   const body = JSON.parse(event.body);
@@ -135,7 +158,7 @@ module.exports.handler = async (event) => {
 
         userBookMap[userSubsBookKey] = true;
 
-        await baseCommandHandler.subscribeBook(parsedBody);
+        await invokeSubscriber(parsedBody);
       } else {
         const userBorrowBookKey = `${parsedBody.chatID}_${parsedBody.bookID}`;
 
@@ -153,6 +176,7 @@ module.exports.handler = async (event) => {
         userBookMap[userBorrowBookKey] = true;
 
         await baseCommandHandler.borrowBook(parsedBody);
+        await invokeSubscriber(parsedBody);
       }
     } else if (parsedBody.command === commands.RETURN) {
       await baseCommandHandler.returnBook(parsedBody);

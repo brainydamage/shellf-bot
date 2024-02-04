@@ -22,6 +22,10 @@ provider:
             - ssm:GetParameter
           Resource:
             - arn:aws:ssm:eu-central-1:959316667373:parameter/*
+        - Effect: Allow
+          Action:
+            - lambda:*
+          Resource: "*"
 
 functions:
   bot_handler:
@@ -60,5 +64,12 @@ functions:
           method: GET
           path: /books
     environment:
+      CLIENT_EMAIL: ${env:SHELLF_CLIENT_EMAIL}
+      PRIVATE_KEY: ${env:SHELLF_PRIVATE_KEY}
+  subscriber:
+    handler: lambdas/subscriber.handler
+    timeout: 10
+    environment:
+      TELEGRAM_TOKEN: ${env:TELEGRAM_TOKEN_SHELLF}
       CLIENT_EMAIL: ${env:SHELLF_CLIENT_EMAIL}
       PRIVATE_KEY: ${env:SHELLF_PRIVATE_KEY}
