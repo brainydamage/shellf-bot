@@ -5,12 +5,10 @@ const subscriberHandler = require('../handlers/subscriberHandler');
 const log = require('../utils/customLogger');
 
 module.exports.handler = async (parsedBody) => {
-  console.log(parsedBody);
-
   if (parsedBody.subscribe) {
     await subscriberHandler.subscribeBook(parsedBody);
   } else if (parsedBody.unsubscribe) {
-
+    await subscriberHandler.unsubscribeBook(parsedBody);
   } else {
     //get all rows from подписки
     //check if parsedBody.chatID is subscribed for parsedBody.bookID

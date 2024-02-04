@@ -1,5 +1,10 @@
-module.exports.getDatesKeyboardArray = async (arrayOfBooks) => {
+const commands = require('../constants/commands');
+
+module.exports.getDatesKeyboardArray = async (arrayOfBooks, returnBook) => {
   let keyboardArray = [];
+
+  const callback = returnBook ? commands.RETURN_CALLBACK :
+    commands.UNSUBSCRIBE_CALLBACK;
 
   arrayOfBooks.forEach(book => {
     const {bookID, bookInfo, rowNumber} = book;
@@ -7,7 +12,7 @@ module.exports.getDatesKeyboardArray = async (arrayOfBooks) => {
     const innerArray = [
       {
         text: `${bookInfo}`,
-        callback_data: `_return_${bookID}_row${rowNumber}`,
+        callback_data: `${callback}_${bookID}`,
       },
     ];
 
@@ -30,7 +35,7 @@ module.exports.getProlongKeyboard = async (bookID, rowNumber) => {
   keyboardArray.push([
     {
       text: 'продлить на 1 неделю',
-      callback_data: `_prolong_${bookID}_row${rowNumber}`,
+      callback_data: `_prolong_${bookID}`,
     },
   ])
 

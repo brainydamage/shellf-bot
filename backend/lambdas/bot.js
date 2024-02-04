@@ -4,6 +4,7 @@ const commands = require('../constants/commands');
 const config = require('../constants/config');
 const baseCommandHandler = require('../handlers/baseCommandHandler');
 const callbackCommandHandler = require('../handlers/callbackCommandHandler');
+const subscriberHandler = require('../handlers/subscriberHandler');
 const log = require('../utils/customLogger');
 const {LambdaClient, InvokeCommand} = require("@aws-sdk/client-lambda");
 
@@ -21,7 +22,6 @@ function parseBody(body) {
     subscribe: false,
     unsubscribe: false,
     callback: null,
-    rowNumber: null,
     bookID: null,
     statusChange: null,
   };
@@ -59,20 +59,15 @@ function parseBody(body) {
     // Generalized extraction of bookID from callback data
     const parts = parsed.callback.split('_');
 
-    // Assuming format: _return_{bookID}_row{rowNumber}
+    // Assuming format: _return_{bookID}
     if ((parsed.callback.startsWith(commands.RETURN_CALLBACK) ||
-        parsed.callback.startsWith(commands.PROLONG_CALLBACK)) && parts.length ===
-      4) {
+        parsed.callback.startsWith(commands.PROLONG_CALLBACK) ||
+        parsed.callback.startsWith(commands.UNSUBSCRIBE_CALLBACK)) &&
+      parts.length ===
+      3) {
       parsed.bookID = parseInt(parts[2], 10);
 
-      // Extract rowNumber from the last part
-      const rowPart = parts[parts.length - 1];
-      const rowNumberMatch = rowPart.match(/^row(\d+)$/);
-      if (rowNumberMatch && rowNumberMatch[1]) {
-        parsed.rowNumber = parseInt(rowNumberMatch[1], 10);
-      }
-
-      // Construct the callback field
+      // Construct the callback field, e.g. _return
       parsed.callback = parts[0] + '_' + parts[1];
     }
 
@@ -180,6 +175,8 @@ module.exports.handler = async (event) => {
       }
     } else if (parsedBody.command === commands.RETURN) {
       await baseCommandHandler.returnBook(parsedBody);
+    } else if (parsedBody.command === commands.UNSUBSCRIBE) {
+      await baseCommandHandler.unsubscribeBook(parsedBody);
     } else if (parsedBody.command === commands.HELP) {
       await baseCommandHandler.showHelpMessage(parsedBody);
     } else if (parsedBody.command === commands.SUPPORT) {
@@ -195,6 +192,8 @@ module.exports.handler = async (event) => {
 
     if (parsedBody.callback === commands.RETURN_CALLBACK) {
       await callbackCommandHandler.returnBook(parsedBody);
+    } else if (parsedBody.callback === commands.UNSUBSCRIBE_CALLBACK) {
+      await subscriberHandler.unsubscribeBook(parsedBody);
     } else if (parsedBody.callback === commands.PROLONG_CALLBACK) {
       await callbackCommandHandler.prolongBook(parsedBody);
     } else if (parsedBody.callback === commands.CANCEL) {

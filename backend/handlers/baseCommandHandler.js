@@ -51,7 +51,7 @@ module.exports.borrowBook = async (parsedBody) => {
         bookInfo = book.author ? `${book.title}, ${book.author}` : book.title;
         shelf = book.shelf;
 
-        message += ` на полку *${book.shelf}*:\n\n${bookInfo}`;
+        message += ` на полку *${book.shelf}*:\n\n*${bookInfo}*`;
       }
     }
 
@@ -125,10 +125,9 @@ module.exports.returnBook = async (parsedBody) => {
         }
 
         const bookInfo = bookAuthor ? `${bookTitle}, ${bookAuthor}` : bookTitle;
-        const rowNumber = i + 1;
 
         const bookToReturn = {
-          bookID: bookID, bookInfo: bookInfo, rowNumber: rowNumber
+          bookID: bookID, bookInfo: bookInfo
         };
 
         arrayOfBooks.push(bookToReturn);
@@ -138,7 +137,8 @@ module.exports.returnBook = async (parsedBody) => {
     await telegramUtils.deleteMessage(parsedBody);
 
     if (arrayOfBooks.length > 0) {
-      await telegramUtils.showBooksToReturn(parsedBody.chatID, arrayOfBooks);
+      await telegramUtils.showBooksToReturnOrUnsubs(parsedBody.chatID,
+        arrayOfBooks, true);
     } else {
       await telegramUtils.sendFormattedMessage(parsedBody.chatID,
         userMessages.NO_BOOK_TO_RETURN);
@@ -148,6 +148,69 @@ module.exports.returnBook = async (parsedBody) => {
     log.error('base-command-handler',
       `Reason: "%s", Username: %s, ChatID: %s, ErrorMessage: %s`,
       messages.FAILED_RETURN_BOOK, parsedBody.username, parsedBody.chatID,
+      error.message);
+
+    console.error(error);
+
+    await telegramUtils.sendFormattedMessage(parsedBody.chatID,
+      userMessages.SUPPORT);
+  }
+}
+
+module.exports.unsubscribeBook = async (parsedBody) => {
+  try {
+    const rows = await googleSheetsUtils.getRows(config.BOOKS_SUBS);
+
+    let arrayOfBooks = [];
+    for (let i = 1; i < rows.length; i++) {
+      const row = rows[i];
+
+      const chatIDColumn = config.CHATID_COLUMN_SUBS;
+      const bookIDColumn = config.BOOKID_COLUMN_SUBS;
+      const titleColumn = config.TITLE_COLUMN_SUBS;
+      const authorColumn = config.AUTHOR_COLUMN_SUBS;
+      const unsubscribeDateColumn = config.UNSUBSCRIBE_COLUMN_SUBS;
+
+      const sameChatID = row[chatIDColumn] === parsedBody.chatID.toString();
+      const isBookNotUnsubscribed = row[unsubscribeDateColumn] === '' ||
+        row.length < config.SUBS_COLUMNS_NUMBER;
+
+      if (sameChatID && isBookNotUnsubscribed) {
+        const bookID = row[bookIDColumn];
+        let bookTitle = row[titleColumn];
+        let bookAuthor = row[authorColumn];
+
+        if (!bookTitle) {
+          const book = await googleSheetsUtils.getBookData(
+            parseInt(bookID, 10));
+          bookTitle = book.title;
+          bookAuthor = book.author;
+        }
+
+        const bookInfo = bookAuthor ? `${bookTitle}, ${bookAuthor}` : bookTitle;
+
+        const bookToUnsubscribe = {
+          bookID: bookID, bookInfo: bookInfo
+        };
+
+        arrayOfBooks.push(bookToUnsubscribe);
+      }
+    }
+
+    await telegramUtils.deleteMessage(parsedBody);
+
+    if (arrayOfBooks.length > 0) {
+      await telegramUtils.showBooksToReturnOrUnsubs(parsedBody.chatID,
+        arrayOfBooks, false);
+    } else {
+      await telegramUtils.sendFormattedMessage(parsedBody.chatID,
+        userMessages.NO_BOOK_TO_UNSUBSCRIBE);
+    }
+
+  } catch (error) {
+    log.error('base-command-handler',
+      `Reason: "%s", Username: %s, ChatID: %s, ErrorMessage: %s`,
+      messages.FAILED_UNSUBSCRIBE_BOOK, parsedBody.username, parsedBody.chatID,
       error.message);
 
     console.error(error);

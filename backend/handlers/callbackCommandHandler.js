@@ -85,7 +85,7 @@ module.exports.returnBook = async (parsedBody) => {
         Date.now() / 1000);
       const dataForRow = setReturnDateForRowArray(bookRow, returnDate);
 
-      const range = `${result.rowNumber}:${result.rowNumber}`;
+      const range = `${config.BOOKS_LOG}!${result.rowNumber}:${result.rowNumber}`;
       await googleSheetsUtils.updateRow(range, dataForRow);
       await telegramUtils.sendFormattedMessage(parsedBody.chatID,
         userMessages.BOOK_RETURNED);
@@ -137,10 +137,10 @@ module.exports.prolongBook = async (parsedBody) => {
         laterDateTimestamp, 7);
       const prolongDate = dateTimeUtils.timestampToHumanReadable(
         Date.now() / 1000);
-
-      const range = `${result.rowNumber}:${result.rowNumber}`;
       const dataForRow = setProlongAndDeadlineDatesForRowArray(bookRow,
         prolongDate, newDeadlineDate);
+
+      const range = `${config.BOOKS_LOG}!${result.rowNumber}:${result.rowNumber}`;
       await googleSheetsUtils.updateRow(range, dataForRow);
 
       const bookTitle = bookRow[config.TITLE_COLUMN_LOG];
@@ -149,7 +149,7 @@ module.exports.prolongBook = async (parsedBody) => {
 
       const shelf = bookRow[config.SHELF_COLUMN_LOG];
 
-      let message = `${userMessages.BOOK_BORROWED}*${newDeadlineDate}* на полку *${shelf}*:\n\n${bookInfo}${userMessages.BOOK_BORROWED_ENDING}`;
+      let message = `${userMessages.BOOK_BORROWED}*${newDeadlineDate}* на полку *${shelf}*:\n\n*${bookInfo}*${userMessages.BOOK_BORROWED_ENDING}`;
       await telegramUtils.sendFormattedMessage(parsedBody.chatID, message);
 
       log.info('callback-command-handler',

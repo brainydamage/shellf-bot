@@ -57,11 +57,14 @@ async function sendAdminMessage(parsedBody, errorMessage) {
   }
 }
 
-async function showBooksToReturn(chatId, arrayOfBooks) {
-  let keyboardArray = await keyboardUtils.getDatesKeyboardArray(arrayOfBooks);
+async function showBooksToReturnOrUnsubs(chatId, arrayOfBooks, returnBook) {
+  let keyboardArray = await keyboardUtils.getDatesKeyboardArray(arrayOfBooks,
+    returnBook);
 
   try {
-    await bot.telegram.sendMessage(chatId, userMessages.CHOOSE_BOOK, {
+    const message = returnBook ? userMessages.CHOOSE_BOOK_RETURN :
+      userMessages.CHOOSE_BOOK_UNSUBSCRIBE;
+    await bot.telegram.sendMessage(chatId, message, {
       reply_markup: {
         inline_keyboard: keyboardArray,
       },
@@ -86,7 +89,7 @@ async function remindToReturn(chatId, reminder) {
 
   const bookInfo = reminder.author ? `${reminder.title}, ${reminder.author}` :
     reminder.title;
-  const message = `${userMessages.REMINDER}*${reminder.deadline}* на полку *${reminder.shelf}*:\n\n${bookInfo}${userMessages.REMINDER_ENDING}`;
+  const message = `${userMessages.REMINDER}*${reminder.deadline}* на полку *${reminder.shelf}*:\n\n*${bookInfo}*${userMessages.REMINDER_ENDING}`;
 
   try {
     if (keyboardExtra) {
@@ -130,7 +133,7 @@ module.exports = {
   sendMessage,
   sendFormattedMessage,
   sendAdminMessage,
-  showBooksToReturn,
+  showBooksToReturnOrUnsubs,
   remindToReturn,
   remindOverdue,
 };

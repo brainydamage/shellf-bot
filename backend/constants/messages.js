@@ -8,6 +8,7 @@ module.exports = {
   BOOK_RETURNED: 'Book returned',
   BOOK_PROLONGED: 'Book prolonged',
   BOOK_SUBSCRIBED: 'Book subscribed',
+  BOOK_UNSUBSCRIBED: 'Book unsubscribed',
 
   //Fail
   FAILED_SCAN_BOOK: 'Failed to scan book',
@@ -18,6 +19,7 @@ module.exports = {
   FAILED_RETURN_BOOK: 'Failed to return book',
   FAILED_PROLONG_BOOK: 'Failed to prolong book',
   FAILED_SUBSCRIBE_BOOK: 'Failed to subscribe on the book',
+  FAILED_UNSUBSCRIBE_BOOK: 'Failed to unsubscribe from the book',
 
   WARN_DOUBLE_REQUEST: 'User requests the same book: double click situation',
   // WARN_PROLONG_BOOK: 'Row with book to PROLONG is not found, probably
