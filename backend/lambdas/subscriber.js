@@ -21,17 +21,19 @@ module.exports.handler = async (parsedBody) => {
       .filter(row => parseInt(row[config.CHATID_COLUMN_SUBS], 10) !==
         parsedBody.chatID)
 
-    const bookTitle = subscriptionsForThisBook[0][config.TITLE_COLUMN_SUBS];
-    const bookAuthor = subscriptionsForThisBook[0][config.AUTHOR_COLUMN_SUBS];
-    const bookInfo = bookAuthor ? `${bookTitle}, ${bookAuthor}` : bookTitle;
-    const shelf = subscriptionsForThisBook[0][config.SHELF_COLUMN_SUBS];
+    if (subscriptionsForThisBook.length > 0) {
+      const bookTitle = subscriptionsForThisBook[0][config.TITLE_COLUMN_SUBS];
+      const bookAuthor = subscriptionsForThisBook[0][config.AUTHOR_COLUMN_SUBS];
+      const bookInfo = bookAuthor ? `${bookTitle}, ${bookAuthor}` : bookTitle;
+      const shelf = subscriptionsForThisBook[0][config.SHELF_COLUMN_SUBS];
 
-    const message = `${userMessages.BOOK_BORROWED_NOTIFY_1}*${shelf}*:\n\n*${bookInfo}*\n\n${userMessages.BOOK_BORROWED_NOTIFY_2}`;
+      const message = `${userMessages.BOOK_BORROWED_NOTIFY_1}*${shelf}*:\n\n*${bookInfo}*\n\n${userMessages.BOOK_BORROWED_NOTIFY_2}`;
 
-    //notify all that book is not available
-    for (const subscription of subscriptionsForThisBook) {
-      await telegramUtils.sendFormattedMessage(
-        parseInt(subscription[config.CHATID_COLUMN_SUBS], 10), message);
+      //notify all that book is not available
+      for (const subscription of subscriptionsForThisBook) {
+        await telegramUtils.sendFormattedMessage(
+          parseInt(subscription[config.CHATID_COLUMN_SUBS], 10), message);
+      }
     }
   } else if (parsedBody.callback === commands.RETURN_CALLBACK) {
     //when someone returns the book
@@ -43,17 +45,19 @@ module.exports.handler = async (parsedBody) => {
       .filter(row => parseInt(row[config.CHATID_COLUMN_SUBS], 10) !==
         parsedBody.chatID)
 
-    const bookTitle = subscriptionsForThisBook[0][config.TITLE_COLUMN_SUBS];
-    const bookAuthor = subscriptionsForThisBook[0][config.AUTHOR_COLUMN_SUBS];
-    const bookInfo = bookAuthor ? `${bookTitle}, ${bookAuthor}` : bookTitle;
-    const shelf = subscriptionsForThisBook[0][config.SHELF_COLUMN_SUBS];
+    if (subscriptionsForThisBook.length > 0) {
+      const bookTitle = subscriptionsForThisBook[0][config.TITLE_COLUMN_SUBS];
+      const bookAuthor = subscriptionsForThisBook[0][config.AUTHOR_COLUMN_SUBS];
+      const bookInfo = bookAuthor ? `${bookTitle}, ${bookAuthor}` : bookTitle;
+      const shelf = subscriptionsForThisBook[0][config.SHELF_COLUMN_SUBS];
 
-    const message = `${userMessages.BOOK_RETURNED_NOTIFY_1}*${shelf}*:\n\n*${bookInfo}*\n\n${userMessages.BOOK_RETURNED_NOTIFY_2}`;
+      const message = `${userMessages.BOOK_RETURNED_NOTIFY_1}*${shelf}*:\n\n*${bookInfo}*\n\n${userMessages.BOOK_RETURNED_NOTIFY_2}`;
 
-    //notify all that book is available again
-    for (const subscription of subscriptionsForThisBook) {
-      await telegramUtils.sendFormattedMessage(
-        parseInt(subscription[config.CHATID_COLUMN_SUBS], 10), message);
+      //notify all that book is available again
+      for (const subscription of subscriptionsForThisBook) {
+        await telegramUtils.sendFormattedMessage(
+          parseInt(subscription[config.CHATID_COLUMN_SUBS], 10), message);
+      }
     }
   }
 
