@@ -18,7 +18,7 @@ jobs:
           aws-region: eu-central-1
 
       - name: Where am I
-        run: la -la
+        run: la -ls
 
       - name: Deploy static site to S3 bucket
         run: aws s3 ls
