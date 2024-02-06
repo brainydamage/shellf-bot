@@ -14,7 +14,11 @@ module.exports.getter = async () => {
         messages.BOOK_LIST_RECEIVED, books.length);
 
       return {
-        statusCode: 200, body: JSON.stringify({
+        statusCode: 200,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+        body: JSON.stringify({
           books
         }, null, 2),
       };
