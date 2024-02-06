@@ -1,100 +1,232 @@
-/* styles.css */
-#content-wrapper {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between; /* Distributes space evenly */
-    align-items: center;
-    height: 90vh;  /* Full viewport height */
+* {
+    box-sizing: border-box;
 }
 
 body {
     font-family: Arial, sans-serif;
-    text-align: center;
     margin: 0;
     padding: 0;
     background-color: #f3eee8;
 }
 
-header {
-    background-color: #f3eee8;
-    padding: 10px 0;
-
-    display: flex;
-    justify-content: center;
-
-    /*flex-direction: column;*/
-    /*align-items: center;*/
+.hidden {
+    display: none;
 }
 
-.header-content {
+.page-wrapper {
+    width: 1200px;
+    max-width: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+}
+
+header {
     display: flex;
     align-items: center;
+}
+
+.header-logo {
+    width: 200px;
+    height: auto;
 }
 
 .social-icons {
     display: flex;
     flex-direction: column;
-    /*align-items: flex-start; !* Align icons to the start of the column *!*/
+    gap: 15px;
 }
 
-.social-icon {
-    color: #2d2c54; /* Icon color */
-    margin: 5px 0; /* Space between icons */
-    font-size: 24px; /* Icon size */
+.social-icons__item {
+    display: inline-block;
+    width: 23px;
+    height: 23px;
 }
 
-.social-icon:hover {
-    color: #e7babd; /* Icon hover color */
+.social-icons__item svg {
+    fill: #2d2c54;
 }
 
-#library-logo {
-    width: 200px;
-    height: auto;
+.social-icons__item svg:hover {
+    fill: #e7babd;
 }
 
-#book-info {
-    margin: 20px;
-    font-size: 1.2em;
-    color: #2d2c54;
-}
-
-.button-style {
-    background-color: #2d2c54;
-    color: white;
-    padding: 30px 80px;
-    border: none;
-    border-radius: 5px;
-    font-size: 1.5em;
-    cursor: pointer;
-    transition: 0.3s;
-    margin-top: 100px;
-}
-
-.button-style:hover {
-    background-color: #e7babd;
-    color: #2d2c54;
-}
-
-#loading-message {
+.controls {
     display: flex;
+    width: 100%;
     justify-content: center;
     align-items: center;
-    height: auto;  /* Take up full viewport height */
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.controls__item {
+    max-width: 50%;
+}
+
+.controls label {
+    margin-bottom: 2px;
+    display: block;
+    font-size: 12px;
+}
+
+.search-input,
+.shelf-filter {
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 16px;
+}
+
+.search-input {
+    max-width: 100%;
+}
+
+.shelf-filter {
+    
+}
+
+.book-list-header {
+    background: #2d2c54;
+    color: #eee;
+    font-weight: bold;
+}
+
+.book-list-header__item {
+    padding: 10px;
+}
+
+.book-list-header__item--shelf {
+    text-align: right;
+}
+
+.book-list-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.book-list-header,
+.book-list {
+    width: 100%;
+}
+
+.book-list__row {
+    display: flex;
+    border-bottom: 1px solid #ddd;
+    padding: 10px 0;
+    gap: 10px;
+}
+
+.book-list__info-column {
+    flex-grow: 1;
+}
+
+.book-list__shelf-column {
+
+}
+
+.book-list__shelf-info {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.book-list__title {
+    font-size: 14px;
+    margin-bottom: 3px;
+}
+
+.book-list__author {
+    font-size: 12px;
+    color: #666;
+}
+
+.book-list__availability {
+    width: 18px;
+    height: 18px;
+    fill: #a44343;
+}
+
+.book-list__availability--available {
+    fill: #57a443;
+}
+
+.book-list__subscribe-button {
+    display: inline-block;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #bbe7ba;
     color: #2d2c54;
-    opacity: 20%;
+    font-size: 16px;
+    text-decoration: none;
+}
+
+.book-list__subscribe-button:hover {
+    text-decoration: underline;
+}
+
+.pager {
+    margin-top: 10px;
+}
+
+.pager__button {
+    background: none;
+    border: none;
+    text-decoration: underline;
+    cursor: pointer;
+    display: inline-block;
+    padding: 10px 20px;
+    color: #2d2c54;
+}
+
+.pager__button:hover {
+    background: #e7babd;
+}
+
+.pager__button:disabled {
+    color: #aaa;
+}
+
+.pager__button:disabled:hover {
+    background: none;
+    cursor: default;
+}
+
+.message {
+    padding: 20px;
+    font-size: 16px;
+    margin-top: 20px;
+}
+
+.message--error {
+    background: #ff9e9e;
+}
+
+.message--warning {
+    background: #ffd29e;
 }
 
 .loader {
-    border: 5px solid #e7babd; /* Light grey */
-    border-top: 5px solid #2d2c54; /* Blue */
+    margin-top: 20px;
+    border: 5px solid #e7babd;
+    border-top: 5px solid #2d2c54;
     border-radius: 50%;
     width: 40px;
     height: 40px;
     animation: spin 2s linear infinite;
-    /*margin-top: auto;*/
 }
 
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+@media (max-width: 400px) {
+    .pager button {
+        display: block;
+    }
 }
