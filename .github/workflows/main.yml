@@ -19,5 +19,5 @@ jobs:
 
       - name: Deploy site to S3 bucket
         run: |
-          cd library
+          cd frontend/library
           aws s3 sync . s3://shellllf-list
