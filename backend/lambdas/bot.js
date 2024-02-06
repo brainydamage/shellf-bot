@@ -59,11 +59,9 @@ function parseBody(body) {
     const parts = parsed.callback.split('_');
 
     // Assuming format: _return_{bookID}
-    if ((parsed.callback.startsWith(commands.RETURN_CALLBACK) ||
-        parsed.callback.startsWith(commands.PROLONG_CALLBACK) ||
-        parsed.callback.startsWith(commands.UNSUBSCRIBE_CALLBACK)) &&
-      parts.length ===
-      3) {
+    if (parsed.callback.startsWith(commands.RETURN_CALLBACK) ||
+      parsed.callback.startsWith(commands.PROLONG_CALLBACK) ||
+      parsed.callback.startsWith(commands.UNSUBSCRIBE_CALLBACK)) {
       parsed.bookID = parseInt(parts[2], 10);
 
       // Construct the callback field, e.g. _return
