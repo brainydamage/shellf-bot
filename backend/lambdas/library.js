@@ -10,6 +10,8 @@ module.exports.getter = async () => {
     const books = await googleSheetsUtils.getBooks();
 
     if (books.length > 0) {
+      books.sort((a, b) => a.title.localeCompare(b.title));
+
       log.info('library', 'Success: "%s", Books Number: %s',
         messages.BOOK_LIST_RECEIVED, books.length);
 

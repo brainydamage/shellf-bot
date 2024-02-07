@@ -43,8 +43,9 @@ const prodConfig = {
   OVERDUE_DAYS: 40,
   LOST_DAYS: 60,
 
-  TINKOFF_LINK: '[tinkoff](https://www.tinkoff.ru/collectmoney/crowd/anderson.layma1/latFj82826/?short_link=165fWSttnKA&httpMethod=GET)',
-  PAYPAL_LINK: '[paypal](https://www.paypal.com/paypalme/shelllf)',
+  CATALOGUE_LINK: 'https://d30noal47qv51w.cloudfront.net/',
+  TINKOFF_LINK: 'https://www.tinkoff.ru/collectmoney/crowd/anderson.layma1/latFj82826/?short_link=165fWSttnKA&httpMethod=GET',
+  PAYPAL_LINK: 'https://www.paypal.com/paypalme/shelllf',
 };
 
 module.exports = prodConfig;

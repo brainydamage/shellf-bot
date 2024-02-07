@@ -172,6 +172,8 @@ module.exports.handler = async (event) => {
       }
     } else if (parsedBody.command === commands.RETURN) {
       await baseCommandHandler.returnBook(parsedBody);
+    } else if (parsedBody.command === commands.CATALOGUE) {
+      await baseCommandHandler.catalogue(parsedBody);
     } else if (parsedBody.command === commands.UNSUBSCRIBE) {
       await baseCommandHandler.unsubscribeBook(parsedBody);
     } else if (parsedBody.command === commands.HELP) {

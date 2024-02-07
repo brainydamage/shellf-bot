@@ -108,7 +108,7 @@ module.exports.returnBook = async (parsedBody) => {
       const range = `${config.BOOKS_LOG}!${result.rowNumber}:${result.rowNumber}`;
       await googleSheetsUtils.updateRow(range, dataForRow);
       await telegramUtils.sendFormattedMessage(parsedBody.chatID,
-        userMessages.BOOK_RETURNED);
+        `${userMessages.BOOK_RETURNED}\n\n${userMessages.DONATE}`);
 
       log.info('callback-command-handler',
         'Success: "%s", Callback: %s, BookID: %s, BookInfo: %s, DaysBorrowed: %s, Username: %s, ChatID: %s, Shelf: %s',

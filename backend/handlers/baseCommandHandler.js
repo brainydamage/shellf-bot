@@ -240,10 +240,16 @@ module.exports.showHelpMessage = async (parsedBody) => {
 module.exports.support = async (parsedBody) => {
   await telegramUtils.deleteMessage(parsedBody);
 
-  const supportMessage = `${userMessages.DONATE}${config.TINKOFF_LINK}\n${config.PAYPAL_LINK}`;
-  await telegramUtils.sendFormattedMessage(parsedBody.chatID, supportMessage);
+  await telegramUtils.sendFormattedMessage(parsedBody.chatID,
+    userMessages.DONATE);
 }
 
+module.exports.catalogue = async (parsedBody) => {
+  await telegramUtils.deleteMessage(parsedBody);
+
+  await telegramUtils.sendFormattedMessage(parsedBody.chatID,
+    userMessages.CATALOGUE);
+}
 
 module.exports.repeatedCommand = async (parsedBody) => {
   await telegramUtils.deleteMessage(parsedBody);

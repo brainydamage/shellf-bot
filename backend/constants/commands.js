@@ -1,6 +1,7 @@
 module.exports = {
   START: '/start',
   RETURN: '/return',
+  CATALOGUE: '/catalogue',
   UNSUBSCRIBE: '/unsubscribe',
   HELP: '/help',
   SUPPORT: '/support',
