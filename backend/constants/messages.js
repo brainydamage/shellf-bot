@@ -52,7 +52,9 @@ module.exports = {
   SENDING_REMINDER: 'Sending reminder',
   SENDING_OVERDUE: 'Sending reminder: overdue',
   SENDING_LOST: 'Sending reminder: lost',
+  SENDING_NOTIFICATION: 'Sending notification',
   TRACKING_OVERDUE: 'Tracking overdue book',
   TRACKING_LOST: 'Tracking lost book',
   FAILED_REMINDER: 'Failed to handle reminder',
+  FAILED_NOTIFIER: 'Failed to handle notifier',
 };

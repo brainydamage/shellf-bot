@@ -8,6 +8,7 @@ const prodConfig = {
   ADMIN_CHAT_ID: 124760667,
   BOOKS_DB: 'список книг',
   BOOKS_LOG: 'бот в телеге',
+  BOOKS_RETURNED: 'вернулись',
   BOOKS_SUBS: 'подписки',
   BOOKID_COLUMN_DB: 1,
   TITLE_COLUMN_DB: 2,
