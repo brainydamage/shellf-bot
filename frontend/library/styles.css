@@ -208,6 +208,7 @@ header {
 
 .message--warning {
     background: #ffd29e;
+    white-space: pre-wrap;
 }
 
 .loader {

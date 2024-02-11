@@ -22,29 +22,31 @@
     </header>
     <div class="controls">
         <div class="controls__item">
-            <label for="search">Поиск:</label>
-            <input id="search" type="text" class="search-input" placeholder="Найти книгу...">
+            <label for="search">поиск:</label>
+            <input class="search-input" id="search" placeholder="найти книгу..." type="text">
         </div>
         <div class="controls__item">
-            <label for="shelf-filter">Показывать полки:</label>
+            <label for="shelf-filter">показывать полки:</label>
             <select id="shelf-filter" class="shelf-filter"></select>
         </div>
     </div>
     <div class="book-list-header">
-        <div class="book-list-header__item">Название</div>
-        <div class="book-list-header__item book-list-header__item--shelf">Где взять</div>
+        <div class="book-list-header__item">название</div>
+        <div class="book-list-header__item book-list-header__item--shelf">где взять</div>
     </div>
     <div id="book-list" class="book-list"></div>
     <div class="loader" id="loader"></div>
-    <div id="error-message" class="message message--error hidden">Ошибка загрузки данных!</div>
-    <div id="not-found-message" class="message message--warning hidden">Не найдено ни одной книги. Попробуйте изменить запрос.</div>
+    <div class="message message--error hidden" id="error-message">кажется, что-то пошло не так</div>
+    <div class="message message--warning hidden" id="not-found-message">не найдено ни одной книги&#10;попробуй изменить
+        запрос
+    </div>
     <div class="pager hidden" id="pager">
-        <button class="pager__button" id="pager-back-button"><<< Назад</button>
-        Страница <span id="current-page-number"></span> из <span id="total-pages-number"></span>
-        <button class="pager__button" id="pager-forward-button">Вперёд >>></button>
+        <button class="pager__button" id="pager-back-button"><<< назад</button>
+        страница <span id="current-page-number"></span> из <span id="total-pages-number"></span>
+        <button class="pager__button" id="pager-forward-button">вперёд >>></button>
     </div>
 </div>
 
-<script src="script.js"></script>
+<script src="booksList.js"></script>
 </body>
 </html>

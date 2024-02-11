@@ -128,6 +128,23 @@ async function remindOverdue(chatId, reminder) {
   }
 }
 
+async function showCatalogueButton(chatId) {
+  try {
+    return await bot.telegram.sendMessage(chatId, userMessages.CATALOGUE, {
+      reply_markup: {
+        inline_keyboard: [
+          [{
+            text: "открыть каталог",
+            web_app: {url: "https://d30noal47qv51w.cloudfront.net"}
+          }]
+        ],
+      },
+    });
+  } catch (error) {
+    throw new Error(messages.FAILED_SEND_TG);
+  }
+}
+
 module.exports = {
   deleteMessage,
   sendMessage,
@@ -136,4 +153,5 @@ module.exports = {
   showBooksToReturnOrUnsubs,
   remindToReturn,
   remindOverdue,
+  showCatalogueButton,
 };

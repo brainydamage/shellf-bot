@@ -247,8 +247,7 @@ module.exports.support = async (parsedBody) => {
 module.exports.catalogue = async (parsedBody) => {
   await telegramUtils.deleteMessage(parsedBody);
 
-  await telegramUtils.sendFormattedMessage(parsedBody.chatID,
-    userMessages.CATALOGUE);
+  await telegramUtils.showCatalogueButton(parsedBody.chatID);
 }
 
 module.exports.repeatedCommand = async (parsedBody) => {
