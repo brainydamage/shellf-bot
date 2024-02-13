@@ -22,12 +22,14 @@ async function processReminders(rows) {
 
   for (let i = 1; i < rows.length; i++) {
     const row = rows[i];
+    const chatID = row[chatIDColumn];
     const deadline = row[deadlineColumn];
     const returned = row[returnedColumn];
 
-    if (!returned && dateTimeUtils.isDeadlineIn(deadline, config.REMIND_DAYS)) {
+    if (chatID && !returned &&
+      dateTimeUtils.isDeadlineIn(deadline, config.REMIND_DAYS)) {
       reminders.push({
-        chatID: row[chatIDColumn],
+        chatID: chatID,
         username: row[usernameColumn],
         bookID: row[bookIDColumn],
         title: row[titleColumn],
@@ -52,14 +54,15 @@ async function processOverdueBooks(rows) {
 
   for (let i = 1; i < rows.length; i++) {
     const row = rows[i];
+    const chatID = row[chatIDColumn];
     const borrowed = row[borrowedColumn];
     const deadline = row[deadlineColumn];
     const returned = row[returnedColumn];
     const daysOnHands = dateTimeUtils.countDaysOnHands(borrowed);
 
-    if (!returned && daysOnHands > config.OVERDUE_DAYS) {
+    if (chatID && !returned && daysOnHands > config.OVERDUE_DAYS) {
       overdueBooks.push({
-        chatID: row[chatIDColumn],
+        chatID: chatID,
         username: row[usernameColumn],
         bookID: row[bookIDColumn],
         title: row[titleColumn],
