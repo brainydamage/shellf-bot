@@ -91,8 +91,10 @@ class View {
       [{name: 'value', value: ''}, {name: 'innerText', value: 'все'},]));
 
     shelves.forEach((item) => {
-      $shelfFilter.appendChild(createElement('option',
-        [{name: 'value', value: item}, {name: 'innerText', value: item},]));
+      if (item) {
+        $shelfFilter.appendChild(createElement('option',
+          [{name: 'value', value: item}, {name: 'innerText', value: item},]));
+      }
     });
   };
 
@@ -213,7 +215,7 @@ window.onload = async () => {
   try {
     const response = await fetch(BOOKS_FETCH_URL);
     const data = await response.json();
-    const booksData = data.books;
+    const booksData = data.filteredBooks;
 
     showElement($pager);
 

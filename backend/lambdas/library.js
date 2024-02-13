@@ -8,9 +8,13 @@ module.exports.getter = async () => {
 
   try {
     const books = await googleSheetsUtils.getBooks();
+    console.log(books);
 
     if (books.length > 0) {
-      books.sort((a, b) => a.title.localeCompare(b.title));
+      const filteredBooks = books
+        .filter(book => book.title)
+        .filter(book => !book.title.startsWith('Uliana'))
+        .sort((a, b) => a.title.localeCompare(b.title));
 
       log.info('library', 'Success: "%s", Books Number: %s',
         messages.BOOK_LIST_RECEIVED, books.length);
@@ -21,7 +25,7 @@ module.exports.getter = async () => {
           "Access-Control-Allow-Origin": "*",
         },
         body: JSON.stringify({
-          books
+          filteredBooks
         }, null, 2),
       };
     } else {
