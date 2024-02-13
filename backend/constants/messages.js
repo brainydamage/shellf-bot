@@ -57,4 +57,8 @@ module.exports = {
   TRACKING_LOST: 'Tracking lost book',
   FAILED_REMINDER: 'Failed to handle reminder',
   FAILED_NOTIFIER: 'Failed to handle notifier',
+
+  //Subscriber
+  BOOK_AVAILABLE_SUBS: 'Sending notification: available',
+  BOOK_NOT_AVAILABLE_SUBS: 'Sending notification: not available',
 };

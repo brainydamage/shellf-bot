@@ -6,6 +6,7 @@ const log = require('../utils/customLogger');
 const googleSheetsUtils = require("../utils/googleSheetsUtils");
 const config = require("../constants/config");
 const userMessages = require("../constants/userMessages");
+const messages = require("../constants/messages");
 
 module.exports.handler = async (parsedBody) => {
   if (parsedBody.subscribe) {
@@ -31,6 +32,12 @@ module.exports.handler = async (parsedBody) => {
 
       //notify all that book is not available
       for (const subscription of subscriptionsForThisBook) {
+        log.info('subscriber',
+          'Success: "%s", BookID: %s, BookInfo: %s, Username: %s, ChatID: %s, Shelf: %s',
+          messages.BOOK_NOT_AVAILABLE_SUBS, parsedBody.bookID, bookInfo,
+          subscription[config.USERNAME_COLUMN_SUBS],
+          subscription[config.CHATID_COLUMN_SUBS], shelf);
+
         await telegramUtils.sendFormattedMessage(
           parseInt(subscription[config.CHATID_COLUMN_SUBS], 10), message);
       }
@@ -55,6 +62,12 @@ module.exports.handler = async (parsedBody) => {
 
       //notify all that book is available again
       for (const subscription of subscriptionsForThisBook) {
+        log.info('subscriber',
+          'Success: "%s", BookID: %s, BookInfo: %s, Username: %s, ChatID: %s, Shelf: %s',
+          messages.BOOK_AVAILABLE_SUBS, parsedBody.bookID, bookInfo,
+          subscription[config.USERNAME_COLUMN_SUBS],
+          subscription[config.CHATID_COLUMN_SUBS], shelf);
+
         await telegramUtils.sendFormattedMessage(
           parseInt(subscription[config.CHATID_COLUMN_SUBS], 10), message);
       }
