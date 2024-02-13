@@ -3,3 +3,4 @@
 /backend/.serverless/
 /backend/node_modules/
 /syncLogs/node_modules/
+/googleApiKey.json
