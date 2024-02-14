@@ -26,7 +26,7 @@ async function processReminders(rows) {
     const deadline = row[deadlineColumn];
     const returned = row[returnedColumn];
 
-    if (chatID && !returned &&
+    if (parseInt(chatID, 10) && !returned &&
       dateTimeUtils.isDeadlineIn(deadline, config.REMIND_DAYS)) {
       reminders.push({
         chatID: chatID,
@@ -60,7 +60,8 @@ async function processOverdueBooks(rows) {
     const returned = row[returnedColumn];
     const daysOnHands = dateTimeUtils.countDaysOnHands(borrowed);
 
-    if (chatID && !returned && daysOnHands > config.OVERDUE_DAYS) {
+    if (parseInt(chatID, 10) && !returned && daysOnHands >
+      config.OVERDUE_DAYS) {
       overdueBooks.push({
         chatID: chatID,
         username: row[usernameColumn],
