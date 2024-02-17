@@ -167,8 +167,10 @@ module.exports.handler = async (event) => {
 
         userBookMap[userBorrowBookKey] = true;
 
-        await baseCommandHandler.borrowBook(parsedBody);
-        await invokeSubscriber(parsedBody);
+        const borrowed = await baseCommandHandler.borrowBook(parsedBody);
+        if (borrowed) {
+          await invokeSubscriber(parsedBody);
+        }
       }
     } else if (parsedBody.command === commands.RETURN) {
       await baseCommandHandler.returnBook(parsedBody);
@@ -190,8 +192,10 @@ module.exports.handler = async (event) => {
       parsedBody.bookID, parsedBody.username, parsedBody.chatID);
 
     if (parsedBody.callback === commands.RETURN_CALLBACK) {
-      await callbackCommandHandler.returnBook(parsedBody);
-      await invokeSubscriber(parsedBody);
+      const returned = await callbackCommandHandler.returnBook(parsedBody);
+      if (returned) {
+        await invokeSubscriber(parsedBody);
+      }
     } else if (parsedBody.callback === commands.UNSUBSCRIBE_CALLBACK) {
       await callbackCommandHandler.unsubscribeBook(parsedBody);
     } else if (parsedBody.callback === commands.PROLONG_CALLBACK) {

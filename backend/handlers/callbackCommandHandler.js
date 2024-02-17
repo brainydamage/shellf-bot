@@ -49,26 +49,33 @@ function setProlongAndDeadlineDatesForRowArray(inputArray, prolongDate,
   return transformedArray;
 }
 
-async function getBookRowWithNumber(parsedBody, sheetName) {
+async function getBookRowWithNumber(parsedBody, sheetName, prolong) {
   const rows = await googleSheetsUtils.getRows(sheetName);
 
   for (let i = 1; i < rows.length; i++) {
     const row = rows[i];
 
-    let chatIDColumn, bookIDColumn;
+    let chatIDColumn, bookIDColumn, dateColumn;
 
     if (sheetName === config.BOOKS_LOG) {
       chatIDColumn = config.CHATID_COLUMN_LOG;
       bookIDColumn = config.BOOKID_COLUMN_LOG;
+      if (prolong) {
+        dateColumn = config.PROLONG_COLUMN_LOG;
+      } else {
+        dateColumn = config.RETURN_COLUMN_LOG;
+      }
     } else if (sheetName === config.BOOKS_SUBS) {
       chatIDColumn = config.CHATID_COLUMN_SUBS;
       bookIDColumn = config.BOOKID_COLUMN_SUBS;
+      dateColumn = config.UNSUBSCRIBE_COLUMN_SUBS;
     }
 
     const sameChatID = row[chatIDColumn] === parsedBody.chatID.toString();
     const sameBookID = row[bookIDColumn] === parsedBody.bookID.toString();
+    const dateIsEmpty = row[dateColumn] === '';
 
-    if (sameChatID && sameBookID) {
+    if (sameChatID && sameBookID && dateIsEmpty) {
       return {bookRow: row, rowNumber: i + 1};
     }
   }
@@ -79,7 +86,8 @@ module.exports.returnBook = async (parsedBody) => {
   await telegramUtils.deleteMessage(parsedBody);
 
   try {
-    const result = await getBookRowWithNumber(parsedBody, config.BOOKS_LOG);
+    const result = await getBookRowWithNumber(parsedBody, config.BOOKS_LOG,
+      false);
     const bookRow = result.bookRow;
 
     if (bookRow && (bookRow.length < config.LOG_COLUMNS_NUMBER ||
@@ -115,6 +123,7 @@ module.exports.returnBook = async (parsedBody) => {
         messages.BOOK_RETURNED, parsedBody.callback, parsedBody.bookID,
         bookInfo, daysBorrowed, parsedBody.username, parsedBody.chatID, shelf);
 
+      return true;
     } else {
       // Handle case where row was not found or double-click
       // console.warn(`${messages.WARN_RETURN_BOOK}`);
@@ -136,7 +145,8 @@ module.exports.prolongBook = async (parsedBody) => {
   await telegramUtils.deleteMessage(parsedBody);
 
   try {
-    const result = await getBookRowWithNumber(parsedBody, config.BOOKS_LOG);
+    const result = await getBookRowWithNumber(parsedBody, config.BOOKS_LOG,
+      true);
     const bookRow = result.bookRow;
 
     if (bookRow && (bookRow.length < config.LOG_COLUMNS_NUMBER - 1 ||
@@ -197,7 +207,8 @@ module.exports.unsubscribeBook = async (parsedBody) => {
   await telegramUtils.deleteMessage(parsedBody);
 
   try {
-    const result = await getBookRowWithNumber(parsedBody, config.BOOKS_SUBS);
+    const result = await getBookRowWithNumber(parsedBody, config.BOOKS_SUBS,
+      false);
     const bookRow = result.bookRow;
 
     if (bookRow && (bookRow.length < config.SUBS_COLUMNS_NUMBER ||

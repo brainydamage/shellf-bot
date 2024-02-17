@@ -65,6 +65,7 @@ module.exports.borrowBook = async (parsedBody) => {
       messages.BOOK_BORROWED, parsedBody.command, parsedBody.bookID, bookInfo,
       shelf, parsedBody.username, parsedBody.chatID);
 
+    return true;
   } catch (error) {
     if (error.message === messages.FAILED_SEND_TG) {
       log.error('base-command-handler',
