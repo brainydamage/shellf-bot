@@ -32,11 +32,11 @@ module.exports.handler = async (parsedBody) => {
       const bookInfo = bookAuthor ? `${bookTitle}, ${bookAuthor}` : bookTitle;
       const shelf = otherBorrowersOfThisBook[0][config.SHELF_COLUMN_LOG];
 
-      const message = `${userMessages.BOOK_NOT_MARKED_AS_RETURNED_1}*${bookInfo}*\n\n${userMessages.HOW_TO_RETURN}\n\n${userMessages.BOOK_NOT_MARKED_AS_RETURNED_2}`;
+      const message = `${userMessages.BOOK_NOT_MARKED_AS_RETURNED_1}*${bookInfo}*\n\n${userMessages.BOOK_NOT_MARKED_AS_RETURNED_2}*${shelf}*${userMessages.BOOK_NOT_MARKED_AS_RETURNED_3}\n\n${userMessages.BOOK_NOT_MARKED_AS_RETURNED_4}`;
 
       //notify all that they probably forgot to return the book
       for (const otherBorrower of otherBorrowersOfThisBook) {
-        log.info('notifier',
+        log.warn('notifier',
           'Warning: "%s", BookID: %s, BookInfo: %s, Username: %s, ChatID: %s, Shelf: %s',
           messages.BOOK_NOT_MARKED_AS_RETURNED, parsedBody.bookID, bookInfo,
           otherBorrower[config.USERNAME_COLUMN_LOG],

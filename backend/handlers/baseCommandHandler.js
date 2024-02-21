@@ -84,8 +84,8 @@ module.exports.borrowBook = async (parsedBody) => {
           await telegramUtils.deleteMessage(loaderMsg);
           await telegramUtils.sendFormattedMessage(parsedBody.chatID, message);
 
-          log.info('base-command-handler',
-            'Reason: "%s", Command: %s, BookID: %s, BookInfo: %s, Shelf: %s, Username: %s, ChatID: %s',
+          log.warn('base-command-handler',
+            'Warning: "%s", Command: %s, BookID: %s, BookInfo: %s, Shelf: %s, Username: %s, ChatID: %s',
             messages.FAILED_BORROW_BOOK_DUPLICATION, parsedBody.command,
             parsedBody.bookID,
             bookInfo, shelf, parsedBody.username, parsedBody.chatID);
