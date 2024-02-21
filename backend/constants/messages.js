@@ -15,6 +15,7 @@ module.exports = {
   FAILED_SCAN_BOOK: 'Failed to scan book',
   FAILED_GET_BOOKS_LIST: 'Failed to get books list',
   FAILED_BORROW_BOOK: 'Failed to borrow book',
+  FAILED_BORROW_BOOK_DUPLICATION: 'Failed to borrow book: duplication',
   FAILED_APPEND_ROW: 'Failed to append a row while borrowing',
   FAILED_GET_BOOK_DATA: 'Failed to get book data while borrowing',
   FAILED_RETURN_BOOK: 'Failed to return book',
@@ -47,6 +48,7 @@ module.exports = {
   FAILED_READ_DB: 'Failed to read Google Sheets',
   FAILED_UPDATE_DB: 'Failed to update Google Sheets',
   FAILED_UPDATE_ROW_DB: 'Failed to update row in Google Sheets',
+  FAILED_GET_ROW_NUMBER: 'Failed to get row number after appending row to Google Sheets',
 
   //Reminder
   SENDING_REMINDER: 'Sending reminder',
@@ -61,4 +63,7 @@ module.exports = {
   //Subscriber
   BOOK_AVAILABLE_SUBS: 'Sending notification: available',
   BOOK_NOT_AVAILABLE_SUBS: 'Sending notification: not available',
+
+  //Notifier
+  BOOK_NOT_MARKED_AS_RETURNED: 'Sending notification: user forgot to return the book in the bot',
 };

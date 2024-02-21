@@ -1,10 +1,24 @@
-const googleSheetsUtils = require("../utils/googleSheetsUtils");
-const telegramUtils = require("../utils/telegramUtils");
-const dateTimeUtils = require("../utils/dateTimeUtils");
-const config = require("../constants/config");
-const messages = require("../constants/messages");
-const userMessages = require("../constants/userMessages");
+const googleSheetsUtils = require('../utils/googleSheetsUtils');
+const telegramUtils = require('../utils/telegramUtils');
+const dateTimeUtils = require('../utils/dateTimeUtils');
+const config = require('../constants/config');
+const messages = require('../constants/messages');
+const userMessages = require('../constants/userMessages');
 const log = require('../utils/customLogger');
+
+function setDuplicationMarkForRowArray(inputArray) {
+  const transformedArrayLength = inputArray.length <=
+  config.LOG_COLUMNS_NUMBER ? config.LOG_COLUMNS_NUMBER : inputArray.length;
+
+  // Create a new array with a fixed length of config.LOG_COLUMNS_NUMBER,
+  // filled with null
+  const transformedArray = new Array(transformedArrayLength).fill(null);
+
+  // Set the last element (index 7) of the transformed array to returnDate
+  transformedArray[config.RETURN_COLUMN_LOG] = 'дубль';
+
+  return transformedArray;
+}
 
 module.exports.borrowBook = async (parsedBody) => {
   const timestamp = Math.floor(Date.now() / 1000);
@@ -16,7 +30,7 @@ module.exports.borrowBook = async (parsedBody) => {
   await telegramUtils.deleteMessage(parsedBody);
 
   const {
-    message_id, chat: {id: chat_id}
+    message_id, chat: {id: chat_id},
   } = await telegramUtils.sendMessage(parsedBody.chatID,
     userMessages.BOOK_LOADER);
   const loaderMsg = {
@@ -24,7 +38,6 @@ module.exports.borrowBook = async (parsedBody) => {
   };
 
   try {
-    let message = `${userMessages.BOOK_BORROWED}*${deadlineDate}*`;
     let rowNumber;
 
     const response = await googleSheetsUtils.appendRow(config.BOOKS_LOG, data);
@@ -46,26 +59,57 @@ module.exports.borrowBook = async (parsedBody) => {
         const book = {
           title: bookRow[config.TITLE_COLUMN_LOG],
           author: bookRow[config.AUTHOR_COLUMN_LOG],
-          shelf: bookRow[config.SHELF_COLUMN_LOG]
+          shelf: bookRow[config.SHELF_COLUMN_LOG],
         };
         bookInfo = book.author ? `${book.title}, ${book.author}` : book.title;
         shelf = book.shelf;
 
-        message += ` на полку *${book.shelf}*:\n\n*${bookInfo}*`;
+        if (bookRow[config.DUPLICATED_COLUMN_LOG] === '') {
+          //book borrowed
+          const message = `${userMessages.BOOK_BORROWED}*${deadlineDate}* на полку *${book.shelf}*:\n\n*${bookInfo}*${userMessages.BOOK_BORROWED_ENDING}`;
+
+          await telegramUtils.deleteMessage(loaderMsg);
+          await telegramUtils.sendFormattedMessage(parsedBody.chatID, message);
+
+          log.info('base-command-handler',
+            'Success: "%s", Command: %s, BookID: %s, BookInfo: %s, Shelf: %s, Username: %s, ChatID: %s',
+            messages.BOOK_BORROWED, parsedBody.command, parsedBody.bookID,
+            bookInfo, shelf, parsedBody.username, parsedBody.chatID);
+
+          return true;
+        } else {
+          //duplicate (same chatID+bookID in a table)
+          const message = `${userMessages.DUPLICATED_BOOK}\n\n${userMessages.HOW_TO_RETURN}`;
+
+          await telegramUtils.deleteMessage(loaderMsg);
+          await telegramUtils.sendFormattedMessage(parsedBody.chatID, message);
+
+          log.info('base-command-handler',
+            'Reason: "%s", Command: %s, BookID: %s, BookInfo: %s, Shelf: %s, Username: %s, ChatID: %s',
+            messages.FAILED_BORROW_BOOK_DUPLICATION, parsedBody.command,
+            parsedBody.bookID,
+            bookInfo, shelf, parsedBody.username, parsedBody.chatID);
+
+          const dataForRow = setDuplicationMarkForRowArray(bookRow);
+
+          const range = `${config.BOOKS_LOG}!${rowNumber}:${rowNumber}`;
+          await googleSheetsUtils.updateRow(range, dataForRow);
+
+          return false;
+        }
       }
+    } else {
+      await telegramUtils.deleteMessage(loaderMsg);
+      await telegramUtils.sendFormattedMessage(parsedBody.chatID,
+        userMessages.SUPPORT);
+
+      log.error('base-command-handler',
+        `Reason: "%s", Username: %s, ChatID: %s, ErrorMessage: %s`,
+        messages.FAILED_BORROW_BOOK, parsedBody.username, parsedBody.chatID,
+        messages.FAILED_GET_ROW_NUMBER);
+
+      return false;
     }
-
-    message += `${userMessages.BOOK_BORROWED_ENDING}`;
-
-    await telegramUtils.deleteMessage(loaderMsg);
-    await telegramUtils.sendFormattedMessage(parsedBody.chatID, message);
-
-    log.info('base-command-handler',
-      'Success: "%s", Command: %s, BookID: %s, BookInfo: %s, Shelf: %s, Username: %s, ChatID: %s',
-      messages.BOOK_BORROWED, parsedBody.command, parsedBody.bookID, bookInfo,
-      shelf, parsedBody.username, parsedBody.chatID);
-
-    return true;
   } catch (error) {
     if (error.message === messages.FAILED_SEND_TG) {
       log.error('base-command-handler',
@@ -92,6 +136,8 @@ module.exports.borrowBook = async (parsedBody) => {
     console.error(error);
 
     await telegramUtils.sendAdminMessage(parsedBody, error.message);
+
+    return false;
   }
 };
 
@@ -128,7 +174,7 @@ module.exports.returnBook = async (parsedBody) => {
         const bookInfo = bookAuthor ? `${bookTitle}, ${bookAuthor}` : bookTitle;
 
         const bookToReturn = {
-          bookID: bookID, bookInfo: bookInfo
+          bookID: bookID, bookInfo: bookInfo,
         };
 
         arrayOfBooks.push(bookToReturn);
@@ -156,7 +202,7 @@ module.exports.returnBook = async (parsedBody) => {
     await telegramUtils.sendFormattedMessage(parsedBody.chatID,
       userMessages.SUPPORT);
   }
-}
+};
 
 module.exports.unsubscribeBook = async (parsedBody) => {
   try {
@@ -191,7 +237,7 @@ module.exports.unsubscribeBook = async (parsedBody) => {
         const bookInfo = bookAuthor ? `${bookTitle}, ${bookAuthor}` : bookTitle;
 
         const bookToUnsubscribe = {
-          bookID: bookID, bookInfo: bookInfo
+          bookID: bookID, bookInfo: bookInfo,
         };
 
         arrayOfBooks.push(bookToUnsubscribe);
@@ -219,40 +265,40 @@ module.exports.unsubscribeBook = async (parsedBody) => {
     await telegramUtils.sendFormattedMessage(parsedBody.chatID,
       userMessages.SUPPORT);
   }
-}
+};
 
 module.exports.emptyStart = async (parsedBody) => {
   await telegramUtils.deleteMessage(parsedBody);
   await telegramUtils.sendMessage(parsedBody.chatID,
     userMessages.EMPTY_START_COMMAND);
-}
+};
 
 module.exports.wrongCommand = async (parsedBody) => {
   await telegramUtils.deleteMessage(parsedBody);
   await telegramUtils.sendMessage(parsedBody.chatID,
     userMessages.WRONG_COMMAND);
-}
+};
 
 module.exports.showHelpMessage = async (parsedBody) => {
   await telegramUtils.deleteMessage(parsedBody);
   await telegramUtils.sendMessage(parsedBody.chatID, userMessages.HELP_COMMAND);
-}
+};
 
 module.exports.support = async (parsedBody) => {
   await telegramUtils.deleteMessage(parsedBody);
 
   await telegramUtils.sendFormattedMessage(parsedBody.chatID,
     userMessages.DONATE);
-}
+};
 
 module.exports.catalogue = async (parsedBody) => {
   await telegramUtils.deleteMessage(parsedBody);
 
   await telegramUtils.showCatalogueButton(parsedBody.chatID);
-}
+};
 
 module.exports.repeatedCommand = async (parsedBody) => {
   await telegramUtils.deleteMessage(parsedBody);
   // await telegramUtils.sendMessage(parsedBody.chatID,
   //   userMessages.REPEATED_COMMAND);
-}
+};

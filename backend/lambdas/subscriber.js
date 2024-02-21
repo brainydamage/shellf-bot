@@ -20,7 +20,7 @@ module.exports.handler = async (parsedBody) => {
       .filter(row => parseInt(row[config.BOOKID_COLUMN_SUBS], 10) ===
         parsedBody.bookID)
       .filter(row => parseInt(row[config.CHATID_COLUMN_SUBS], 10) !==
-        parsedBody.chatID)
+        parsedBody.chatID);
 
     if (subscriptionsForThisBook.length > 0) {
       const bookTitle = subscriptionsForThisBook[0][config.TITLE_COLUMN_SUBS];

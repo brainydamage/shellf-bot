@@ -102,6 +102,24 @@ async function invokeSubscriber(payload) {
   }
 }
 
+async function invokeNotifier(payload) {
+  const params = {
+    FunctionName: config.NOTIFIER_LAMBDA,
+    InvocationType: 'Event',
+    Payload: JSON.stringify(payload),
+  };
+
+  const command = new InvokeCommand(params);
+
+  try {
+    const response = await lambdaClient.send(command);
+
+    console.log('Notifier invoked successfully: HTTP', response.StatusCode);
+  } catch (error) {
+    console.error('Error invoking Notifier:', error);
+  }
+}
+
 module.exports.handler = async (event) => {
   const body = JSON.parse(event.body);
   const parsedBody = parseBody(body);
@@ -170,6 +188,7 @@ module.exports.handler = async (event) => {
         const borrowed = await baseCommandHandler.borrowBook(parsedBody);
         if (borrowed) {
           await invokeSubscriber(parsedBody);
+          await invokeNotifier(parsedBody);
         }
       }
     } else if (parsedBody.command === commands.RETURN) {

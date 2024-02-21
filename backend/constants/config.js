@@ -1,6 +1,7 @@
 const prodConfig = {
   REGION: 'eu-central-1',
   SUBSCRIBER_LAMBDA: 'shellf-bot-dev-subscriber',
+  NOTIFIER_LAMBDA: 'shellf-bot-dev-notifier',
   CLIENT_EMAIL: 'shellf_client_email',
   CLIENT_PRIVATE_KEY: 'shellf_private_key',
   SCOPE: 'https://www.googleapis.com/auth/spreadsheets',
@@ -26,8 +27,9 @@ const prodConfig = {
   SHELF_COLUMN_LOG: 7,
   PROLONG_COLUMN_LOG: 8,
   RETURN_COLUMN_LOG: 9,
-  SEQ_NUM_COLUMN_LOG: 10,
-  LOG_COLUMNS_NUMBER: 11,
+  DUPLICATED_COLUMN_LOG: 10,
+  SEQ_NUM_COLUMN_LOG: 11,
+  LOG_COLUMNS_NUMBER: 12,
 
   DATE_COLUMN_SUBS: 0,
   USERNAME_COLUMN_SUBS: 1,

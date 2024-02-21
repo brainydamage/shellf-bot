@@ -73,9 +73,9 @@ functions:
       TELEGRAM_TOKEN: ${env:TELEGRAM_TOKEN_SHELLF}
       CLIENT_EMAIL: ${env:SHELLF_CLIENT_EMAIL}
       PRIVATE_KEY: ${env:SHELLF_PRIVATE_KEY}
-  notifier_handler:
+  notifier:
     handler: lambdas/notifier.handler
-    timeout: 50
+    timeout: 20
     environment:
       TELEGRAM_TOKEN: ${env:TELEGRAM_TOKEN_SHELLF}
       CLIENT_EMAIL: ${env:SHELLF_CLIENT_EMAIL}

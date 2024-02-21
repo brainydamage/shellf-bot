@@ -10,7 +10,8 @@ function setReturnDateForRowArray(inputArray, returnDate) {
   const transformedArrayLength = inputArray.length <=
   config.LOG_COLUMNS_NUMBER ? config.LOG_COLUMNS_NUMBER : inputArray.length;
 
-  // Create a new array with a fixed length of 8, filled with null
+  // Create a new array with a fixed length of config.LOG_COLUMNS_NUMBER,
+  // filled with null
   const transformedArray = new Array(transformedArrayLength).fill(null);
 
   // Set the last element (index 7) of the transformed array to returnDate
