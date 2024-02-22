@@ -24,7 +24,8 @@ module.exports.handler = async (parsedBody) => {
       .filter(row => parseInt(row[config.BOOKID_COLUMN_LOG], 10) ===
         parsedBody.bookID)
       .filter(row => parseInt(row[config.CHATID_COLUMN_LOG], 10) !==
-        parsedBody.chatID);
+        parsedBody.chatID)
+      .filter(row => row[config.RETURN_COLUMN_LOG] === '');
 
     if (otherBorrowersOfThisBook.length > 0) {
       const bookTitle = otherBorrowersOfThisBook[0][config.TITLE_COLUMN_LOG];
