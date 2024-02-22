@@ -1,9 +1,9 @@
-const googleSheetsUtils = require("../utils/googleSheetsUtils");
-const telegramUtils = require("../utils/telegramUtils");
-const dateTimeUtils = require("../utils/dateTimeUtils");
-const config = require("../constants/config");
-const messages = require("../constants/messages");
-const userMessages = require("../constants/userMessages");
+const googleSheetsUtils = require('../utils/googleSheetsUtils');
+const telegramUtils = require('../utils/telegramUtils');
+const dateTimeUtils = require('../utils/dateTimeUtils');
+const config = require('../constants/config');
+const messages = require('../constants/messages');
+const userMessages = require('../constants/userMessages');
 const log = require('../utils/customLogger');
 
 function setUnsubsDateForRowArray(inputArray, unsubsDate) {
@@ -28,7 +28,7 @@ module.exports.subscribeBook = async (parsedBody) => {
   await telegramUtils.deleteMessage(parsedBody);
 
   const {
-    message_id, chat: {id: chat_id}
+    message_id, chat: {id: chat_id},
   } = await telegramUtils.sendMessage(parsedBody.chatID,
     userMessages.BOOK_LOADER);
   const loaderMsg = {
@@ -58,7 +58,7 @@ module.exports.subscribeBook = async (parsedBody) => {
         const book = {
           title: bookRow[config.TITLE_COLUMN_SUBS],
           author: bookRow[config.AUTHOR_COLUMN_SUBS],
-          shelf: bookRow[config.SHELF_COLUMN_SUBS]
+          shelf: bookRow[config.SHELF_COLUMN_SUBS],
         };
         bookInfo = book.author ? `${book.title}, ${book.author}` : book.title;
         shelf = book.shelf;
@@ -80,23 +80,27 @@ module.exports.subscribeBook = async (parsedBody) => {
   } catch (error) {
     if (error.message === messages.FAILED_SEND_TG) {
       log.error('subscriber-handler',
-        `Reason: "%s", Username: %s, ChatID: %s, ErrorMessage: %s`,
+        `Reason: "%s", Username: %s, ChatID: %s, BookID: %s, ErrorMessage: %s`,
         messages.FAILED_SEND_TG, parsedBody.username, parsedBody.chatID,
+        parsedBody.bookID,
         error.message);
     } else if (error.message === messages.FAILED_READ_DB) {
       log.error('subscriber-handler',
-        `Reason: "%s", Username: %s, ChatID: %s, ErrorMessage: %s`,
+        `Reason: "%s", Username: %s, ChatID: %s, BookID: %s, ErrorMessage: %s`,
         messages.FAILED_GET_BOOK_DATA, parsedBody.username, parsedBody.chatID,
+        parsedBody.bookID,
         error.message);
     } else if (error.message === messages.FAILED_UPDATE_DB) {
       log.error('subscriber-handler',
-        `Reason: "%s", Username: %s, ChatID: %s, ErrorMessage: %s`,
+        `Reason: "%s", Username: %s, ChatID: %s, BookID: %s, ErrorMessage: %s`,
         messages.FAILED_APPEND_ROW, parsedBody.username, parsedBody.chatID,
+        parsedBody.bookID,
         error.message);
     } else {
       log.error('subscriber-handler',
-        `Reason: "%s", Username: %s, ChatID: %s, ErrorMessage: %s`,
+        `Reason: "%s", Username: %s, ChatID: %s, BookID: %s, ErrorMessage: %s`,
         messages.FAILED_SUBSCRIBE_BOOK, parsedBody.username, parsedBody.chatID,
+        parsedBody.bookID,
         error.message);
     }
 
@@ -150,8 +154,9 @@ module.exports.unsubscribeUserFromBorrowedBook = async (rows, parsedBody) => {
     }
   } catch (error) {
     log.error('subscriber-handler',
-      `Reason: "%s", Username: %s, ChatID: %s, ErrorMessage: %s`,
+      `Reason: "%s", Username: %s, ChatID: %s, BookID: %s, ErrorMessage: %s`,
       messages.FAILED_UNSUBSCRIBE_BOOK, parsedBody.username, parsedBody.chatID,
+      parsedBody.bookID,
       error.message);
 
     console.error(error);
@@ -159,4 +164,4 @@ module.exports.unsubscribeUserFromBorrowedBook = async (rows, parsedBody) => {
     await telegramUtils.sendFormattedMessage(parsedBody.chatID,
       userMessages.SUPPORT);
   }
-}
+};

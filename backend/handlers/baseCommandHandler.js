@@ -87,8 +87,8 @@ module.exports.borrowBook = async (parsedBody) => {
           log.warn('base-command-handler',
             'Warning: "%s", Command: %s, BookID: %s, BookInfo: %s, Shelf: %s, Username: %s, ChatID: %s',
             messages.FAILED_BORROW_BOOK_DUPLICATION, parsedBody.command,
-            parsedBody.bookID,
-            bookInfo, shelf, parsedBody.username, parsedBody.chatID);
+            parsedBody.bookID, bookInfo, shelf, parsedBody.username,
+            parsedBody.chatID);
 
           const dataForRow = setDuplicationMarkForRowArray(bookRow);
 
@@ -104,33 +104,33 @@ module.exports.borrowBook = async (parsedBody) => {
         userMessages.SUPPORT);
 
       log.error('base-command-handler',
-        `Reason: "%s", Username: %s, ChatID: %s, ErrorMessage: %s`,
+        `Reason: "%s", Username: %s, ChatID: %s, BookID: %s, ErrorMessage: %s`,
         messages.FAILED_BORROW_BOOK, parsedBody.username, parsedBody.chatID,
-        messages.FAILED_GET_ROW_NUMBER);
+        parsedBody.bookID, messages.FAILED_GET_ROW_NUMBER);
 
       return false;
     }
   } catch (error) {
     if (error.message === messages.FAILED_SEND_TG) {
       log.error('base-command-handler',
-        `Reason: "%s", Username: %s, ChatID: %s, ErrorMessage: %s`,
+        `Reason: "%s", Username: %s, ChatID: %s, BookID: %s, ErrorMessage: %s`,
         messages.FAILED_SEND_TG, parsedBody.username, parsedBody.chatID,
-        error.message);
+        parsedBody.bookID, error.message);
     } else if (error.message === messages.FAILED_READ_DB) {
       log.error('base-command-handler',
-        `Reason: "%s", Username: %s, ChatID: %s, ErrorMessage: %s`,
+        `Reason: "%s", Username: %s, ChatID: %s, BookID: %s, ErrorMessage: %s`,
         messages.FAILED_GET_BOOK_DATA, parsedBody.username, parsedBody.chatID,
-        error.message);
+        parsedBody.bookID, error.message);
     } else if (error.message === messages.FAILED_UPDATE_DB) {
       log.error('base-command-handler',
-        `Reason: "%s", Username: %s, ChatID: %s, ErrorMessage: %s`,
+        `Reason: "%s", Username: %s, ChatID: %s, BookID: %s, ErrorMessage: %s`,
         messages.FAILED_APPEND_ROW, parsedBody.username, parsedBody.chatID,
-        error.message);
+        parsedBody.bookID, error.message);
     } else {
       log.error('base-command-handler',
-        `Reason: "%s", Username: %s, ChatID: %s, ErrorMessage: %s`,
+        `Reason: "%s", Username: %s, ChatID: %s, BookID: %s, ErrorMessage: %s`,
         messages.FAILED_BORROW_BOOK, parsedBody.username, parsedBody.chatID,
-        error.message);
+        parsedBody.bookID, error.message);
     }
 
     console.error(error);
@@ -193,9 +193,9 @@ module.exports.returnBook = async (parsedBody) => {
 
   } catch (error) {
     log.error('base-command-handler',
-      `Reason: "%s", Username: %s, ChatID: %s, ErrorMessage: %s`,
+      `Reason: "%s", Username: %s, ChatID: %s, BookID: %s, ErrorMessage: %s`,
       messages.FAILED_RETURN_BOOK, parsedBody.username, parsedBody.chatID,
-      error.message);
+      parsedBody.bookID, error.message);
 
     console.error(error);
 
@@ -256,9 +256,9 @@ module.exports.unsubscribeBook = async (parsedBody) => {
 
   } catch (error) {
     log.error('base-command-handler',
-      `Reason: "%s", Username: %s, ChatID: %s, ErrorMessage: %s`,
+      `Reason: "%s", Username: %s, ChatID: %s, BookID: %s, ErrorMessage: %s`,
       messages.FAILED_UNSUBSCRIBE_BOOK, parsedBody.username, parsedBody.chatID,
-      error.message);
+      parsedBody.bookID, error.message);
 
     console.error(error);
 

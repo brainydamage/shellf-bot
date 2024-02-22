@@ -1,9 +1,9 @@
 const {Telegraf} = require('telegraf');
-const keyboardUtils = require("../utils/keyboardUtils");
-const messages = require("../constants/messages");
-const userMessages = require("../constants/userMessages");
+const keyboardUtils = require('../utils/keyboardUtils');
+const messages = require('../constants/messages');
+const userMessages = require('../constants/userMessages');
 const log = require('./customLogger');
-const config = require("../constants/config");
+const config = require('../constants/config');
 
 const TOKEN = process.env.TELEGRAM_TOKEN;
 const bot = new Telegraf(TOKEN);
@@ -33,7 +33,7 @@ async function sendMessage(chatId, message) {
 async function sendFormattedMessage(chatID, message) {
   try {
     return await bot.telegram.sendMessage(chatID, message, {
-      parse_mode: "Markdown", disable_web_page_preview: true
+      parse_mode: 'Markdown', disable_web_page_preview: true,
     });
   } catch (error) {
     throw new Error(messages.FAILED_SEND_TG);
@@ -51,9 +51,9 @@ async function sendAdminMessage(parsedBody, errorMessage) {
     return await bot.telegram.sendMessage(adminChatID, adminMessage);
   } catch (error) {
     log.error('telegram-utils',
-      `Reason: "%s", Username: %s, ChatID: %s, ErrorMessage: %s`,
+      `Reason: "%s", Username: %s, ChatID: %s, BookID: %s, ErrorMessage: %s`,
       messages.FAILED_SEND_TG_ADMIN, parsedBody.username, parsedBody.chatID,
-      error.message);
+      parsedBody.bookID, error.message);
   }
 }
 
@@ -81,10 +81,10 @@ async function remindToReturn(chatId, reminder) {
     const prolongKeyboard = await keyboardUtils.getProlongKeyboard(
       reminder.bookID, reminder.rowNumber);
     keyboardExtra = {
-      parse_mode: "Markdown", reply_markup: {
+      parse_mode: 'Markdown', reply_markup: {
         inline_keyboard: prolongKeyboard,
       },
-    }
+    };
   }
 
   const bookInfo = reminder.author ? `${reminder.title}, ${reminder.author}` :
@@ -96,14 +96,14 @@ async function remindToReturn(chatId, reminder) {
       await bot.telegram.sendMessage(chatId, message, keyboardExtra);
     } else {
       await bot.telegram.sendMessage(chatId, message, {
-        parse_mode: "Markdown",
+        parse_mode: 'Markdown',
       });
     }
   } catch (error) {
     log.error('telegram-utils',
-      `Reason: "%s", Username: %s, ChatID: %s, ErrorMessage: %s`,
+      `Reason: "%s", Username: %s, ChatID: %s, BookID: %s, ErrorMessage: %s`,
       messages.FAILED_SEND_TG_REMINDER, reminder.username, reminder.chatID,
-      error.message);
+      reminder.bookID, error.message);
 
     // throw new Error(messages.FAILED_SEND_TG_REMINDER);
   }
@@ -116,13 +116,13 @@ async function remindOverdue(chatId, reminder) {
 
   try {
     await bot.telegram.sendMessage(chatId, message, {
-      parse_mode: "Markdown",
+      parse_mode: 'Markdown',
     });
   } catch (error) {
     log.error('telegram-utils',
-      `Reason: "%s", Username: %s, ChatID: %s, ErrorMessage: %s`,
+      `Reason: "%s", Username: %s, ChatID: %s, BookID: %s, ErrorMessage: %s`,
       messages.FAILED_SEND_TG_OVERDUE_LOST, reminder.username, reminder.chatID,
-      error.message);
+      reminder.bookID, error.message);
 
     // throw new Error(messages.FAILED_SEND_TG_REMINDER);
   }
@@ -132,12 +132,10 @@ async function showCatalogueButton(chatId) {
   try {
     return await bot.telegram.sendMessage(chatId, userMessages.CATALOGUE, {
       reply_markup: {
-        inline_keyboard: [
-          [{
-            text: "открыть каталог",
-            web_app: {url: "https://d30noal47qv51w.cloudfront.net"}
-          }]
-        ],
+        inline_keyboard: [[{
+          text: 'открыть каталог',
+          web_app: {url: 'https://d30noal47qv51w.cloudfront.net'},
+        }]],
       },
     });
   } catch (error) {

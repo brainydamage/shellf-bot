@@ -1,9 +1,9 @@
-const googleSheetsUtils = require("../utils/googleSheetsUtils");
-const config = require("../constants/config");
-const telegramUtils = require("../utils/telegramUtils");
-const dateTimeUtils = require("../utils/dateTimeUtils");
-const messages = require("../constants/messages");
-const userMessages = require("../constants/userMessages");
+const googleSheetsUtils = require('../utils/googleSheetsUtils');
+const config = require('../constants/config');
+const telegramUtils = require('../utils/telegramUtils');
+const dateTimeUtils = require('../utils/dateTimeUtils');
+const messages = require('../constants/messages');
+const userMessages = require('../constants/userMessages');
 const log = require('../utils/customLogger');
 
 function setReturnDateForRowArray(inputArray, returnDate) {
@@ -131,16 +131,16 @@ module.exports.returnBook = async (parsedBody) => {
     }
   } catch (error) {
     log.error('callback-command-handler',
-      `Reason: "%s", Username: %s, BookID: %s, ChatID: %s, ErrorMessage: %s`,
-      messages.FAILED_RETURN_BOOK, parsedBody.username, parsedBody.bookID,
-      parsedBody.chatID, error.message);
+      `Reason: "%s", Username: %s, ChatID: %s, BookID: %s, ErrorMessage: %s`,
+      messages.FAILED_RETURN_BOOK, parsedBody.username, parsedBody.chatID,
+      parsedBody.bookID, error.message);
 
     console.error(error);
 
     await telegramUtils.sendFormattedMessage(parsedBody.chatID,
       userMessages.SUPPORT);
   }
-}
+};
 
 module.exports.prolongBook = async (parsedBody) => {
   await telegramUtils.deleteMessage(parsedBody);
@@ -193,16 +193,16 @@ module.exports.prolongBook = async (parsedBody) => {
     }
   } catch (error) {
     log.error('callback-command-handler',
-      `Reason: "%s", Username: %s, BookID: %s, ChatID: %s, ErrorMessage: %s`,
-      messages.FAILED_PROLONG_BOOK, parsedBody.username, parsedBody.bookID,
-      parsedBody.chatID, error.message);
+      `Reason: "%s", Username: %s, ChatID: %s, BookID: %s, ErrorMessage: %s`,
+      messages.FAILED_PROLONG_BOOK, parsedBody.username, parsedBody.chatID,
+      parsedBody.bookID, error.message);
 
     console.error(error);
 
     await telegramUtils.sendFormattedMessage(parsedBody.chatID,
       userMessages.SUPPORT);
   }
-}
+};
 
 module.exports.unsubscribeBook = async (parsedBody) => {
   await telegramUtils.deleteMessage(parsedBody);
@@ -240,22 +240,22 @@ module.exports.unsubscribeBook = async (parsedBody) => {
     }
   } catch (error) {
     log.error('callback-command-handler',
-      `Reason: "%s", Username: %s, BookID: %s, ChatID: %s, ErrorMessage: %s`,
-      messages.FAILED_UNSUBSCRIBE_BOOK, parsedBody.username, parsedBody.bookID,
-      parsedBody.chatID, error.message);
+      `Reason: "%s", Username: %s, ChatID: %s, BookID: %s, ErrorMessage: %s`,
+      messages.FAILED_UNSUBSCRIBE_BOOK, parsedBody.username, parsedBody.chatID,
+      parsedBody.bookID, error.message);
 
     console.error(error);
 
     await telegramUtils.sendFormattedMessage(parsedBody.chatID,
       userMessages.SUPPORT);
   }
-}
+};
 
 module.exports.cancel = async (parsedBody) => {
   await telegramUtils.deleteMessage(parsedBody);
-}
+};
 
 module.exports.howToReturn = async (parsedBody) => {
   await telegramUtils.sendMessage(parsedBody.chatID,
     userMessages.HOW_TO_RETURN);
-}
+};
