@@ -275,8 +275,8 @@ module.exports.emptyStart = async (parsedBody) => {
 
 module.exports.wrongCommand = async (parsedBody) => {
   await telegramUtils.deleteMessage(parsedBody);
-  await telegramUtils.sendMessage(parsedBody.chatID,
-    userMessages.WRONG_COMMAND);
+  const message = `${userMessages.WRONG_COMMAND}\n\n${userMessages.EMPTY_START_COMMAND}\n\n${userMessages.HOW_TO_RETURN}\n\n${userMessages.BOOK_NOT_MARKED_AS_RETURNED_4}`;
+  await telegramUtils.sendMessage(parsedBody.chatID, message);
 };
 
 module.exports.showHelpMessage = async (parsedBody) => {

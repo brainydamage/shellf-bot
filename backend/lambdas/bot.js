@@ -29,10 +29,11 @@ function parseBody(body) {
     parsed.messageID = body.message.message_id;
     parsed.chatID = body.message.chat.id;
     parsed.username = body.message.from.username || 'no_username';
-    parsed.command = body.message.text.split(' ')[0];
+    parsed.command = body.message.text;
 
     const command = body.message.text;
     if (command.startsWith(commands.START)) {
+      parsed.command = body.message.text.split(' ')[0];
       const parts = command.split(' ');
       if (parts.length === 2) {
         let parameter = parts[1];
