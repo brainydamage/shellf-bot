@@ -8,6 +8,10 @@ const config = require('../constants/config');
 const TOKEN = process.env.TELEGRAM_TOKEN;
 const bot = new Telegraf(TOKEN);
 
+function escapeMarkdown(text) {
+  return text.replace(/([_*[\]()`])/g, '\\$1');
+}
+
 async function deleteMessage(parsedBody) {
   const messageID = parsedBody.messageID;
   const chatID = parsedBody.chatID;
@@ -109,6 +113,28 @@ async function remindToReturn(chatId, reminder) {
   }
 }
 
+async function reportOverdue(reminder) {
+  const bookInfo = reminder.author ? `${reminder.title}, ${reminder.author}` :
+    reminder.title;
+  const username = reminder.username !== 'no_username' ?
+    `*username:* @${escapeMarkdown(reminder.username)}` :
+    `chatID: ${reminder.chatID}`;
+  const message = `${userMessages.REPORT_OVERDUE}*книга:* ${bookInfo}\n${username}\n*дедлайн:* ${reminder.deadline}`;
+
+  try {
+    await bot.telegram.sendMessage(config.SUPPORT_CHAT_ID, message, {
+      parse_mode: 'Markdown',
+    });
+  } catch (error) {
+    log.error('telegram-utils',
+      `Reason: "%s", Username: %s, ChatID: %s, BookID: %s, ErrorMessage: %s`,
+      messages.FAILED_SEND_TG_REPORT, reminder.username, reminder.chatID,
+      reminder.bookID, error.message);
+
+    // throw new Error(messages.FAILED_SEND_TG_REMINDER);
+  }
+}
+
 async function remindOverdue(chatId, reminder) {
   const bookInfo = reminder.author ? `${reminder.title}, ${reminder.author}` :
     reminder.title;
@@ -151,5 +177,6 @@ module.exports = {
   showBooksToReturnOrUnsubs,
   remindToReturn,
   remindOverdue,
+  reportOverdue,
   showCatalogueButton,
 };

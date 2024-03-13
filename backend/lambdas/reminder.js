@@ -78,9 +78,15 @@ async function processOverdueBooks(rows) {
   for (const overdueBook of overdueBooks) {
     const bookInfo = constructBookInfo(overdueBook);
     logOverdueBookInfo(overdueBook, bookInfo);
+
     if (overdueBook.overdueDays === 1 || overdueBook.overdueDays % 7 === 0) {
       logOverdueBookReminder(overdueBook, bookInfo);
       await telegramUtils.remindOverdue(overdueBook.chatID, overdueBook);
+    }
+
+    if (overdueBook.overdueDays % 30 === 0) {
+      // logOverdueBookReminder(overdueBook, bookInfo);
+      await telegramUtils.reportOverdue(overdueBook);
     }
   }
 }

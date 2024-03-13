@@ -7,6 +7,7 @@ const prodConfig = {
   SCOPE: 'https://www.googleapis.com/auth/spreadsheets',
   SHEETS_ID: '1_M9hvCTY1MAbxKIa2ANeUYQpnx2W8IPwleSaR4hazYs',
   ADMIN_CHAT_ID: 124760667,
+  SUPPORT_CHAT_ID: 6116111170,
   BOOKS_DB: 'список книг',
   BOOKS_LOG: 'бот в телеге',
   BOOKS_RETURNED: 'вернулись',
