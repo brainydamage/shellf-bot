@@ -138,7 +138,7 @@ async function reportOverdue(reminder) {
 async function remindOverdue(chatId, reminder) {
   const bookInfo = reminder.author ? `${reminder.title}, ${reminder.author}` :
     reminder.title;
-  const message = `${userMessages.REMINDER_OVERDUE_1}*${reminder.deadline}*${userMessages.REMINDER_OVERDUE_2}\n\n*${bookInfo}*\n\n${userMessages.REMINDER_OVERDUE_3}*${reminder.shelf}*${userMessages.REMINDER_OVERDUE_4}`;
+  const message = `${userMessages.REMINDER_OVERDUE_1}*${reminder.deadline}*${userMessages.REMINDER_OVERDUE_2}\n\n*${bookInfo}*\n\n${userMessages.REMINDER_OVERDUE_3}*${reminder.shelf}*${userMessages.REMINDER_OVERDUE_4}${userMessages.REMINDER_OVERDUE_5}`;
 
   try {
     await bot.telegram.sendMessage(chatId, message, {

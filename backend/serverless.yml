@@ -39,7 +39,7 @@ functions:
       PRIVATE_KEY: ${env:SHELLF_PRIVATE_KEY}
   backend_handler:
     handler: lambdas/backend.handler
-    timeout: 5
+    timeout: 10
     events:
       - httpApi:
           method: GET
@@ -49,7 +49,7 @@ functions:
       PRIVATE_KEY: ${env:SHELLF_PRIVATE_KEY}
   reminder_handler:
     handler: lambdas/reminder.handler
-    timeout: 5
+    timeout: 10
     events:
       - schedule: cron(30 13 * * ? *)
     environment:
