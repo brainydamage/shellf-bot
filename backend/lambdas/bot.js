@@ -5,7 +5,7 @@ const config = require('../constants/config');
 const baseCommandHandler = require('../handlers/baseCommandHandler');
 const callbackCommandHandler = require('../handlers/callbackCommandHandler');
 const log = require('../utils/customLogger');
-const {LambdaClient, InvokeCommand} = require("@aws-sdk/client-lambda");
+const {LambdaClient, InvokeCommand} = require('@aws-sdk/client-lambda');
 
 const lambdaClient = new LambdaClient({region: config.REGION});
 
@@ -13,6 +13,7 @@ let userBookMap = {};
 
 function parseBody(body) {
   let parsed = {
+    lang: 'ru',
     date: null,
     messageID: null,
     chatID: null,
@@ -24,6 +25,12 @@ function parseBody(body) {
     bookID: null,
     statusChange: null,
   };
+
+  const lang = findLanguageCode(body);
+
+  if (lang !== 'ru') {
+    parsed.lang = 'eng';
+  }
 
   if (body.message) {
     parsed.messageID = body.message.message_id;
@@ -68,7 +75,6 @@ function parseBody(body) {
       // Construct the callback field, e.g. _return
       parsed.callback = parts[0] + '_' + parts[1];
     }
-
   } else if (body.my_chat_member) {
     parsed.chatID = body.my_chat_member.chat.id;
     parsed.username = body.my_chat_member.from.username || 'no_username';
@@ -83,6 +89,21 @@ function parseBody(body) {
   }
 
   return parsed;
+}
+
+function findLanguageCode(data) {
+  if (typeof data === 'object' && data !== null) {
+    for (let key in data) {
+      if (key === 'language_code') {
+        return data[key];
+      }
+      let result = findLanguageCode(data[key]);
+      if (result !== undefined) {
+        return result;
+      }
+    }
+  }
+  return undefined;
 }
 
 async function invokeSubscriber(payload) {
@@ -124,6 +145,7 @@ async function invokeNotifier(payload) {
 module.exports.handler = async (event) => {
   const body = JSON.parse(event.body);
   const parsedBody = parseBody(body);
+  console.log(body);
 
   if (parsedBody.chatID === 0) {
     log.error('bot-interactions', 'chatID is null: %j', body);
@@ -141,7 +163,7 @@ module.exports.handler = async (event) => {
 
     return {
       statusCode: 200,
-      body: JSON.stringify({message: "Non-private interaction, skipped"}),
+      body: JSON.stringify({message: 'Non-private interaction, skipped'}),
     };
   }
 
