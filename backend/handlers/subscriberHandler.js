@@ -22,8 +22,8 @@ function setUnsubsDateForRowArray(inputArray, unsubsDate) {
 module.exports.subscribeBook = async (parsedBody) => {
   const timestamp = Math.floor(Date.now() / 1000);
   const dateTime = dateTimeUtils.timestampToHumanReadable(timestamp);
-  const data = [dateTime, parsedBody.username, parsedBody.chatID,
-    parsedBody.bookID];
+  const data = [dateTime, parsedBody.lang, parsedBody.username,
+    parsedBody.chatID, parsedBody.bookID];
 
   await telegramUtils.deleteMessage(parsedBody);
 
@@ -82,26 +82,22 @@ module.exports.subscribeBook = async (parsedBody) => {
       log.error('subscriber-handler',
         `Reason: "%s", Username: %s, ChatID: %s, BookID: %s, ErrorMessage: %s`,
         messages.FAILED_SEND_TG, parsedBody.username, parsedBody.chatID,
-        parsedBody.bookID,
-        error.message);
+        parsedBody.bookID, error.message);
     } else if (error.message === messages.FAILED_READ_DB) {
       log.error('subscriber-handler',
         `Reason: "%s", Username: %s, ChatID: %s, BookID: %s, ErrorMessage: %s`,
         messages.FAILED_GET_BOOK_DATA, parsedBody.username, parsedBody.chatID,
-        parsedBody.bookID,
-        error.message);
+        parsedBody.bookID, error.message);
     } else if (error.message === messages.FAILED_UPDATE_DB) {
       log.error('subscriber-handler',
         `Reason: "%s", Username: %s, ChatID: %s, BookID: %s, ErrorMessage: %s`,
         messages.FAILED_APPEND_ROW, parsedBody.username, parsedBody.chatID,
-        parsedBody.bookID,
-        error.message);
+        parsedBody.bookID, error.message);
     } else {
       log.error('subscriber-handler',
         `Reason: "%s", Username: %s, ChatID: %s, BookID: %s, ErrorMessage: %s`,
         messages.FAILED_SUBSCRIBE_BOOK, parsedBody.username, parsedBody.chatID,
-        parsedBody.bookID,
-        error.message);
+        parsedBody.bookID, error.message);
     }
 
     console.error(error);
@@ -149,15 +145,14 @@ module.exports.unsubscribeUserFromBorrowedBook = async (rows, parsedBody) => {
       log.info('subscriber-handler',
         'Success: "%s", Command: %s, BookID: %s, BookInfo: %s, Username: %s, ChatID: %s, Shelf: %s',
         messages.BOOK_UNSUBSCRIBED_HIDDEN, parsedBody.command,
-        parsedBody.bookID,
-        bookInfo, parsedBody.username, parsedBody.chatID, shelf);
+        parsedBody.bookID, bookInfo, parsedBody.username, parsedBody.chatID,
+        shelf);
     }
   } catch (error) {
     log.error('subscriber-handler',
       `Reason: "%s", Username: %s, ChatID: %s, BookID: %s, ErrorMessage: %s`,
       messages.FAILED_UNSUBSCRIBE_BOOK, parsedBody.username, parsedBody.chatID,
-      parsedBody.bookID,
-      error.message);
+      parsedBody.bookID, error.message);
 
     console.error(error);
 

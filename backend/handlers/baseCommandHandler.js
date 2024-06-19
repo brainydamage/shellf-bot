@@ -24,8 +24,8 @@ module.exports.borrowBook = async (parsedBody) => {
   const timestamp = Math.floor(Date.now() / 1000);
   const dateTime = dateTimeUtils.timestampToHumanReadable(timestamp);
   const deadlineDate = dateTimeUtils.addOneMonthAndFormat(timestamp);
-  const data = [dateTime, deadlineDate, parsedBody.username, parsedBody.chatID,
-    parsedBody.bookID];
+  const data = [dateTime, deadlineDate, parsedBody.lang, parsedBody.username,
+    parsedBody.chatID, parsedBody.bookID];
 
   await telegramUtils.deleteMessage(parsedBody);
 
