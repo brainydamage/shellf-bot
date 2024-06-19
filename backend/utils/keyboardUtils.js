@@ -1,4 +1,5 @@
 const commands = require('../constants/commands');
+const userMessages = require('../constants/userMessages');
 
 module.exports.getDatesKeyboardArray = async (arrayOfBooks, returnBook) => {
   let keyboardArray = [];
@@ -21,7 +22,7 @@ module.exports.getDatesKeyboardArray = async (arrayOfBooks, returnBook) => {
 
   keyboardArray.push([
     {
-      text: 'отмена',
+      text: userMessages.BUTTON_CANCEL,
       callback_data: `_cancel`,
     },
   ])
@@ -34,14 +35,14 @@ module.exports.getProlongKeyboard = async (bookID, rowNumber) => {
 
   keyboardArray.push([
     {
-      text: 'продлить на 1 неделю',
+      text: userMessages.BUTTON_PROLONG,
       callback_data: `_prolong_${bookID}`,
     },
   ])
 
   keyboardArray.push([
     {
-      text: 'как вернуть?',
+      text: userMessages.BUTTON_HOW_TO_RETURN,
       callback_data: `_how_to_return`,
     },
   ])

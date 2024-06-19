@@ -159,7 +159,7 @@ async function showCatalogueButton(chatId) {
     return await bot.telegram.sendMessage(chatId, userMessages.CATALOGUE, {
       reply_markup: {
         inline_keyboard: [[{
-          text: 'открыть каталог',
+          text: userMessages.BUTTON_OPEN_CATALOGUE,
           web_app: {url: 'https://d30noal47qv51w.cloudfront.net'},
         }]],
       },
